@@ -1,0 +1,12 @@
+.App {
+  display: flex;
+  background-color: rgb(240, 240, 240);
+  padding: 15px;
+  width: 100vw;
+}
+.rightSide {
+  margin-left: 275px;
+  width: -webkit-fill-available;
+  min-height: 100vh;
+  background-color: rgb(240, 240, 240);
+}

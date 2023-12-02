@@ -1,0 +1,60 @@
+.navbar {
+  width: 100%;
+  height: auto;
+  padding: 8px;
+  background-color: #fff;
+  font-weight: 500;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  margin: 0px auto;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+.navbar .navbar-items {
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 15px;
+}
+.navbar .navbar-items .profile {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+.navbar .navbar-items .profile > span::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  background-color: rgb(104, 192, 83);
+  bottom: 0;
+  right: -2px;
+  border: 2px solid #fff;
+}
+.navbar .navbar-items .profile > span {
+  margin-right: 13px;
+  background-color: aqua;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  align-items: center;
+  border-radius: 50%;
+  /* overflow: hidden; */
+}
+.navbar .navbar-items .profile img {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+}
+.navbar .navbar-items .profile div p {
+  font-weight: 600;
+  margin-bottom: 0px;
+  line-height: 16px;
+  color: #000;
+}
+.navbar .navbar-items .profile div span {
+  font-size: 14px;
+  color: rgb(149, 149, 149);
+}
