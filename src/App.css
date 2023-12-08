@@ -1,0 +1,84 @@
+.App {
+  display: flex;
+  background-color: rgb(240, 240, 240);
+  padding: 15px;
+  width: 100vw;
+}
+.actionIcon {
+  color: rgb(128, 119, 113);
+  transition: 0.2s;
+  font-size: 18px;
+  cursor: pointer;
+  margin-right: 15px;
+  text-align: center;
+}
+.actionIcon:hover {
+  color: #000;
+}
+.rightSide {
+  margin-left: 275px;
+  width: -webkit-fill-available;
+  min-height: 100vh;
+  background-color: rgb(240, 240, 240);
+}
+.rightSide .css-1ygcj2i-MuiTableCell-root,
+.rightSide .css-1azl6jz-MuiTableCell-root {
+  font-size: 17px;
+  font-family: inherit;
+  text-align: left;
+}
+.rightSide .css-1ex1afd-MuiTableCell-root,
+.rightSide .css-177gid-MuiTableCell-root {
+  font-family: inherit;
+  text-align: left;
+}
+
+.rightSide .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+}
+
+.rightSide
+  .css-apqrd9-MuiTableBody-root
+  > :nth-child(odd).css-34nofg-MuiTableRow-root {
+  background-color: rgb(240, 240, 240);
+}
+.rightSide .menu {
+  position: absolute;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  right: 125px;
+  z-index: 999;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 100px;
+  top: 30px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.rightSide .menu p {
+  padding: 8px;
+  transition: 0.2s;
+  cursor: pointer;
+  font-size: 15px;
+}
+.rightSide .menu p:hover {
+  background-color: #cccccc30;
+}
+.rightSide .menu p:last-child:hover {
+  background-color: rgb(255, 134, 134);
+  color: #fff;
+}
+.rightSide .ModalOpeningButtton {
+  margin-bottom: 20px;
+  outline: none;
+  background-color: #0080ff;
+  float: right;
+}
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.rightSide button:hover {
+  border-color: none !important;
+}
