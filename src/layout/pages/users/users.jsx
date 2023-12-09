@@ -1,137 +1,133 @@
 import React, { useState } from "react";
 import "./users.css";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { DataGrid } from "@mui/x-data-grid";
+function Users() {
+  const [menu, setmenu] = useState([]);
 
-const rows = [
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-  {
-    email: "johndoe@gmail.com",
-    name: "John Doe",
-    phone: "+91 3674689047",
-    totalLand: 50,
-  },
-];
-
-const Row = ({ row, index }) => {
-  const [menu, setmenu] = useState(false);
-  return (
-    <>
-      <TableRow
-        key={row.name}
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-      >
-        <TableCell component="th" scope="row">
-          {index + 1}
-        </TableCell>
-        <TableCell align="right">{row.name}</TableCell>
-        <TableCell align="right">{row.email}</TableCell>
-        <TableCell align="right">{row.phone}</TableCell>
-        <TableCell align="right">{row.totalLand} km</TableCell>
-        <TableCell align="right" style={{ position: "relative" }}>
-          {/* <i class="fa-solid fa-eye actionIcon"></i>
-          <i class="fa-solid fa-pen-to-square actionIcon"></i>
-          <i class="fa-solid fa-trash actionIcon"></i> */}
+  const rows = [
+    {
+      id: 1,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 2,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 3,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 4,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 5,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 6,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 7,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 8,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 9,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+    {
+      id: 10,
+      email: "johndoe@gmail.com",
+      name: "John Doe",
+      phone: "+91 3674689047",
+      totalLand: 50,
+    },
+  ];
+  const columns = [
+    { field: "id", headerName: "S.NO", width: 150 },
+    { field: "name", headerName: "Name", width: 200 },
+    { field: "email", headerName: "Email", width: 200 },
+    { field: "phone", headerName: "Phone", width: 200 },
+    {
+      field: "totalLand",
+      headerName: "Total Land",
+      width: 200,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      sortable: false,
+      disableClickEventBubbling: true,
+      width: 100,
+      renderCell: (params) => (
+        <>
           <i
             class="fa-solid fa-ellipsis actionIcon"
             style={{ fontSize: 25, marginLeft: 15 }}
-            onClick={() => setmenu(!menu)}
+            onClick={() =>
+              setmenu(
+                menu.includes(params.row.id)
+                  ? menu.filter((id) => id !== params.row.id)
+                  : [...menu, params.row.id]
+              )
+            }
           ></i>
-          {menu && (
-            <div
-              className="menu"
-              // style={{ transform: `translateY(${index * 60}px)` }}
-            >
+          {menu.includes(params.row.id) && (
+            <div className="menu">
               <p>View</p>
               <p>Delete</p>
             </div>
           )}
-        </TableCell>
-      </TableRow>
-    </>
-  );
-};
+        </>
+      ),
+    },
+  ];
 
-function Users() {
   return (
     <div className="users">
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>S.No</TableCell>
-              <TableCell align="right">Name</TableCell>
-              <TableCell align="right">Email</TableCell>
-              <TableCell align="right">Phone</TableCell>
-              <TableCell align="right">Total Land</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row, index) => {
-              return <Row row={row} index={index} key={row} />;
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 10 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+      />
     </div>
   );
 }

@@ -21,7 +21,23 @@
   min-height: 100vh;
   background-color: rgb(240, 240, 240);
 }
-.rightSide .css-1ygcj2i-MuiTableCell-root,
+.rightSide .css-ptkaw2-MuiDataGrid-root {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  font-family: inherit;
+  background-color: #fff;
+}
+.rightSide .css-t89xny-MuiDataGrid-columnHeaderTitle {
+  font-size: 17px;
+  font-family: inherit;
+}
+.rightSide .css-ptkaw2-MuiDataGrid-root .MuiDataGrid-row {
+  position: relative;
+}
+.rightSide .css-ptkaw2-MuiDataGrid-root .MuiDataGrid-row:nth-child(odd) {
+  background-color: rgb(240, 240, 240);
+}
+/* .rightSide .css-1ygcj2i-MuiTableCell-root,
 .rightSide .css-1azl6jz-MuiTableCell-root {
   font-size: 17px;
   font-family: inherit;
@@ -42,16 +58,16 @@
   .css-apqrd9-MuiTableBody-root
   > :nth-child(odd).css-34nofg-MuiTableRow-root {
   background-color: rgb(240, 240, 240);
-}
+} */
 .rightSide .menu {
   position: absolute;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  right: 125px;
+  right: 25px;
   z-index: 999;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.1);
   width: 100px;
-  top: 30px;
+  top: 25px;
   overflow: hidden;
   border-radius: 10px;
 }
@@ -72,7 +88,8 @@
   margin-bottom: 20px;
   outline: none;
   background-color: #0080ff;
-  float: right;
+  align-self: flex-end;
+  width: max-content;
 }
 .modal {
   display: flex;

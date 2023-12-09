@@ -5,9 +5,6 @@
   cursor: pointer;
   margin-right: 15px;
 }
-.users .actionIcon:hover {
-  color: #000;
-}
 /* .users .css-apqrd9-MuiTableBody-root:nth-child(even) {
   background-color: rgb(255, 255, 255);
 } */
