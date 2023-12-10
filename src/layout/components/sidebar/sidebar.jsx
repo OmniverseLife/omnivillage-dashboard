@@ -20,7 +20,7 @@ export default function Sidebar() {
   const [consumtionMenu, setconsumtionMenu] = useState(
     paths.includes("consumption") && true
   );
-
+  const [cropsMenu, setcropsMenu] = useState(paths.includes("crops") && true);
   return (
     <div className="sidebar">
       <div className="logo">
@@ -51,34 +51,48 @@ export default function Sidebar() {
       {productionMenu && (
         <div className="menu">
           <a
-            href="/production/menu1"
-            className={paths.includes("menu1") ? "link active" : "link"}
+            href="/production/cultivation"
+            className={paths.includes("cultivation") ? "link active" : "link"}
           >
-            Menu 1
+            Cultivation
           </a>
           <a
-            href="/production/menu2"
-            className={paths.includes("menu2") ? "link active" : "link"}
+            href="/production/trees&shrubs"
+            className={paths.includes("trees&shrubs") ? "link active" : "link"}
           >
-            Menu 2
+            Trees/Shrubs
           </a>
           <a
-            href="/production/menu3"
-            className={paths.includes("menu3") ? "link active" : "link"}
+            href="/production/poultry"
+            className={paths.includes("poultry") ? "link active" : "link"}
           >
-            Menu 3
+            Poultry
           </a>
           <a
-            href="/production/menu4"
-            className={paths.includes("menu4") ? "link active" : "link"}
+            href="/production/fishery"
+            className={paths.includes("fishery") ? "link active" : "link"}
           >
-            Menu 4
+            Fishery
           </a>
           <a
-            href="/production/menu5"
-            className={paths.includes("menu5") ? "link active" : "link"}
+            href="/production/hunting"
+            className={paths.includes("hunting") ? "link active" : "link"}
           >
-            Menu 5
+            Hunting
+          </a>
+          <a
+            href="/production/storage"
+            className={paths.includes("storage") ? "link active" : "link"}
+          >
+            Storage
+          </a>
+          <a
+            href="/production/sellingChannel"
+            className={
+              paths.includes("sellingChannel") ? "link active" : "link"
+            }
+          >
+            Selling Channel
           </a>
         </div>
       )}
@@ -138,12 +152,53 @@ export default function Sidebar() {
         <p>Users</p>
       </a>
       <a
-        href="/crops"
+        onClick={() => setcropsMenu(!cropsMenu)}
         className={paths.includes("crops") ? "link active" : "link"}
       >
-        <i class="fa-solid fa-carrot"></i>
+        <i class="fa-solid fa-utensils"></i>
         <p>Crops</p>
+        <span>
+          {cropsMenu ? (
+            <i class="fa-solid fa-minus"></i>
+          ) : (
+            <i class="fa-solid fa-plus"></i>
+          )}
+        </span>
       </a>
+      {cropsMenu && (
+        <div className="menu">
+          <a
+            href="/crops/cultivation"
+            className={paths.includes("cultivation") ? "link active" : "link"}
+          >
+            Cultivation
+          </a>
+          <a
+            href="/crops/trees&shrubs"
+            className={paths.includes("trees&shrubs") ? "link active" : "link"}
+          >
+            Trees/Shrubs
+          </a>
+          <a
+            href="/crops/poultry"
+            className={paths.includes("poultry") ? "link active" : "link"}
+          >
+            Poultry
+          </a>
+          <a
+            href="/crops/fishery"
+            className={paths.includes("fishery") ? "link active" : "link"}
+          >
+            Fishery
+          </a>
+          <a
+            href="/crops/hunting"
+            className={paths.includes("hunting") ? "link active" : "link"}
+          >
+            Hunting
+          </a>
+        </div>
+      )}
       <a
         href="/logout"
         style={{ marginTop: "auto" }}

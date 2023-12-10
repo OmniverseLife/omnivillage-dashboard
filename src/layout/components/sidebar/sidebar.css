@@ -54,7 +54,7 @@
   background: transparent;
   transition: background 0.15s ease, color 0.15s ease;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   cursor: pointer;
   /* font-weight: 500; */
 }
