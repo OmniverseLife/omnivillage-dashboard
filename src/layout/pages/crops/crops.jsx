@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import "./crops.css";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { DataGrid } from "@mui/x-data-grid";
 import {
   Button,
   Chip,
@@ -16,104 +10,8 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-
-const rows = [
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-  {
-    Engname: "Gobi Flower",
-    Malyname: "Gabi Flawera",
-    country: "India",
-    label: "Vegetables",
-  },
-];
-
-const Row = ({ row, index }) => {
-  const [menu, setmenu] = useState(false);
-  return (
-    <>
-      <TableRow
-        key={row.name}
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-      >
-        <TableCell component="th" scope="row">
-          {index + 1}
-        </TableCell>
-        <TableCell align="right">{row.Engname}</TableCell>
-        <TableCell align="right">{row.Malyname}</TableCell>
-        <TableCell align="right">{row.country}</TableCell>
-        <TableCell align="right">{row.label}</TableCell>
-        <TableCell align="right" style={{ position: "relative" }}>
-          {/* <i class="fa-solid fa-eye actionIcon"></i>
-          <i class="fa-solid fa-pen-to-square actionIcon"></i>
-          <i class="fa-solid fa-trash actionIcon"></i> */}
-          <i
-            class="fa-solid fa-ellipsis actionIcon"
-            style={{ fontSize: 25, marginLeft: 15 }}
-            onClick={() => setmenu(!menu)}
-          ></i>
-          {menu && (
-            <div
-              className="menu"
-              // style={{ transform: `translateY(${index * 60}px)` }}
-            >
-              <p>View</p>
-              <p>Delete</p>
-            </div>
-          )}
-        </TableCell>
-      </TableRow>
-    </>
-  );
-};
-
 function Crops() {
+  const [menu, setmenu] = useState([]);
   const [open, setopen] = useState(false);
   const [country, setcountry] = useState("india");
   const [selectedLabel, setselectedLabel] = useState("");
@@ -131,12 +29,95 @@ function Crops() {
     "Processed food & beverages",
     "Alcohol/Tobacco",
   ];
-
   const handleChange = (event, newcountry) => {
     setcountry(newcountry);
   };
+  const rows = [
+    {
+      id: 1,
+      Engname: "Gobi Flower",
+      Malyname: "Gabi Flawera",
+      country: "India",
+      label: "Vegetables",
+    },
+    {
+      id: 2,
+      Engname: "Gobi Flower",
+      Malyname: "Gabi Flawera",
+      country: "India",
+      label: "Vegetables",
+    },
+    {
+      id: 3,
+      Engname: "Gobi Flower",
+      Malyname: "Gabi Flawera",
+      country: "India",
+      label: "Vegetables",
+    },
+    {
+      id: 4,
+      Engname: "Gobi Flower",
+      Malyname: "Gabi Flawera",
+      country: "India",
+      label: "Vegetables",
+    },
+    {
+      id: 5,
+      Engname: "Gobi Flower",
+      Malyname: "Gabi Flawera",
+      country: "India",
+      label: "Vegetables",
+    },
+    {
+      id: 6,
+      Engname: "Gobi Flower",
+      Malyname: "Gabi Flawera",
+      country: "India",
+      label: "Vegetables",
+    },
+  ];
+  const columns = [
+    { field: "id", headerName: "S.NO", width: 150 },
+    { field: "Engname", headerName: "English Name", width: 200 },
+    { field: "Malyname", headerName: "Malay Name", width: 200 },
+    { field: "country", headerName: "Country", width: 200 },
+    {
+      field: "label",
+      headerName: "Label",
+      width: 200,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      sortable: false,
+      disableClickEventBubbling: true,
+      width: 100,
+      renderCell: (params) => (
+        <>
+          <i
+            class="fa-solid fa-ellipsis actionIcon"
+            style={{ fontSize: 25, marginLeft: 15 }}
+            onClick={() =>
+              setmenu(
+                menu.includes(params.row.id)
+                  ? menu.filter((id) => id !== params.row.id)
+                  : [...menu, params.row.id]
+              )
+            }
+          ></i>
+          {menu.includes(params.row.id) && (
+            <div className="menu">
+              <p>View</p>
+              <p>Delete</p>
+            </div>
+          )}
+        </>
+      ),
+    },
+  ];
+
   return (
-    <div className="Crops">
+    <Stack>
       <Button
         variant="contained"
         className="ModalOpeningButtton"
@@ -144,25 +125,16 @@ function Crops() {
       >
         Add Crop
       </Button>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>S.No</TableCell>
-              <TableCell align="right">English Name</TableCell>
-              <TableCell align="right">Malay Name</TableCell>
-              <TableCell align="right">Country</TableCell>
-              <TableCell align="right">Label</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row, index) => {
-              return <Row row={row} index={index} key={row} />;
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 10 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+      />
       <Modal open={open} className="modal">
         <Stack
           width={500}
@@ -265,7 +237,7 @@ function Crops() {
           </Stack>
         </Stack>
       </Modal>
-    </div>
+    </Stack>
   );
 }
 
