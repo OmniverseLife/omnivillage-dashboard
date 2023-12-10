@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-// import "./crops.css";
+
 import { DataGrid } from "@mui/x-data-grid";
 import {
   Button,
@@ -12,7 +12,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-function Crops() {
+function Production() {
   const [menu, setmenu] = useState([]);
   const [open, setopen] = useState(false);
   const [country, setcountry] = useState("india");
@@ -271,4 +271,4 @@ function Crops() {
   );
 }
 
-export default Crops;
+export default Production;
