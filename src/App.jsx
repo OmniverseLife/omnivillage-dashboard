@@ -9,7 +9,6 @@ import Users from "./layout/pages/users/users";
 import Crops from "./layout/pages/crops/crops";
 
 function App() {
-  const [count, setCount] = useState(0);
   const location = useLocation();
   return (
     <div className="App">
