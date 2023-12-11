@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import "./crops.css";
 import { DataGrid } from "@mui/x-data-grid";
 import {
+  Box,
   Button,
   Chip,
+  CircularProgress,
+  Grid,
   Menu,
   MenuItem,
   Modal,
@@ -11,140 +14,151 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Typography,
 } from "@mui/material";
-function Crops() {
-  const [menu, setmenu] = useState([]);
+import Loading from "../../components/loading";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { fetchLabels } from "../../../functions/others";
+
+const schema = yup.object().shape({
+  name: yup.object().shape({
+    en: yup.string().required("Name in english is required!"),
+    ms: yup.string().required("Name in malay is required!"),
+  }),
+  status: yup.number(),
+});
+
+function Crops({
+  rows,
+  columns,
+  isLoading,
+  editItem,
+  setEdit,
+  editFn,
+  refetch,
+  addFn,
+  deleteFn,
+  deleteId,
+  setDeleteId,
+}) {
   const [open, setopen] = useState(false);
-  const [country, setcountry] = useState("india");
-  const [selectedLabel, setselectedLabel] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedrow, setSelectedrow] = useState(null);
-  const labels = [
-    "Grains & Nuts",
-    "Vegetables",
-    "Herbs",
-    "Legumes",
-    "Fruits",
-    "Dairy",
-    "Meat",
-    "Spices & Condiments",
-    "Tea/Coffee",
-    "Oils",
-    "Processed food & beverages",
-    "Alcohol/Tobacco",
-  ];
+  const [country, setcountry] = useState(() => ["india"]);
+  const [selectedLabel, setselectedLabel] = useState(null);
+  const [additionalError, setAdditionalError] = useState({
+    country: "",
+  });
+
+  const { data: labels = [], isLoading: isLabelsLoading } = useQuery({
+    queryKey: ["labels"],
+    queryFn: fetchLabels,
+  });
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      status: 1,
+    },
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: addFn,
+    onSuccess: () => {
+      toast.success("Crop added sucessfully");
+      refetch();
+      setEdit(null);
+      setopen(false);
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg);
+    },
+  });
+
+  const { mutate: editMutate, isPending: isEditPending } = useMutation({
+    mutationFn: editFn,
+    onSuccess: () => {
+      toast.success("Crop edited sucessfully");
+      refetch();
+      setEdit(null);
+      setopen(false);
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg);
+    },
+  });
+
+  const { mutate: deleteMutate, isPending: isDeletePending } = useMutation({
+    mutationFn: deleteFn,
+    onSuccess: () => {
+      toast.success("Crop deleted sucessfully");
+      refetch();
+      setDeleteId(null);
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg);
+    },
+  });
+
   const handleChange = (event, newcountry) => {
     setcountry(newcountry);
   };
-  const rows = [
-    {
-      id: 1,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 2,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 3,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 4,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 5,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 6,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-  ];
-  const columns = [
-    { field: "id", headerName: "S.NO", width: 150 },
-    { field: "Engname", headerName: "English Name", width: 200 },
-    { field: "Malyname", headerName: "Malay Name", width: 200 },
-    { field: "country", headerName: "Country", width: 200 },
-    {
-      field: "label",
-      headerName: "Label",
-      width: 200,
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      sortable: false,
-      disableClickEventBubbling: true,
-      width: 100,
-      renderCell: (params) => {
-        return (
-          <div>
-            <i
-              className="fa-solid fa-ellipsis-vertical actionIcon"
-              style={{ fontSize: 25, marginLeft: 15, paddingInline: 10 }}
-              onClick={(e) => {
-                setSelectedrow(params.row.id);
-                setAnchorEl(e.currentTarget);
-              }}
-              id={params.row.id}
-            ></i>
-            <Menu
-              anchorEl={anchorEl}
-              open={selectedrow === params.row.id && Boolean(anchorEl)}
-              onClose={() => {
-                setAnchorEl(null);
-                setSelectedrow(null);
-              }}
-              // anchorOrigin={{}}
-            >
-              <MenuItem onClick={() => setAnchorEl(null)}>
-                <Stack direction="row" alignItems="center">
-                  <i
-                    className="fa-regular fa-file-lines"
-                    style={{ marginRight: 10 }}
-                  ></i>
-                  View Detail
-                </Stack>
-              </MenuItem>
-              <MenuItem onClick={() => setAnchorEl(null)}>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  sx={{ color: "#f45536" }}
-                >
-                  <i
-                    className="fa-regular fa-trash-can"
-                    style={{ marginRight: 10 }}
-                  ></i>{" "}
-                  Delete
-                </Stack>
-              </MenuItem>
-            </Menu>
-          </div>
-        );
-      },
-    },
-  ];
+
+  useEffect(() => {
+    if (editItem) {
+      reset({
+        name: {
+          en: editItem.Engname,
+          ms: editItem.Malayname,
+        },
+        status: 1,
+      });
+      setselectedLabel(editItem.label?._id);
+      setcountry(() => editItem.country?.split(", "));
+    } else {
+      reset({
+        name: {
+          en: "",
+          ms: "",
+        },
+        status: 1,
+      });
+      setselectedLabel(null);
+      setcountry(() => []);
+    }
+  }, [editItem]);
+
+  const onEditSubmit = (data) => {
+    if (country.length === 0) {
+      setAdditionalError({ country: "Please select atleast one country!" });
+      return;
+    }
+    editMutate({
+      ...data,
+      country,
+      label: selectedLabel,
+      crop_id: editItem.crop_id,
+    });
+  };
+
+  const onAddSubmit = (data) => {
+    if (country.length === 0) {
+      setAdditionalError({ country: "Please select atleast one country!" });
+      return;
+    }
+    mutate({
+      ...data,
+      country,
+      label: selectedLabel,
+    });
+  };
 
   return (
     <Stack>
@@ -165,7 +179,8 @@ function Crops() {
         }}
         pageSizeOptions={[5, 10]}
       />
-      <Modal open={open} className="modal">
+      <Loading isLoading={isLoading} />
+      <Modal open={Boolean(editItem) || open} className="modal">
         <Stack
           width={500}
           bgcolor={"#fff"}
@@ -182,36 +197,48 @@ function Crops() {
           >
             <h3>Add Crop</h3>
             <i
-              class="fa-solid fa-xmark actionIcon"
+              className="fa-solid fa-xmark actionIcon"
               style={{ fontSize: 25 }}
-              onClick={() => setopen(false)}
+              onClick={() => {
+                setopen(false);
+                setEdit && setEdit(null);
+              }}
             ></i>
           </Stack>
           <Stack>
             <h3 style={{ margin: "10px 0" }}>Name :</h3>
-            <Stack spacing={2} direction="row" justifyContent="space-between">
-              <TextField
-                id="outlined-basic"
-                label="Name In English"
-                variant="outlined"
-                size="small"
-                style={{ width: "48%" }}
-              />
-              <TextField
-                id="outlined-basic"
-                label="Name In Malay"
-                size="small"
-                style={{ width: "48%" }}
-                variant="outlined"
-              />
-            </Stack>
+            <Grid container spacing={2}>
+              <Grid item lg={6}>
+                <TextField
+                  id="outlined-basic"
+                  label="Name In English"
+                  variant="outlined"
+                  size="small"
+                  {...register("name.en")}
+                  fullWidth
+                  error={Boolean(errors.name?.en)}
+                  helperText={errors.name?.en}
+                />
+              </Grid>
+              <Grid item lg={6}>
+                <TextField
+                  id="outlined-basic"
+                  label="Name In Malay"
+                  size="small"
+                  variant="outlined"
+                  {...register("name.ms")}
+                  fullWidth
+                  error={Boolean(errors.name?.ms)}
+                  helperText={errors.name?.ms}
+                />
+              </Grid>
+            </Grid>
           </Stack>
           <Stack marginTop={2}>
             <h3 style={{ margin: "10px 0" }}>Select Country :</h3>
             <ToggleButtonGroup
               color="info"
               value={country}
-              exclusive
               onChange={handleChange}
               aria-label="Platform"
             >
@@ -225,6 +252,7 @@ function Crops() {
                 Nepal
               </ToggleButton>
             </ToggleButtonGroup>
+            <Typography variant="caption">{additionalError.country}</Typography>
           </Stack>
           <Stack marginTop={2}>
             <h3 style={{ margin: "10px 0" }}>Select label :</h3>
@@ -234,26 +262,35 @@ function Crops() {
               justifyContent="flex-start"
               spacing={2}
             >
-              {labels.map((item, id) => (
+              {labels.map((_label) => (
                 <Chip
                   style={{
                     margin: "5px 10px 5px 0",
-                    background: item === selectedLabel && "#0080ff",
-                    color: item === selectedLabel && "#fff",
+                    background: _label._id === selectedLabel && "#0080ff",
+                    color: _label._id === selectedLabel && "#fff",
+                    textTransform: "capitalize",
                   }}
-                  key={item}
-                  label={item}
+                  key={_label._id}
+                  label={_label.name}
                   variant="contained"
-                  onClick={() => setselectedLabel(item)}
+                  onClick={() =>
+                    setselectedLabel((prev) =>
+                      prev === _label._id ? null : _label._id
+                    )
+                  }
                 />
               ))}
             </Stack>
+            {/* <Typography variant="caption">{additionalError.label}</Typography> */}
           </Stack>
           <Stack spacing={2} direction="row" alignSelf="flex-end" marginTop={3}>
             <Button
               color="warning"
               style={{ outline: "none" }}
-              onClick={() => setopen(false)}
+              onClick={() => {
+                setopen(false);
+                setEdit && setEdit(null);
+              }}
             >
               Close
             </Button>
@@ -261,11 +298,85 @@ function Crops() {
               variant="contained"
               style={{ outline: "none" }}
               className="ModalOpeningButtton"
+              onClick={handleSubmit(editItem ? onEditSubmit : onAddSubmit)}
+              disabled={isPending || isEditPending}
+              sx={{ color: "#fff" }}
             >
-              add
+              {(isPending || isEditPending) && (
+                <CircularProgress
+                  size={16}
+                  color="inherit"
+                  sx={{ marginRight: "5px" }}
+                />
+              )}{" "}
+              {editItem ? "edit" : "add"}
             </Button>
           </Stack>
         </Stack>
+      </Modal>
+      <Modal open={Boolean(deleteId)} className="modal">
+        <Box
+          width={500}
+          bgcolor={"#fff"}
+          borderRadius={1}
+          padding={2}
+          color={"#000"}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom="1px solid #333"
+            paddingBottom={1}
+          >
+            <h3>Delete Corp</h3>
+            <i
+              className="fa-solid fa-xmark actionIcon"
+              style={{ fontSize: 25 }}
+              onClick={() => {
+                setDeleteId(null);
+              }}
+            ></i>
+          </Stack>
+          <Typography variant="body1" marginTop={2}>
+            Are you sure, you want to delete this corp?
+          </Typography>
+          <Stack
+            spacing={2}
+            direction="row"
+            alignItems="center"
+            justifyContent="flex-end"
+            width={460}
+            marginTop={3}
+          >
+            <Button
+              color="warning"
+              style={{ outline: "none" }}
+              onClick={() => {
+                setDeleteId(null);
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              style={{ outline: "none" }}
+              className="ModalOpeningButtton"
+              onClick={() => deleteMutate(deleteId)}
+              disabled={isDeletePending}
+              sx={{ color: "#fff" }}
+            >
+              {isDeletePending && (
+                <CircularProgress
+                  size={16}
+                  color="inherit"
+                  sx={{ marginRight: "5px" }}
+                />
+              )}{" "}
+              Delete Corp
+            </Button>
+          </Stack>
+        </Box>
       </Modal>
     </Stack>
   );

@@ -8,11 +8,13 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Users from "./layout/pages/users/users";
 import Crops from "./layout/pages/crops/crops";
 import { routes } from "./routes/routes";
+import { Toaster } from "sonner";
 
 function App() {
   const location = useLocation();
   return (
     <div className="App">
+      <Toaster richColors closeButton />
       <Sidebar />
       <div className="rightSide">
         <Navbar />
@@ -21,7 +23,12 @@ function App() {
           <Route exact path="/users" element={<Users />} />
           <Route exact path="/crops" element={<Crops />} /> */}
           {routes.map((item, id) => (
-            <Route exact path={item.path} element={<item.Component />} />
+            <Route
+              exact
+              path={item.path}
+              element={<item.Component />}
+              key={id}
+            />
           ))}
         </Routes>
       </div>

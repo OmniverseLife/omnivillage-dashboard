@@ -99,3 +99,7 @@
 .rightSide button:hover {
   border-color: none !important;
 }
+
+.MuiDataGrid-cellContent {
+  text-transform: capitalize;
+}
