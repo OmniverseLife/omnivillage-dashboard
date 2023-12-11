@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Crops from "./crops";
 import {
   addHuntingCrops,
+  deleteHuntingCrops,
   editHuntingCrops,
   fetchHuntingCrops,
 } from "../../../functions/crops";
@@ -13,6 +14,7 @@ function Hunting() {
   const [selectedrow, setSelectedrow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [editItem, setEditItem] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const {
     data: crops = [],
@@ -103,7 +105,12 @@ function Hunting() {
                   Edit
                 </Stack>
               </MenuItem>
-              <MenuItem onClick={() => setAnchorEl(null)}>
+              <MenuItem
+                onClick={() => {
+                  setDeleteId(params.row.crop_id);
+                  setAnchorEl(null);
+                }}
+              >
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -133,6 +140,9 @@ function Hunting() {
       editFn={editHuntingCrops}
       refetch={refetch}
       addFn={addHuntingCrops}
+      deleteFn={deleteHuntingCrops}
+      setDeleteId={setDeleteId}
+      deleteId={deleteId}
     />
   );
 }

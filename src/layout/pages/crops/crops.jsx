@@ -172,6 +172,9 @@ function Crops({
       <DataGrid
         rows={rows}
         columns={columns}
+        columnVisibilityModel={{
+          crop_id: false,
+        }}
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 10 },

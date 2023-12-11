@@ -4,6 +4,7 @@ import { Menu, MenuItem, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import {
   addPoultryCrops,
+  deletePoultryCrops,
   editPoultryCrops,
   fetchPoultryCrops,
 } from "../../../functions/crops";
@@ -13,6 +14,7 @@ function Poultry() {
   const [selectedrow, setSelectedrow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [editItem, setEditItem] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const {
     data: crops = [],
@@ -103,7 +105,12 @@ function Poultry() {
                   Edit
                 </Stack>
               </MenuItem>
-              <MenuItem onClick={() => setAnchorEl(null)}>
+              <MenuItem
+                onClick={() => {
+                  setDeleteId(params.row.crop_id);
+                  setAnchorEl(null);
+                }}
+              >
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -133,6 +140,9 @@ function Poultry() {
       editFn={editPoultryCrops}
       refetch={refetch}
       addFn={addPoultryCrops}
+      deleteFn={deletePoultryCrops}
+      setDeleteId={setDeleteId}
+      deleteId={deleteId}
     />
   );
 }

@@ -80,7 +80,7 @@ export default function Sidebar() {
           >
             Hunting
           </a>
-          <a
+          {/* <a
             href="/production/storage"
             className={paths.includes("storage") ? "link active" : "link"}
           >
@@ -93,7 +93,7 @@ export default function Sidebar() {
             }
           >
             Selling Channel
-          </a>
+          </a> */}
         </div>
       )}
       <a

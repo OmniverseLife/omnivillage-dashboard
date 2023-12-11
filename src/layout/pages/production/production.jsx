@@ -2,8 +2,10 @@ import React, { useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 import {
+  Box,
   Button,
   Chip,
+  CircularProgress,
   Menu,
   MenuItem,
   Modal,
@@ -11,150 +13,43 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Typography,
 } from "@mui/material";
-function Production() {
-  const [menu, setmenu] = useState([]);
-  const [open, setopen] = useState(false);
-  const [country, setcountry] = useState("india");
-  const [selectedLabel, setselectedLabel] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedrow, setSelectedrow] = useState(null);
-  const labels = [
-    "Grains & Nuts",
-    "Vegetables",
-    "Herbs",
-    "Legumes",
-    "Fruits",
-    "Dairy",
-    "Meat",
-    "Spices & Condiments",
-    "Tea/Coffee",
-    "Oils",
-    "Processed food & beverages",
-    "Alcohol/Tobacco",
-  ];
-  const handleChange = (event, newcountry) => {
-    setcountry(newcountry);
-  };
-  const rows = [
-    {
-      id: 1,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import Loading from "../../components/loading";
+
+function Production({
+  rows,
+  columns,
+  isLoading,
+  deleteId,
+  deleteFn,
+  setDeleteId,
+  refetch,
+}) {
+  const { mutate: deleteMutate, isPending: isDeletePending } = useMutation({
+    mutationFn: deleteFn,
+    onSuccess: () => {
+      toast.success("Item deleted sucessfully");
+      refetch();
+      setDeleteId(null);
     },
-    {
-      id: 2,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
+    onError: (err) => {
+      toast.error(err.response.data.msg);
     },
-    {
-      id: 3,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 4,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 5,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-    {
-      id: 6,
-      Engname: "Gobi Flower",
-      Malyname: "Gabi Flawera",
-      country: "India",
-      label: "Vegetables",
-    },
-  ];
-  const columns = [
-    { field: "id", headerName: "S.NO", width: 150 },
-    { field: "Engname", headerName: "English Name", width: 200 },
-    { field: "Malyname", headerName: "Malay Name", width: 200 },
-    { field: "country", headerName: "Country", width: 200 },
-    {
-      field: "label",
-      headerName: "Label",
-      width: 200,
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      sortable: false,
-      disableClickEventBubbling: true,
-      width: 100,
-      renderCell: (params) => {
-        return (
-          <div>
-            <i
-              className="fa-solid fa-ellipsis-vertical actionIcon"
-              style={{ fontSize: 25, marginLeft: 15, paddingInline: 10 }}
-              onClick={(e) => {
-                setSelectedrow(params.row.id);
-                setAnchorEl(e.currentTarget);
-              }}
-              id={params.row.id}
-            ></i>
-            <Menu
-              anchorEl={anchorEl}
-              open={selectedrow === params.row.id && Boolean(anchorEl)}
-              onClose={() => {
-                setAnchorEl(null);
-                setSelectedrow(null);
-              }}
-              // anchorOrigin={{}}
-            >
-              <MenuItem onClick={() => setAnchorEl(null)}>
-                <Stack direction="row" alignItems="center">
-                  <i
-                    className="fa-regular fa-file-lines"
-                    style={{ marginRight: 10 }}
-                  ></i>
-                  View Detail
-                </Stack>
-              </MenuItem>
-              <MenuItem onClick={() => setAnchorEl(null)}>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  sx={{ color: "#f45536" }}
-                >
-                  <i
-                    className="fa-regular fa-trash-can"
-                    style={{ marginRight: 10 }}
-                  ></i>{" "}
-                  Delete
-                </Stack>
-              </MenuItem>
-            </Menu>
-          </div>
-        );
-      },
-    },
-  ];
+  });
 
   return (
     <Stack>
-      <Button
+      {/* <Button
         variant="contained"
         className="ModalOpeningButtton"
         onClick={() => setopen(true)}
       >
         Add Crop
-      </Button>
+      </Button> */}
+      <Loading isLoading={isLoading} />
       <DataGrid
         rows={rows}
         columns={columns}
@@ -163,9 +58,12 @@ function Production() {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
+        columnVisibilityModel={{
+          _id: false,
+        }}
         pageSizeOptions={[5, 10]}
       />
-      <Modal open={open} className="modal">
+      {/* <Modal open={open} className="modal">
         <Stack
           width={500}
           bgcolor={"#fff"}
@@ -182,7 +80,7 @@ function Production() {
           >
             <h3>Add Crop</h3>
             <i
-              class="fa-solid fa-xmark actionIcon"
+              className="fa-solid fa-xmark actionIcon"
               style={{ fontSize: 25 }}
               onClick={() => setopen(false)}
             ></i>
@@ -266,6 +164,70 @@ function Production() {
             </Button>
           </Stack>
         </Stack>
+      </Modal> */}
+      <Modal open={Boolean(deleteId)} className="modal">
+        <Box
+          width={500}
+          bgcolor={"#fff"}
+          borderRadius={1}
+          padding={2}
+          color={"#000"}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom="1px solid #333"
+            paddingBottom={1}
+          >
+            <h3>Delete Corp</h3>
+            <i
+              className="fa-solid fa-xmark actionIcon"
+              style={{ fontSize: 25 }}
+              onClick={() => {
+                setDeleteId(null);
+              }}
+            ></i>
+          </Stack>
+          <Typography variant="body1" marginTop={2}>
+            Are you sure, you want to delete this corp?
+          </Typography>
+          <Stack
+            spacing={2}
+            direction="row"
+            alignItems="center"
+            justifyContent="flex-end"
+            width={460}
+            marginTop={3}
+          >
+            <Button
+              color="warning"
+              style={{ outline: "none" }}
+              onClick={() => {
+                setDeleteId(null);
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              style={{ outline: "none" }}
+              className="ModalOpeningButtton"
+              onClick={() => deleteMutate(deleteId)}
+              disabled={isDeletePending}
+              sx={{ color: "#fff" }}
+            >
+              {isDeletePending && (
+                <CircularProgress
+                  size={16}
+                  color="inherit"
+                  sx={{ marginRight: "5px" }}
+                />
+              )}{" "}
+              Delete Corp
+            </Button>
+          </Stack>
+        </Box>
       </Modal>
     </Stack>
   );

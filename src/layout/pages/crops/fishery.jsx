@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Crops from "./crops";
 import {
   addFisheryCrops,
+  deleteFisheryCrops,
   editFisheryCrops,
   fetchFisheryCrops,
 } from "../../../functions/crops";
@@ -13,6 +14,7 @@ function Fishery() {
   const [selectedrow, setSelectedrow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [editItem, setEditItem] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const {
     data: crops = [],
@@ -103,7 +105,12 @@ function Fishery() {
                   Edit
                 </Stack>
               </MenuItem>
-              <MenuItem onClick={() => setAnchorEl(null)}>
+              <MenuItem
+                onClick={() => {
+                  setDeleteId(params.row.crop_id);
+                  setAnchorEl(null);
+                }}
+              >
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -133,6 +140,9 @@ function Fishery() {
       editFn={editFisheryCrops}
       refetch={refetch}
       addFn={addFisheryCrops}
+      deleteFn={deleteFisheryCrops}
+      setDeleteId={setDeleteId}
+      deleteId={deleteId}
     />
   );
 }
