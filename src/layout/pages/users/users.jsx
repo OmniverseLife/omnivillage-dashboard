@@ -5,11 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAllUsers } from "../../../functions/users";
 import Loading from "../../components/loading";
 import { Menu, MenuItem, Stack } from "@mui/material";
+import ViewDetails from "../../components/viewDetails/viewDetails";
 
 function Users() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedrow, setSelectedrow] = useState(null);
-
+  const [modalOpen, setmodalOpen] = useState(false);
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: fetchAllUsers,
@@ -70,7 +71,12 @@ function Users() {
               }}
               // anchorOrigin={{}}
             >
-              <MenuItem onClick={() => setAnchorEl(null)}>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  setmodalOpen(true);
+                }}
+              >
                 <Stack direction="row" alignItems="center">
                   <i
                     className="fa-regular fa-file-lines"
@@ -98,7 +104,7 @@ function Users() {
       },
     },
   ];
-
+  console.log(selectedrow);
   return (
     <div className="users">
       <DataGrid
@@ -113,6 +119,11 @@ function Users() {
         loading={isLoading}
       />
       <Loading isLoading={isLoading} />
+      <ViewDetails
+        open={modalOpen}
+        setOpen={() => setmodalOpen(false)}
+        data={users[selectedrow - 1]}
+      />
     </div>
   );
 }
