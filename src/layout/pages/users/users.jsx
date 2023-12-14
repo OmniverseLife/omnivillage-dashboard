@@ -11,19 +11,32 @@ function Users() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedrow, setSelectedrow] = useState(null);
   const [modalOpen, setmodalOpen] = useState(false);
+  const [modalData, setmodalData] = useState({});
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: fetchAllUsers,
   });
 
-  // {
-  //   id: 1,
-  //   email: "johndoe@gmail.com",
-  //   name: "John Doe",
-  //   phone: "+91 3674689047",
-  //   totalLand: 50,
-  // }
+  function deepFlattenToObject(obj, prefix = "") {
+    return Object.keys(obj).reduce((acc, k) => {
+      const pre = prefix.length ? prefix + "#" : "";
+      if (typeof obj[k] === "object" && obj[k] !== null) {
+        Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
+      } else {
+        acc[pre + k] = obj[k];
+      }
+      return acc;
+    }, {});
+  }
+  const selectData = (data) => {
+    let obj = deepFlattenToObject(data);
+    delete obj["updatedAt"];
+    delete obj["__v"];
+    delete obj["_id"];
 
+    console.log(obj);
+    setmodalData({ ...obj });
+  };
   const rows = users.map((_user, idx) => ({
     id: idx + 1,
     name: `${_user.first_name} ${_user.last_name}`,
@@ -59,6 +72,8 @@ function Users() {
               onClick={(e) => {
                 setSelectedrow(params.row.id);
                 setAnchorEl(e.currentTarget);
+
+                selectData(users[params.row.id - 1]);
               }}
               id={params.row.id}
             ></i>
@@ -115,15 +130,21 @@ function Users() {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
+        // columnVisibilityModel={{
+        //   totalLand: false,
+        // }}
         pageSizeOptions={[5, 10]}
         loading={isLoading}
       />
       <Loading isLoading={isLoading} />
-      <ViewDetails
-        open={modalOpen}
-        setOpen={() => setmodalOpen(false)}
-        data={users[selectedrow - 1]}
-      />
+      {selectedrow && (
+        <ViewDetails
+          open={modalOpen}
+          setOpen={() => setmodalOpen(false)}
+          data={modalData}
+          heading="User"
+        />
+      )}
     </div>
   );
 }

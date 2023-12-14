@@ -13,7 +13,8 @@ function Cultivation() {
   const [selectedrow, setSelectedrow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-
+  const [modalData, setmodalData] = useState({});
+  const [modalOpen, setmodalOpen] = useState(false);
   const {
     data: cultivations = [],
     isLoading,
@@ -22,7 +23,22 @@ function Cultivation() {
     queryKey: ["cultivations"],
     queryFn: fetchCultivations,
   });
-
+  function deepFlattenToObject(obj, prefix = "") {
+    return Object.keys(obj).reduce((acc, k) => {
+      const pre = prefix.length ? prefix + "#" : "";
+      if (typeof obj[k] === "object" && obj[k] !== null) {
+        Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
+      } else {
+        acc[pre + k] = obj[k];
+      }
+      return acc;
+    }, {});
+  }
+  const selectData = (data) => {
+    let obj = deepFlattenToObject(data);
+    console.log(obj);
+    setmodalData({ ...obj });
+  };
   const rows = cultivations.map((_cultivation, index) => ({
     id: index + 1,
     _id: _cultivation._id,
@@ -58,6 +74,7 @@ function Cultivation() {
               onClick={(e) => {
                 setSelectedrow(params.row.id);
                 setAnchorEl(e.currentTarget);
+                selectData(cultivations[params.row.id]);
               }}
               id={params.row.id}
             ></i>
@@ -70,7 +87,12 @@ function Cultivation() {
               }}
               // anchorOrigin={{}}
             >
-              <MenuItem onClick={() => setAnchorEl(null)}>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  setmodalOpen(true);
+                }}
+              >
                 <Stack direction="row" alignItems="center">
                   <i
                     className="fa-regular fa-file-lines"
@@ -93,7 +115,7 @@ function Cultivation() {
                   <i
                     className="fa-regular fa-trash-can"
                     style={{ marginRight: 10 }}
-                  ></i>{" "}
+                  ></i>
                   Delete
                 </Stack>
               </MenuItem>
@@ -103,17 +125,26 @@ function Cultivation() {
       },
     },
   ];
-
   return (
-    <Production
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
-      refetch={refetch}
-      setDeleteId={setDeleteId}
-      deleteFn={deleteCultivation}
-      deleteId={deleteId}
-    />
+    <div>
+      <Production
+        rows={rows}
+        columns={columns}
+        isLoading={isLoading}
+        refetch={refetch}
+        setDeleteId={setDeleteId}
+        deleteFn={deleteCultivation}
+        deleteId={deleteId}
+      />
+      {selectedrow && (
+        <ViewDetails
+          open={modalOpen}
+          setOpen={() => setmodalOpen(false)}
+          data={modalData}
+          heading="Cultivation"
+        />
+      )}
+    </div>
   );
 }
 

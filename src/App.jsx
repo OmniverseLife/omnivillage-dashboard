@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
@@ -9,6 +9,7 @@ import Users from "./layout/pages/users/users";
 import Crops from "./layout/pages/crops/crops";
 import { routes } from "./routes/routes";
 import { Toaster } from "sonner";
+import Loading from "./layout/components/loading";
 
 function App() {
   const location = useLocation();
@@ -18,19 +19,18 @@ function App() {
       <Sidebar />
       <div className="rightSide">
         <Navbar />
-        <Routes location={location}>
-          {/* <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route exact path="/users" element={<Users />} />
-          <Route exact path="/crops" element={<Crops />} /> */}
-          {routes.map((item, id) => (
-            <Route
-              exact
-              path={item.path}
-              element={<item.Component />}
-              key={id}
-            />
-          ))}
-        </Routes>
+        <Suspense fallback={<Loading />}>
+          <Routes location={location}>
+            {routes.map((item, id) => (
+              <Route
+                exact
+                path={item.path}
+                element={<item.Component />}
+                key={id}
+              />
+            ))}
+          </Routes>
+        </Suspense>
       </div>
     </div>
   );

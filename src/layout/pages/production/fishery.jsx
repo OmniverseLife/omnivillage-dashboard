@@ -13,7 +13,8 @@ function Fishery() {
   const [selectedrow, setSelectedrow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-
+  const [modalData, setmodalData] = useState({});
+  const [modalOpen, setmodalOpen] = useState(false);
   const {
     data: fishery = [],
     isLoading,
@@ -22,7 +23,22 @@ function Fishery() {
     queryKey: ["fishery"],
     queryFn: fetchFishery,
   });
-
+  function deepFlattenToObject(obj, prefix = "") {
+    return Object.keys(obj).reduce((acc, k) => {
+      const pre = prefix.length ? prefix + "#" : "";
+      if (typeof obj[k] === "object" && obj[k] !== null) {
+        Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
+      } else {
+        acc[pre + k] = obj[k];
+      }
+      return acc;
+    }, {});
+  }
+  const selectData = (data) => {
+    let obj = deepFlattenToObject(data);
+    console.log(obj);
+    setmodalData({ ...obj });
+  };
   const rows = fishery.map((_fishery, index) => ({
     id: index + 1,
     _id: _fishery._id,
@@ -58,6 +74,7 @@ function Fishery() {
               onClick={(e) => {
                 setSelectedrow(params.row.id);
                 setAnchorEl(e.currentTarget);
+                selectData(fishery[params.row.id]);
               }}
               id={params.row.id}
             ></i>
@@ -70,7 +87,12 @@ function Fishery() {
               }}
               // anchorOrigin={{}}
             >
-              <MenuItem onClick={() => setAnchorEl(null)}>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  setmodalOpen(true);
+                }}
+              >
                 <Stack direction="row" alignItems="center">
                   <i
                     className="fa-regular fa-file-lines"
@@ -105,15 +127,25 @@ function Fishery() {
   ];
 
   return (
-    <Production
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
-      refetch={refetch}
-      setDeleteId={setDeleteId}
-      deleteFn={deleteFishery}
-      deleteId={deleteId}
-    />
+    <div>
+      <Production
+        rows={rows}
+        columns={columns}
+        isLoading={isLoading}
+        refetch={refetch}
+        setDeleteId={setDeleteId}
+        deleteFn={deleteFishery}
+        deleteId={deleteId}
+      />
+      {selectedrow && (
+        <ViewDetails
+          open={modalOpen}
+          setOpen={() => setmodalOpen(false)}
+          data={modalData}
+          heading="Fishery"
+        />
+      )}
+    </div>
   );
 }
 

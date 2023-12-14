@@ -6,14 +6,11 @@ export default function Navbar() {
   const location = useLocation();
   const paths = location.pathname.split("/");
   console.log(paths);
-  paths.shift();
-
+  let heading = paths[2] ? paths[2] + " " + paths[1] : paths[1];
   return (
     <div className="navbar">
       <div className="navbar-items">
-        <h3 style={{ textTransform: "capitalize" }}>
-          {paths[paths.length - 1]}
-        </h3>
+        <h3 style={{ textTransform: "capitalize" }}>{heading}</h3>
         <div className="profile">
           <span>
             <img src={profile} alt="" />

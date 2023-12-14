@@ -9,8 +9,11 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Typography,
 } from "@mui/material";
-function ViewDetails({ open, setOpen, data }) {
+import moment from "moment";
+import { mediaURL } from "../../../axios/axiosInstance";
+function ViewDetails({ open, setOpen, data, heading }) {
   console.log(data);
   let obj = {
     id: 1,
@@ -23,13 +26,13 @@ function ViewDetails({ open, setOpen, data }) {
     <Stack>
       <Modal open={open} className="modal">
         <Stack
-          width={500}
+          width="auto"
+          maxWidth="90vw"
           bgcolor={"#fff"}
           borderRadius={1}
           padding={2}
           color={"#000"}
           maxHeight="90vh"
-          overflow="scroll"
         >
           <Stack
             direction="row"
@@ -38,49 +41,79 @@ function ViewDetails({ open, setOpen, data }) {
             borderBottom={"1px solid #333"}
             paddingBottom={1}
           >
-            <h3>Details</h3>
+            <h3>{heading} Details</h3>
             <i
               class="fa-solid fa-xmark actionIcon"
               style={{ fontSize: 25 }}
               onClick={() => setOpen()}
             ></i>
           </Stack>
-          <Stack margin="30px 0" direction="row">
+          <Stack
+            margin="20px 0"
+            direction="row"
+            flexWrap="wrap"
+            justifyContent="flex-start"
+            // maxHeight="90vh"
+            overflow="scroll"
+          >
             {data && (
               <>
-                <Stack width="50%">
-                  {Object.keys(obj)?.map((item, id) => (
+                {/* <Stack width="100%"> */}
+                {Object.keys(data)?.map((item, id) => (
+                  <>
                     <Stack
-                      spacing={2}
-                      direction="row"
-                      justifyContent="space-between"
-                      width="100%"
-                      border="0.5px solid #999"
+                      spacing={1}
+                      justifyContent="flex-start"
                       padding={1}
+                      marginRight={3}
+                      width="30%"
+                      marginBottom={2}
                     >
-                      <p style={{ textTransform: "capitalize" }}>{item}</p>
+                      <Typography
+                        textTransform="capitalize"
+                        fontSize={18}
+                        fontFamily="inherit"
+                      >
+                        {item.replaceAll("_", " ").replaceAll("#", "-")}
+                      </Typography>
+                      {
+                        // console.log(String(data[item]).includes("uploads"))
+
+                        String(data[item]).includes("uploads/") ? (
+                          <img
+                            style={{
+                              width: "95%",
+                              objectFit: "contain",
+                            }}
+                            src={mediaURL + data[item]}
+                            alt=""
+                          />
+                        ) : (
+                          <Typography
+                            textTransform="capitalize"
+                            fontSize={16}
+                            border="0.5px solid rgba(0,0,0,0.1)"
+                            padding={1}
+                            borderRadius={1}
+                            fontFamily="inherit"
+                            style={{ background: "rgb(250, 250, 250)" }}
+                          >
+                            {String(item).includes("createdAt")
+                              ? moment(data[item]).add(10, "days").calendar()
+                              : data[item]}
+                          </Typography>
+                        )
+                      }
                     </Stack>
-                  ))}
-                </Stack>
-                <Stack width="50%">
-                  {Object.values(obj)?.map((item, id) => (
-                    <Stack
-                      spacing={2}
-                      direction="row"
-                      justifyContent="space-between"
-                      width="100%"
-                      border="0.5px solid #999"
-                      padding={1}
-                    >
-                      <p style={{ textTransform: "capitalize" }}>{item}</p>
-                    </Stack>
-                  ))}
-                </Stack>
+                  </>
+                ))}
+                {/* </Stack> */}
               </>
             )}
           </Stack>
           <Stack spacing={2} direction="row" alignSelf="flex-end">
             <Button
+              variant="outlined"
               color="warning"
               style={{ outline: "none" }}
               onClick={() => setOpen()}
