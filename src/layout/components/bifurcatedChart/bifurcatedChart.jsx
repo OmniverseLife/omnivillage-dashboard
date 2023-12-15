@@ -3,7 +3,7 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
-import * as faker from "@faker-js/faker";
+// import * as faker from "@faker-js/faker";
 const BifurcatedChart = ({ tag }) => {
   const tagData = {
     labels: [
@@ -142,7 +142,7 @@ const BifurcatedChart = ({ tag }) => {
   ];
 
   const fertilizerData = {
-    Organiclabels,
+    labels: Organiclabels,
     datasets: [
       {
         label: "Fertilizer A",

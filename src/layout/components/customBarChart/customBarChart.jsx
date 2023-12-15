@@ -29,7 +29,6 @@ const options = {
 };
 
 function CustomBarChart({ header, data }) {
-  console.log(data);
   return (
     <div style={{ width: "100%" }}>
       <h3>{header}</h3>

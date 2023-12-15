@@ -159,7 +159,7 @@ text {
   align-items: center;
 }
 canvas.pieChart {
-  width: 370px !important;
-  height: 350px !important;
+  /* width: 370px !important;
+  height: 350px !important; */
   aspect-ratio: 1/1;
 }

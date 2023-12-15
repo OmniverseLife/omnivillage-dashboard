@@ -32,7 +32,7 @@ const LandAllocated = () => {
     datasets: [
       {
         label: "Land Allocated",
-        data: [20, 20, 20, 20, 20],
+        data: [20, 20, 20, 40, 20],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
