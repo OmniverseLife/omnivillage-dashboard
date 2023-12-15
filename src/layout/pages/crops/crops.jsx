@@ -46,6 +46,8 @@ function Crops({
   setDeleteId,
 }) {
   const [open, setopen] = useState(false);
+  const [csvModal, setcsvModal] = useState(false);
+
   const [country, setcountry] = useState(() => ["india"]);
   const [selectedLabel, setselectedLabel] = useState(null);
   const [additionalError, setAdditionalError] = useState({
@@ -162,13 +164,22 @@ function Crops({
 
   return (
     <Stack>
-      <Button
-        variant="contained"
-        className="ModalOpeningButtton"
-        onClick={() => setopen(true)}
-      >
-        Add Crop
-      </Button>
+      <Stack direction="row" justifyContent="flex-end">
+        <Button
+          variant="contained"
+          className="ModalOpeningButtton"
+          onClick={() => setopen(true)}
+        >
+          Add Crop
+        </Button>
+        <Button
+          variant="contained"
+          className="ModalOpeningButtton"
+          onClick={() => setcsvModal(true)}
+        >
+          Add Sheet
+        </Button>
+      </Stack>
       <DataGrid
         rows={rows}
         columns={columns}
@@ -288,6 +299,7 @@ function Crops({
           </Stack>
           <Stack spacing={2} direction="row" alignSelf="flex-end" marginTop={3}>
             <Button
+              variant="outlined"
               color="warning"
               style={{ outline: "none" }}
               onClick={() => {
@@ -353,6 +365,7 @@ function Crops({
             marginTop={3}
           >
             <Button
+              variant="outlined"
               color="warning"
               style={{ outline: "none" }}
               onClick={() => {
@@ -375,8 +388,71 @@ function Crops({
                   color="inherit"
                   sx={{ marginRight: "5px" }}
                 />
-              )}{" "}
+              )}
               Delete Corp
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
+      {/* csv modal */}
+      <Modal open={csvModal} className="modal">
+        <Box
+          width={500}
+          bgcolor={"#fff"}
+          borderRadius={1}
+          padding={2}
+          color={"#000"}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom="1px solid #333"
+            paddingBottom={1}
+          >
+            <h3>Add Shhet</h3>
+            <i
+              className="fa-solid fa-xmark actionIcon"
+              style={{ fontSize: 25 }}
+              onClick={() => {
+                setcsvModal(false);
+              }}
+            ></i>
+          </Stack>
+          <Typography variant="body1" marginTop={2} fontFamily="inherit">
+            Upload Your Sheet As CSV File
+          </Typography>
+          <label className="dropBox">
+            <i
+              class="fa-solid fa-cloud-arrow-up"
+              style={{ marginRight: 5 }}
+            ></i>
+            Upload File
+            <input type="file" hidden />
+          </label>
+
+          <Stack
+            spacing={2}
+            direction="row"
+            alignItems="center"
+            justifyContent="flex-end"
+            width={460}
+            marginTop={3}
+          >
+            <Button
+              variant="outlined"
+              color="warning"
+              style={{ outline: "none" }}
+            >
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              style={{ outline: "none" }}
+              className="ModalOpeningButtton"
+              sx={{ color: "#fff" }}
+            >
+              Add Sheet
             </Button>
           </Stack>
         </Box>

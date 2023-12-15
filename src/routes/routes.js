@@ -53,4 +53,16 @@ export const routes = [
     path: "/production/sellingChannel",
     Component: lazy(() => import("../layout/pages/production/sellingChannel")),
   },
+  {
+    path: "/dashboard/production",
+    Component: lazy(() => import("../layout/pages/dashboard/production")),
+  },
+  {
+    path: "/dashboard/consumption",
+    Component: lazy(() => import("../layout/pages/dashboard/consumption")),
+  },
+  {
+    path: "/dashboard/food-balance",
+    Component: lazy(() => import("../layout/pages/dashboard/foodBalance")),
+  },
 ];

@@ -1,42 +1,73 @@
 import React, { useState } from "react";
 import "./sidebar.css";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../../assets/logo.png";
-import barChart from "../../../assets/bar-chart.png";
-import barChartInactive from "../../../assets/bar-chart-inactive.png";
-import userInactive from "../../../assets/user-inactive.png";
-import user from "../../../assets/user.png";
-import settings from "../../../assets/settings.png";
-import settingsInactive from "../../../assets/settings-inactive.png";
-import logout from "../../../assets/shutdown.png";
-import logoutInactive from "../../../assets/shutdown-inactive.png";
 
 export default function Sidebar() {
   const location = useLocation();
   const paths = location.pathname.split("/");
   const [productionMenu, setproductionMenu] = useState(
-    paths.includes("production") && true
+    paths.includes("production") && !paths.includes("dashboard") && true
   );
   const [consumtionMenu, setconsumtionMenu] = useState(
-    paths.includes("consumption") && true
+    paths.includes("consumption") && !paths.includes("dashboard") && true
   );
   const [cropsMenu, setcropsMenu] = useState(paths.includes("crops") && true);
+  const [dashboardMenu, setdashboardMenu] = useState(
+    paths.includes("dashboard") && true
+  );
+
   return (
     <div className="sidebar">
       <div className="logo">
         <img src={logo} alt="" />
         <h1>OMNI VIlLAGE</h1>
       </div>
-      <a
-        href="/dashboard"
+      <Link
+        // to="/dashboard"
+        onClick={() => setdashboardMenu(!dashboardMenu)}
         className={paths.includes("dashboard") ? "link active" : "link"}
       >
         <i class="fa-solid fa-chart-line"></i>
         <p>Dashboard</p>
-      </a>
-      <a
-        className={paths.includes("production") ? "link active" : "link"}
+        <span>
+          {dashboardMenu ? (
+            <i class="fa-solid fa-minus"></i>
+          ) : (
+            <i class="fa-solid fa-plus"></i>
+          )}
+        </span>
+      </Link>
+      {dashboardMenu && (
+        <div className="menu">
+          <Link
+            to="/dashboard/production"
+            className={paths.includes("production") ? "link active" : "link"}
+          >
+            Production
+          </Link>
+          <Link
+            to="/dashboard/consumption"
+            className={paths.includes("consumption") ? "link active" : "link"}
+          >
+            Consumption
+          </Link>
+          <Link
+            to="/dashboard/food-balance"
+            className={paths.includes("food-balance") ? "link active" : "link"}
+          >
+            Food Balance
+          </Link>
+        </div>
+      )}
+      <Link
+        className={
+          paths.includes("production") && !paths.includes("dashboard")
+            ? "link active"
+            : "link"
+        }
         onClick={() => setproductionMenu(!productionMenu)}
+        // to="/production"
       >
         <i class="fa-solid fa-seedling"></i>
         <p>Production</p>
@@ -47,58 +78,62 @@ export default function Sidebar() {
             <i class="fa-solid fa-plus"></i>
           )}
         </span>
-      </a>
+      </Link>
       {productionMenu && (
         <div className="menu">
-          <a
-            href="/production/cultivation"
+          <Link
+            to="/production/cultivation"
             className={paths.includes("cultivation") ? "link active" : "link"}
           >
             Cultivation
-          </a>
-          <a
-            href="/production/trees&shrubs"
+          </Link>
+          <Link
+            to="/production/trees&shrubs"
             className={paths.includes("trees&shrubs") ? "link active" : "link"}
           >
             Trees/Shrubs
-          </a>
-          <a
-            href="/production/poultry"
+          </Link>
+          <Link
+            to="/production/poultry"
             className={paths.includes("poultry") ? "link active" : "link"}
           >
             Poultry
-          </a>
-          <a
-            href="/production/fishery"
+          </Link>
+          <Link
+            to="/production/fishery"
             className={paths.includes("fishery") ? "link active" : "link"}
           >
             Fishery
-          </a>
-          <a
-            href="/production/hunting"
+          </Link>
+          <Link
+            to="/production/hunting"
             className={paths.includes("hunting") ? "link active" : "link"}
           >
             Hunting
-          </a>
-          {/* <a
-            href="/production/storage"
+          </Link>
+          {/* <Link
+            to="/production/storage"
             className={paths.includes("storage") ? "link active" : "link"}
           >
             Storage
-          </a>
-          <a
-            href="/production/sellingChannel"
+          </Link>
+          <Link
+            to="/production/sellingChannel"
             className={
               paths.includes("sellingChannel") ? "link active" : "link"
             }
           >
             Selling Channel
-          </a> */}
+          </Link> */}
         </div>
       )}
-      <a
+      <Link
         onClick={() => setconsumtionMenu(!consumtionMenu)}
-        className={paths.includes("consumption") ? "link active" : "link"}
+        className={
+          paths.includes("consumption") && !paths.includes("dashboard")
+            ? "link active"
+            : "link"
+        }
       >
         <i class="fa-solid fa-utensils"></i>
         <p>Consumption</p>
@@ -109,48 +144,48 @@ export default function Sidebar() {
             <i class="fa-solid fa-plus"></i>
           )}
         </span>
-      </a>
+      </Link>
       {consumtionMenu && (
         <div className="menu">
-          <a
-            href="/consumption/menu1"
+          <Link
+            to="/consumption/menu1"
             className={paths.includes("menu1") ? "link active" : "link"}
           >
             Menu 1
-          </a>
-          <a
-            href="/consumption/menu2"
+          </Link>
+          <Link
+            to="/consumption/menu2"
             className={paths.includes("menu2") ? "link active" : "link"}
           >
             Menu 2
-          </a>
-          <a
-            href="/consumption/menu3"
+          </Link>
+          <Link
+            to="/consumption/menu3"
             className={paths.includes("menu3") ? "link active" : "link"}
           >
             Menu 3
-          </a>
-          <a
-            href="/consumption/menu4"
+          </Link>
+          <Link
+            to="/consumption/menu4"
             className={paths.includes("menu4") ? "link active" : "link"}
           >
             Menu 4
-          </a>
-          <a
-            href="/consumption/menu5"
+          </Link>
+          <Link
+            to="/consumption/menu5"
             className={paths.includes("menu5") ? "link active" : "link"}
           >
             Menu 5
-          </a>
+          </Link>
         </div>
       )}
-      <a
-        href="/users"
+      <Link
+        to="/users"
         className={paths.includes("users") ? "link active" : "link"}
       >
         <i class="fa-solid fa-user-group"></i>
         <p>Users</p>
-      </a>
+      </Link>
       <a
         onClick={() => setcropsMenu(!cropsMenu)}
         className={paths.includes("crops") ? "link active" : "link"}
@@ -167,53 +202,53 @@ export default function Sidebar() {
       </a>
       {cropsMenu && (
         <div className="menu">
-          <a
-            href="/crops/cultivation"
+          <Link
+            to="/crops/cultivation"
             className={paths.includes("cultivation") ? "link active" : "link"}
           >
             Cultivation
-          </a>
-          <a
-            href="/crops/trees&shrubs"
+          </Link>
+          <Link
+            to="/crops/trees&shrubs"
             className={paths.includes("trees&shrubs") ? "link active" : "link"}
           >
             Trees/Shrubs
-          </a>
-          <a
-            href="/crops/poultry"
+          </Link>
+          <Link
+            to="/crops/poultry"
             className={paths.includes("poultry") ? "link active" : "link"}
           >
             Poultry
-          </a>
-          <a
-            href="/crops/fishery"
+          </Link>
+          <Link
+            to="/crops/fishery"
             className={paths.includes("fishery") ? "link active" : "link"}
           >
             Fishery
-          </a>
-          <a
-            href="/crops/hunting"
+          </Link>
+          <Link
+            to="/crops/hunting"
             className={paths.includes("hunting") ? "link active" : "link"}
           >
             Hunting
-          </a>
+          </Link>
         </div>
       )}
-      <a
-        href="/logout"
+      <Link
+        to="/logout"
         style={{ marginTop: "auto" }}
         className={paths.includes("logout") ? "link active" : "link"}
       >
         <i class="fa-solid fa-power-off"></i>
         <p>Logout</p>
-      </a>
-      <a
-        href="/settings"
+      </Link>
+      <Link
+        to="/settings"
         className={paths.includes("settings") ? "link active" : "link"}
       >
         <i class="fa-solid fa-gear"></i>
         <p>Settings</p>
-      </a>
+      </Link>
     </div>
   );
 }

@@ -223,7 +223,7 @@ function Production({
                   color="inherit"
                   sx={{ marginRight: "5px" }}
                 />
-              )}{" "}
+              )}
               Delete Corp
             </Button>
           </Stack>

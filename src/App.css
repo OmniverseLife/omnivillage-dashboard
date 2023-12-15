@@ -21,6 +21,14 @@
   min-height: 100vh;
   background-color: rgb(240, 240, 240);
 }
+.rightSide .container {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  font-family: inherit;
+  background-color: #fff;
+  color: #333;
+  padding: 20px;
+}
 .rightSide .css-ptkaw2-MuiDataGrid-root {
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 10px;
@@ -90,6 +98,7 @@
   background-color: #0080ff;
   align-self: flex-end;
   width: max-content;
+  margin-left: 20px;
 }
 .modal {
   display: flex;
@@ -102,4 +111,55 @@
 
 .MuiDataGrid-cellContent {
   text-transform: capitalize;
+}
+.dropBox {
+  position: relative;
+  display: block;
+  width: 100%;
+  font-size: 18px;
+  font-family: inherit;
+  text-align: center;
+  text-transform: uppercase;
+  border: 2px dashed #ccc;
+  margin: 1.5rem auto;
+  padding: 3rem;
+  color: #aaa;
+}
+.dropBox:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.dropBox:active,
+.dropBox.focus {
+  border-color: #09f;
+}
+input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  outline: 0;
+  border: 1px solid red;
+}
+text {
+  font-family: inherit !important;
+  font-size: 14px;
+}
+.App .pieChartContainer {
+  margin: 40px auto;
+
+  width: 48%;
+  font-family: inherit;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #4b465c1f;
+  padding: 15px;
+  align-items: center;
+}
+canvas.pieChart {
+  width: 370px !important;
+  height: 350px !important;
+  aspect-ratio: 1/1;
 }
