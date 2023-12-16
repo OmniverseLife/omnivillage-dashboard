@@ -156,6 +156,60 @@ const BifurcatedChart = ({ tag }) => {
       },
     ],
   };
+  const OrganicPesticides = [
+    "Grains & Nuts",
+    "Vegetables",
+    "Herbs",
+    "Legumes",
+    "Fruits",
+    "Dairy",
+    "Meat",
+    "Spices & Condiments",
+    "DaiTea/Coffeery",
+    "Oils",
+    "Processed Food & Beverages",
+    "Alcohol/Tobacco",
+  ];
+
+  const pesticideData = {
+    labels: OrganicPesticides,
+    datasets: [
+      {
+        label: "Pesticide A",
+        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        backgroundColor: backgroundColor[2],
+      },
+      {
+        label: "Pesticide B",
+        data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
+        backgroundColor: backgroundColor[1],
+      },
+    ],
+  };
+  const organicFetilizerCrops = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Fertilizer A",
+        data: [10, 30, 25, 15, 25, 25],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const organicPesticidesCrops = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Processing",
+        data: [30, 40, 50, 30, 25, 35],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <CustomPieChart header="Quantity Produced(Types)" data={tagData} />
@@ -168,6 +222,11 @@ const BifurcatedChart = ({ tag }) => {
       <CustomPieChart header="Wastage" data={wastage} />
       <CustomPieChart header="Processing" data={processing} />
       <CustomBarChart header="Organic Fertilizer" data={fertilizerData} />
+      <CustomPieChart header="Fertilizer A" data={organicFetilizerCrops} />
+      <CustomPieChart header="Fertilizer B" data={organicFetilizerCrops} />
+      <CustomBarChart header="Organic Pesticides" data={pesticideData} />
+      <CustomPieChart header="Pesticide A" data={organicPesticidesCrops} />
+      <CustomPieChart header="Pesticide B" data={organicPesticidesCrops} />
     </Stack>
   );
 };

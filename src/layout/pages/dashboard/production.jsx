@@ -9,6 +9,12 @@ import {
 import React, { useState } from "react";
 import CustomPieChart from "../../components/customPieChart/customPieChart";
 import BifurcatedChart from "../../components/bifurcatedChart/bifurcatedChart";
+import IncomeSaleChart from "../../components/incomeSaleChart/incomeSaleChart";
+import ExpenditureSaleChart from "../../components/expenditureSaleChart /expenditureSaleChart";
+import LandAllocated from "../../components/landAllocated/landAllocated";
+import LandChart from "../../components/landChart/landChart";
+import SellingChannel from "../../components/sellingChannel/sellingChannel";
+import StorageFacility from "../../components/storageFacility/storageFacility";
 
 export const backgroundColor = [
   "rgba(255, 99, 132, 0.35)",
@@ -26,53 +32,13 @@ export const borderColor = [
   "rgba(153, 102, 255, 1)",
   "rgba(255, 159, 64, 1)",
 ];
-const LandAllocated = () => {
-  const data = {
-    labels: ["Cultivation", "Trees & Shrubs", "Poultry", "Fishery", "Storage"],
-    datasets: [
-      {
-        label: "Land Allocated",
-        data: [20, 20, 20, 40, 20],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  return (
-    <Stack>
-      <CustomPieChart header="Land Allocated" data={data} />
-    </Stack>
-  );
-};
-
-const LandChart = () => {
-  const data = {
-    labels: ["Cultivation", "Trees & Shrubs", "Poultry", "Fishery", "Storage"],
-    datasets: [
-      {
-        label: "Land Allocated",
-        data: [20, 20, 20, 20, 20],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  return (
-    <Stack direction={"row"} justifyContent={"space-between"}>
-      <CustomPieChart header="Land Allocated" data={data} />
-      <CustomPieChart header="Land Used" data={data} />
-    </Stack>
-  );
-};
 
 function Production() {
   const [selectedOption, setselectedOption] = useState("land-allocated");
   const [selectedTag, setselectedTag] = useState("grains-nuts");
   return (
     <Stack className="container">
-      <Stack direction={"row"} spacing={3}>
+      <Stack direction={"row"} spacing={3} marginBottom={3}>
         <FormControl>
           <InputLabel id="demo-simple-select-label">
             Production Information
@@ -94,7 +60,9 @@ function Production() {
             <MenuItem value="storage-facility">Storage Facility</MenuItem>
           </Select>
         </FormControl>
-        {selectedOption === "bifurcated" && (
+        {selectedOption === "bifurcated" ||
+        selectedOption === "income-chart" ||
+        selectedOption === "expenditure-chart" ? (
           <FormControl>
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
@@ -121,7 +89,7 @@ function Production() {
               <MenuItem value="alocohol-tobacco">Alcohol/Tobacco</MenuItem>
             </Select>
           </FormControl>
-        )}
+        ) : null}
       </Stack>
       {selectedOption === "land-allocated" ? (
         <LandAllocated />
@@ -129,6 +97,14 @@ function Production() {
         <LandChart />
       ) : selectedOption === "bifurcated" ? (
         <BifurcatedChart tag={selectedTag} />
+      ) : selectedOption === "income-chart" ? (
+        <IncomeSaleChart />
+      ) : selectedOption === "expenditure-chart" ? (
+        <ExpenditureSaleChart />
+      ) : selectedOption === "selling-channel" ? (
+        <SellingChannel />
+      ) : selectedOption === "storage-facility" ? (
+        <StorageFacility />
       ) : null}
     </Stack>
   );
