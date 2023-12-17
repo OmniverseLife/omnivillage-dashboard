@@ -30,13 +30,6 @@ function CustomPieChart({ header, data }) {
     <div className="pieChartContainer">
       <h3 style={{ marginBottom: 20, alignSelf: "flex-start" }}>{header}</h3>
       <Pie options={options} data={data} className="pieChart" />
-      {/* <Chart
-        chartType="PieChart"
-        data={data}
-        options={options}
-        width="100%"
-        height={"400px"}
-      /> */}
     </div>
   );
 }
