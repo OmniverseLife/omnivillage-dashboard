@@ -8,6 +8,7 @@ import {
 } from "../../../functions/production";
 import { toast } from "sonner";
 import moment from "moment";
+import ViewDetails from "../../components/viewDetails/viewDetails";
 
 function Cultivation() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -101,7 +102,7 @@ function Cultivation() {
                   View Detail
                 </Stack>
               </MenuItem>
-              <MenuItem
+              {/* <MenuItem
                 onClick={() => {
                   setDeleteId(params.row._id);
                   setAnchorEl(null);
@@ -118,7 +119,7 @@ function Cultivation() {
                   ></i>
                   Delete
                 </Stack>
-              </MenuItem>
+              </MenuItem> */}
             </Menu>
           </div>
         );

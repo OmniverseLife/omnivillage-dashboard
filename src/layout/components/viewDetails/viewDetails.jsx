@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import { mediaURL } from "../../../axios/axiosInstance";
+
 function ViewDetails({ open, setOpen, data, heading }) {
-  console.log(data);
   let obj = {
     id: 1,
     email: "johndoe@gmail.com",
@@ -43,7 +43,7 @@ function ViewDetails({ open, setOpen, data, heading }) {
           >
             <h3>{heading} Details</h3>
             <i
-              class="fa-solid fa-xmark actionIcon"
+              className="fa-solid fa-xmark actionIcon"
               style={{ fontSize: 25 }}
               onClick={() => setOpen()}
             ></i>
@@ -59,53 +59,55 @@ function ViewDetails({ open, setOpen, data, heading }) {
             {data && (
               <>
                 {/* <Stack width="100%"> */}
-                {Object.keys(data)?.map((item, id) => (
-                  <>
-                    <Stack
-                      spacing={1}
-                      justifyContent="flex-start"
-                      padding={1}
-                      marginRight={3}
-                      width="30%"
-                      marginBottom={2}
+                {Object.keys(data)?.map((item) => (
+                  <Stack
+                    spacing={1}
+                    justifyContent="flex-start"
+                    padding={1}
+                    marginRight={3}
+                    width="30%"
+                    marginBottom={2}
+                    key={item}
+                  >
+                    <Typography
+                      textTransform="capitalize"
+                      fontSize={18}
+                      fontFamily="inherit"
                     >
-                      <Typography
-                        textTransform="capitalize"
-                        fontSize={18}
-                        fontFamily="inherit"
-                      >
-                        {item.replaceAll("_", " ").replaceAll("#", "-")}
-                      </Typography>
-                      {
-                        // console.log(String(data[item]).includes("uploads"))
+                      {item.replaceAll("_", " ").replaceAll("#", "-")}
+                    </Typography>
+                    {
+                      // console.log(String(data[item]).includes("uploads"))
 
-                        String(data[item]).includes("uploads/") ? (
-                          <img
-                            style={{
-                              width: "95%",
-                              objectFit: "contain",
-                            }}
-                            src={mediaURL + data[item]}
-                            alt=""
-                          />
-                        ) : (
-                          <Typography
-                            textTransform="capitalize"
-                            fontSize={16}
-                            border="0.5px solid rgba(0,0,0,0.1)"
-                            padding={1}
-                            borderRadius={1}
-                            fontFamily="inherit"
-                            style={{ background: "rgb(250, 250, 250)" }}
-                          >
-                            {String(item).includes("createdAt")
-                              ? moment(data[item]).add(10, "days").calendar()
-                              : data[item]}
-                          </Typography>
-                        )
-                      }
-                    </Stack>
-                  </>
+                      String(data[item]).includes("uploads/") ? (
+                        <img
+                          style={{
+                            width: "95%",
+                            objectFit: "contain",
+                          }}
+                          src={mediaURL + data[item]}
+                          alt=""
+                        />
+                      ) : (
+                        <Typography
+                          textTransform="capitalize"
+                          fontSize={16}
+                          border="0.5px solid rgba(0,0,0,0.1)"
+                          padding={1}
+                          borderRadius={1}
+                          fontFamily="inherit"
+                          style={{
+                            background: "rgb(250, 250, 250)",
+                            minHeight: "41px",
+                          }}
+                        >
+                          {String(item).includes("createdAt")
+                            ? moment(data[item]).add(10, "days").calendar()
+                            : data[item]}
+                        </Typography>
+                      )
+                    }
+                  </Stack>
                 ))}
                 {/* </Stack> */}
               </>

@@ -4,6 +4,7 @@ import { Menu, MenuItem, Stack } from "@mui/material";
 import { deleteHunting, fetchHunting } from "../../../functions/production";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
+import ViewDetails from "../../components/viewDetails/viewDetails";
 
 function Hunting() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -97,7 +98,7 @@ function Hunting() {
                   View Detail
                 </Stack>
               </MenuItem>
-              <MenuItem
+              {/* <MenuItem
                 onClick={() => {
                   setDeleteId(params.row._id);
                   setAnchorEl(null);
@@ -114,7 +115,7 @@ function Hunting() {
                   ></i>{" "}
                   Delete
                 </Stack>
-              </MenuItem>
+              </MenuItem> */}
             </Menu>
           </div>
         );

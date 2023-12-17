@@ -50,8 +50,52 @@ export const routes = [
     Component: lazy(() => import("../layout/pages/production/storage")),
   },
   {
-    path: "/production/sellingChannel",
-    Component: lazy(() => import("../layout/pages/production/sellingChannel")),
+    path: "/consumption/grains-nuts",
+    Component: lazy(() => import("../layout/pages/consumption/grainsandnuts")),
+  },
+  {
+    path: "/consumption/herbs",
+    Component: lazy(() => import("../layout/pages/consumption/herbs")),
+  },
+  {
+    path: "/consumption/legumes",
+    Component: lazy(() => import("../layout/pages/consumption/legumes")),
+  },
+  // {
+  //   path: "/consumption/sellingChannel",
+  //   Component: lazy(() => import("../layout/pages/consumption/sellingChannel")),
+  // },
+  {
+    path: "/consumption/fuits-vegetables",
+    Component: lazy(() => import("../layout/pages/consumption/fruits")),
+  },
+  {
+    path: "/consumption/dairy",
+    Component: lazy(() => import("../layout/pages/consumption/dairy")),
+  },
+  {
+    path: "/consumption/meat",
+    Component: lazy(() => import("../layout/pages/consumption/meat")),
+  },
+  {
+    path: "/consumption/spices",
+    Component: lazy(() => import("../layout/pages/consumption/spices")),
+  },
+  {
+    path: "/consumption/tea-coffee",
+    Component: lazy(() => import("../layout/pages/consumption/tea")),
+  },
+  {
+    path: "/consumption/oils",
+    Component: lazy(() => import("../layout/pages/consumption/oils")),
+  },
+  {
+    path: "/consumption/processed-foods",
+    Component: lazy(() => import("../layout/pages/consumption/processedFoods")),
+  },
+  {
+    path: "/consumption/alcohol",
+    Component: lazy(() => import("../layout/pages/consumption/alcohol")),
   },
   {
     path: "/dashboard/production",

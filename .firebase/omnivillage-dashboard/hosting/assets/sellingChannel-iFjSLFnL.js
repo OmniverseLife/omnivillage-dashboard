@@ -1,1 +1,0 @@
-import{j as a}from"./index-LJsbQ0vA.js";import{P as e}from"./production-N9uAdM1-.js";function o(){return a.jsxDEV(e,{},void 0,!1,{fileName:"/Users/aannaassalam/Documents/Github/omni-village-dashboard/src/layout/pages/production/sellingChannel.jsx",lineNumber:5,columnNumber:10},this)}export{o as default};

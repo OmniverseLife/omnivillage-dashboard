@@ -1,28 +1,28 @@
-import React, { useState } from "react";
-import Production from "./production";
 import { Menu, MenuItem, Stack } from "@mui/material";
-import {
-  deleteFishery,
-  fetchCultivations,
-  fetchFishery,
-} from "../../../functions/production";
-import moment from "moment";
 import { useQuery } from "@tanstack/react-query";
+import moment from "moment";
+import React, { useState } from "react";
+import {
+  fetchGrains,
+  fetchProcessedFoods,
+} from "../../../functions/consumption";
+import { deleteCultivation } from "../../../functions/production";
+import Consumption from "./consumption";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 
-function Fishery() {
+function ProcessedFoods() {
   const [selectedrow, setSelectedrow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [modalData, setmodalData] = useState({});
   const [modalOpen, setmodalOpen] = useState(false);
   const {
-    data: fishery = [],
+    data: processed_foods = [],
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["fishery"],
-    queryFn: fetchFishery,
+    queryKey: ["processed_foods"],
+    queryFn: fetchProcessedFoods,
   });
   function deepFlattenToObject(obj, prefix = "") {
     return Object.keys(obj).reduce((acc, k) => {
@@ -40,13 +40,13 @@ function Fishery() {
     console.log(obj);
     setmodalData({ ...obj });
   };
-  const rows = fishery.map((_fishery, index) => ({
+  const rows = processed_foods.map((_cultivation, index) => ({
     id: index + 1,
-    _id: _fishery._id,
-    name: `${_fishery.user.first_name} ${_fishery.user.last_name}`,
-    phone: `${_fishery.country_code} ${_fishery.phone}`,
-    crop_name: _fishery.crop.name.en,
-    date: moment(_fishery.created_at).format("ll"),
+    _id: _cultivation._id,
+    name: `${_cultivation.user.first_name} ${_cultivation.user.last_name}`,
+    phone: `${_cultivation.user.country_code} ${_cultivation.user.phone}`,
+    crop_name: _cultivation.consumption_crop.name,
+    date: moment(_cultivation.created_at).format("ll"),
   }));
 
   const columns = [
@@ -75,7 +75,7 @@ function Fishery() {
               onClick={(e) => {
                 setSelectedrow(params.row.id);
                 setAnchorEl(e.currentTarget);
-                selectData(fishery[params.row.id]);
+                selectData(processed_foods[params.row.id]);
               }}
               id={params.row.id}
             ></i>
@@ -116,7 +116,7 @@ function Fishery() {
                   <i
                     className="fa-regular fa-trash-can"
                     style={{ marginRight: 10 }}
-                  ></i>{" "}
+                  ></i>
                   Delete
                 </Stack>
               </MenuItem> */}
@@ -126,16 +126,15 @@ function Fishery() {
       },
     },
   ];
-
   return (
     <div>
-      <Production
+      <Consumption
         rows={rows}
         columns={columns}
         isLoading={isLoading}
         refetch={refetch}
         setDeleteId={setDeleteId}
-        deleteFn={deleteFishery}
+        deleteFn={deleteCultivation}
         deleteId={deleteId}
       />
       {selectedrow && (
@@ -143,11 +142,11 @@ function Fishery() {
           open={modalOpen}
           setOpen={() => setmodalOpen(false)}
           data={modalData}
-          heading="Fishery"
+          heading="Processed Foods"
         />
       )}
     </div>
   );
 }
 
-export default Fishery;
+export default ProcessedFoods;

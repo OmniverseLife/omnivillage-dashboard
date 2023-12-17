@@ -43,6 +43,66 @@ export const endpoints = {
     edit_crop: "/hunting_crop/edit_hunting_crop",
     delete_crop: "/hunting_crop",
     get_all: "/hunting/get_all",
-    delete: "hunting/delete_hunting",
+    delete: "/hunting/delete_hunting",
+  },
+  grains: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28381f75fd724a743b3",
+    // delete: "/consumption/delete_hunting",
+  },
+  // vegetables: {
+  //   get_all:
+  //     "/consumption/get_all?consumption_type_id=6506e28381f75fd724a743b3",
+  //   // delete: "/consumption/delete_hunting",
+  // },
+  herbs: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28381f75fd724a743b3",
+    // delete: "/consumption/delete_hunting",
+  },
+  legumes: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28381f75fd724a743b9",
+    // delete: "/consumption/delete_hunting",
+  },
+  fruits_vegetables: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28381f75fd724a743bb",
+    // delete: "/consumption/delete_hunting",
+  },
+  dairy: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28381f75fd724a743bd",
+    // delete: "/consumption/delete_hunting",
+  },
+  meat: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28381f75fd724a743bf",
+    // delete: "/consumption/delete_hunting",
+  },
+  sauce: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28481f75fd724a743c3",
+    // delete: "/consumption/delete_hunting",
+  },
+  tea: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28481f75fd724a743c5",
+    // delete: "/consumption/delete_hunting",
+  },
+  oils: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28481f75fd724a743c7",
+    // delete: "/consumption/delete_hunting",
+  },
+  processedFoods: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28481f75fd724a743c9",
+    // delete: "/consumption/delete_hunting",
+  },
+  alcohol: {
+    get_all:
+      "/consumption/get_all?consumption_type_id=6506e28481f75fd724a743cb",
+    // delete: "/consumption/delete_hunting",
   },
 };

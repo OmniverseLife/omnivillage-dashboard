@@ -28,13 +28,13 @@ export default function Sidebar() {
         onClick={() => setdashboardMenu(!dashboardMenu)}
         className={paths.includes("dashboard") ? "link active" : "link"}
       >
-        <i class="fa-solid fa-chart-line"></i>
+        <i className="fa-solid fa-chart-line"></i>
         <p>Dashboard</p>
         <span>
           {dashboardMenu ? (
-            <i class="fa-solid fa-minus"></i>
+            <i className="fa-solid fa-minus"></i>
           ) : (
-            <i class="fa-solid fa-plus"></i>
+            <i className="fa-solid fa-plus"></i>
           )}
         </span>
       </Link>
@@ -69,13 +69,13 @@ export default function Sidebar() {
         onClick={() => setproductionMenu(!productionMenu)}
         // to="/production"
       >
-        <i class="fa-solid fa-seedling"></i>
+        <i className="fa-solid fa-seedling"></i>
         <p>Production</p>
         <span>
           {productionMenu ? (
-            <i class="fa-solid fa-minus"></i>
+            <i className="fa-solid fa-minus"></i>
           ) : (
-            <i class="fa-solid fa-plus"></i>
+            <i className="fa-solid fa-plus"></i>
           )}
         </span>
       </Link>
@@ -135,47 +135,87 @@ export default function Sidebar() {
             : "link"
         }
       >
-        <i class="fa-solid fa-utensils"></i>
+        <i className="fa-solid fa-utensils"></i>
         <p>Consumption</p>
         <span>
           {consumtionMenu ? (
-            <i class="fa-solid fa-minus"></i>
+            <i className="fa-solid fa-minus"></i>
           ) : (
-            <i class="fa-solid fa-plus"></i>
+            <i className="fa-solid fa-plus"></i>
           )}
         </span>
       </Link>
       {consumtionMenu && (
         <div className="menu">
           <Link
-            to="/consumption/menu1"
-            className={paths.includes("menu1") ? "link active" : "link"}
+            to="/consumption/grains-nuts"
+            className={paths.includes("grains-nuts") ? "link active" : "link"}
           >
-            Menu 1
+            Grains & Nuts
+          </Link>
+          {/* <Link
+            to="/consumption/herbs"
+            className={paths.includes("herbs") ? "link active" : "link"}
+          >
+            Herbs
+          </Link> */}
+          <Link
+            to="/consumption/legumes"
+            className={paths.includes("legumes") ? "link active" : "link"}
+          >
+            Legumes
           </Link>
           <Link
-            to="/consumption/menu2"
-            className={paths.includes("menu2") ? "link active" : "link"}
+            to="/consumption/fuits-vegetables"
+            className={
+              paths.includes("fuits-vegetables") ? "link active" : "link"
+            }
           >
-            Menu 2
+            Fruits & Vegetables
           </Link>
           <Link
-            to="/consumption/menu3"
-            className={paths.includes("menu3") ? "link active" : "link"}
+            to="/consumption/dairy"
+            className={paths.includes("dairy") ? "link active" : "link"}
           >
-            Menu 3
+            Dairy
           </Link>
           <Link
-            to="/consumption/menu4"
-            className={paths.includes("menu4") ? "link active" : "link"}
+            to="/consumption/meat"
+            className={paths.includes("meat") ? "link active" : "link"}
           >
-            Menu 4
+            Meat
           </Link>
           <Link
-            to="/consumption/menu5"
-            className={paths.includes("menu5") ? "link active" : "link"}
+            to="/consumption/spices"
+            className={paths.includes("spices") ? "link active" : "link"}
           >
-            Menu 5
+            Spices
+          </Link>
+          <Link
+            to="/consumption/tea-coffee"
+            className={paths.includes("tea-coffee") ? "link active" : "link"}
+          >
+            Tea/Coffee
+          </Link>
+          <Link
+            to="/consumption/oils"
+            className={paths.includes("oils") ? "link active" : "link"}
+          >
+            Oils
+          </Link>
+          <Link
+            to="/consumption/processed-foods"
+            className={
+              paths.includes("processed-foods") ? "link active" : "link"
+            }
+          >
+            Processed Foods
+          </Link>
+          <Link
+            to="/consumption/alcohol"
+            className={paths.includes("alcohol") ? "link active" : "link"}
+          >
+            Alcohol
           </Link>
         </div>
       )}
@@ -183,20 +223,20 @@ export default function Sidebar() {
         to="/users"
         className={paths.includes("users") ? "link active" : "link"}
       >
-        <i class="fa-solid fa-user-group"></i>
+        <i className="fa-solid fa-user-group"></i>
         <p>Users</p>
       </Link>
       <a
         onClick={() => setcropsMenu(!cropsMenu)}
         className={paths.includes("crops") ? "link active" : "link"}
       >
-        <i class="fa-solid fa-utensils"></i>
+        <i className="fa-solid fa-utensils"></i>
         <p>Crops</p>
         <span>
           {cropsMenu ? (
-            <i class="fa-solid fa-minus"></i>
+            <i className="fa-solid fa-minus"></i>
           ) : (
-            <i class="fa-solid fa-plus"></i>
+            <i className="fa-solid fa-plus"></i>
           )}
         </span>
       </a>
@@ -235,19 +275,19 @@ export default function Sidebar() {
         </div>
       )}
       <Link
+        to="/settings"
+        className={paths.includes("settings") ? "link active" : "link"}
+      >
+        <i className="fa-solid fa-gear"></i>
+        <p>Settings</p>
+      </Link>
+      <Link
         to="/logout"
         style={{ marginTop: "auto" }}
         className={paths.includes("logout") ? "link active" : "link"}
       >
-        <i class="fa-solid fa-power-off"></i>
+        <i className="fa-solid fa-power-off"></i>
         <p>Logout</p>
-      </Link>
-      <Link
-        to="/settings"
-        className={paths.includes("settings") ? "link active" : "link"}
-      >
-        <i class="fa-solid fa-gear"></i>
-        <p>Settings</p>
       </Link>
     </div>
   );

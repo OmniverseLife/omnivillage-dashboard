@@ -5,8 +5,10 @@ import profile from "../../../assets/profile.png";
 export default function Navbar() {
   const location = useLocation();
   const paths = location.pathname.split("/");
-  console.log(paths);
-  let heading = paths[2] ? paths[2] + " " + paths[1] : paths[1];
+
+  let heading = paths[2]
+    ? paths[2].replace("-", " & ") + " " + paths[1]
+    : paths[1];
   return (
     <div className="navbar">
       <div className="navbar-items">
