@@ -7,7 +7,7 @@ import {
   Stack,
 } from "@mui/material";
 import React, { useState } from "react";
-import CustomPieChart from "../../components/customPieChart/customPieChart";
+
 import BifurcatedChart from "../../components/bifurcatedChart/bifurcatedChart";
 import IncomeSaleChart from "../../components/incomeSaleChart/incomeSaleChart";
 import ExpenditureSaleChart from "../../components/expenditureSaleChart /expenditureSaleChart";
@@ -34,7 +34,7 @@ export const borderColor = [
 ];
 
 function Production() {
-  const [selectedOption, setselectedOption] = useState("land-allocated");
+  const [selectedOption, setselectedOption] = useState("land-chart");
   const [selectedTag, setselectedTag] = useState("grains-nuts");
   return (
     <Stack className="container">
@@ -51,18 +51,14 @@ function Production() {
             label="Production Information"
             onChange={(e) => setselectedOption(e.target.value)}
           >
-            <MenuItem value="land-allocated">Land Allocated</MenuItem>
             <MenuItem value="land-chart">Land Chart</MenuItem>
             <MenuItem value="bifurcated">Bifurcated Chart By Tags</MenuItem>
-            <MenuItem value="income-chart">Income Chart</MenuItem>
-            <MenuItem value="expenditure-chart">Expenditure Chart</MenuItem>
+            <MenuItem value="income-chart">Income & Expenditure Chart</MenuItem>
             <MenuItem value="selling-channel">Selling Channel</MenuItem>
             <MenuItem value="storage-facility">Storage Facility</MenuItem>
           </Select>
         </FormControl>
-        {selectedOption === "bifurcated" ||
-        selectedOption === "income-chart" ||
-        selectedOption === "expenditure-chart" ? (
+        {selectedOption === "bifurcated" ? (
           <FormControl>
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
@@ -91,16 +87,12 @@ function Production() {
           </FormControl>
         ) : null}
       </Stack>
-      {selectedOption === "land-allocated" ? (
-        <LandAllocated />
-      ) : selectedOption === "land-chart" ? (
+      {selectedOption === "land-chart" ? (
         <LandChart />
       ) : selectedOption === "bifurcated" ? (
         <BifurcatedChart tag={selectedTag} />
       ) : selectedOption === "income-chart" ? (
         <IncomeSaleChart />
-      ) : selectedOption === "expenditure-chart" ? (
-        <ExpenditureSaleChart />
       ) : selectedOption === "selling-channel" ? (
         <SellingChannel />
       ) : selectedOption === "storage-facility" ? (

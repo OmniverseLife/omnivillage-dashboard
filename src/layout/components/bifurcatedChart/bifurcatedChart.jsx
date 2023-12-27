@@ -210,6 +210,30 @@ const BifurcatedChart = ({ tag }) => {
       },
     ],
   };
+  const incomeByCrops = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Income Generated",
+        data: [10, 40, 20, 30, 25, 35],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const expenditureByCrops = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Expenditure",
+        data: [10, 40, 20, 30, 25, 35],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <CustomPieChart header="Quantity Produced(Types)" data={tagData} />
@@ -220,6 +244,8 @@ const BifurcatedChart = ({ tag }) => {
       <CustomPieChart header="Sold To Market" data={soldToMarket} />
       <CustomPieChart header="Fed To Live Stock" data={fedToLiveStock} />
       <CustomPieChart header="Wastage" data={wastage} />
+      <CustomPieChart header="Income By Crops" data={incomeByCrops} />
+      <CustomPieChart header="Expenditure By Crops" data={expenditureByCrops} />
       <CustomPieChart header="Processing" data={processing} />
       <CustomBarChart header="Organic Fertilizer" data={fertilizerData} />
       <CustomPieChart header="Fertilizer A" data={organicFetilizerCrops} />

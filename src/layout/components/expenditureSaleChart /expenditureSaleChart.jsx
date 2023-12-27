@@ -30,25 +30,13 @@ function ExpenditureSaleChart() {
       },
     ],
   };
-  const expenditureByCrops = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
-    datasets: [
-      {
-        label: "Expenditure",
-        data: [10, 40, 20, 30, 25, 35],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <CustomBarChart
         header="Expenditure By Labels"
         data={expenditureByLabelsData}
       />
-      <CustomPieChart header="Expenditure By Crops" data={expenditureByCrops} />
     </Stack>
   );
 }
