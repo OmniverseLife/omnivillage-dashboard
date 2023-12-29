@@ -16,10 +16,49 @@ function LandChart() {
       },
     ],
   };
+  const tagData = {
+    labels: [
+      "Grains & Nuts",
+      "Vegetables",
+      "Herbs",
+      "Legumes",
+      "Fruits",
+      "Dairy",
+      "Meat",
+      "Spices & Condiments",
+      "DaiTea/Coffeery",
+      "Oils",
+      "Processed Food & Beverages",
+      "Alcohol/Tobacco",
+    ],
+    datasets: [
+      {
+        label: "Quantity Produced",
+        data: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
   return (
-    <Stack direction={"row"} justifyContent={"space-between"}>
-      <CustomPieChart header="Land Allocated" data={data} />
-      <CustomPieChart header="Land Used" data={data} />
+    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <CustomPieChart
+        header="Land Allocated"
+        data={data}
+        measurement={"100km"}
+      />
+      <CustomPieChart header="Land Used" data={data} measurement={"100km"} />
+      <CustomPieChart
+        header="Land Allocated (Tags)"
+        data={tagData}
+        measurement={"100km"}
+      />
+      <CustomPieChart
+        header="Land Used (Tags)"
+        data={tagData}
+        measurement={"100km"}
+      />
     </Stack>
   );
 }

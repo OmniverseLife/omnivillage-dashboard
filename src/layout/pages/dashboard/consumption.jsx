@@ -8,68 +8,37 @@ import {
 import React, { useState } from "react";
 import { backgroundColor } from "./production";
 import CustomBarChart from "../../components/customBarChart/customBarChart";
+import ConsumptionFromProduction from "../../components/consumptionFromProduction/consumptionFromProduction";
+import SelfGrown from "../../components/selfGrown/selfGrown";
+import PurchasedNeighbour from "../../components/purchasedNeighbour/purchasedNeighbour";
+import PurchasedOutside from "../../components/purchasedOutside/purchasedOutside";
+import IdealQuantityDiet from "../../components/idealQuantityDiet/idealQuantityDiet";
 
 function Consumption() {
-  const tags = [
-    "Grains & Nuts",
-    "Vegetables",
-    "Herbs",
-    "Legumes",
-    "Fruits",
-    "Dairy",
-    "Meat",
-    "Spices & Condiments",
-    "DaiTea/Coffeery",
-    "Oils",
-    "Processed Food & Beverages",
-    "Alcohol/Tobacco",
-  ];
-
-  const tagsData = {
-    labels: tags,
-    datasets: [
-      {
-        label: "Ideal Quantity To Be Consumed",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
-        backgroundColor: backgroundColor[2],
-      },
-      {
-        label: "Currently Quantity Consumed",
-        data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
-        backgroundColor: backgroundColor[1],
-      },
-    ],
-  };
-  const crops = [
-    "Almonds",
-    "Walnuts",
-    "Cashew Nuts",
-    "Carrot",
-    "Apple",
-    "Banana",
-  ];
-  const cropsData = {
-    labels: crops,
-    datasets: [
-      {
-        label: "Ideal Quantity To Be Consumed",
-        data: [40, 80, 60, 30, 70, 10],
-        backgroundColor: backgroundColor[2],
-      },
-      {
-        label: "Currently Quantity Consumed",
-        data: [20, 60, 90, 30, 20, 50],
-        backgroundColor: backgroundColor[1],
-      },
-    ],
-  };
-  const [selectedOption, setselectedOption] = useState("ideal");
-  const [selectedCrop, setselectedCrop] = useState("");
+  const [selectedOption, setselectedOption] = useState(
+    "consumption-production"
+  );
   const [selectedTag, setselectedTag] = useState("grains-nuts");
+  const [selectedCrop, setselectedCrop] = useState("");
+  const [selectedWeight, setselectedWeight] = useState("kg");
+  const renderItems = () => {
+    switch (selectedOption) {
+      case "consumption-production":
+        return <ConsumptionFromProduction />;
+      case "self-grown":
+        return <SelfGrown />;
+      case "purchased-neighbours":
+        return <PurchasedNeighbour />;
+      case "purchased-outside":
+        return <PurchasedOutside />;
+      case "ideal-diet":
+        return <IdealQuantityDiet />;
+    }
+  };
   return (
     <Stack className="container">
       <Stack direction={"row"} spacing={3} marginBottom={3}>
-        {/* <FormControl>
+        <FormControl size="small">
           <InputLabel id="demo-simple-select-label">
             Consumption Information
           </InputLabel>
@@ -81,11 +50,20 @@ function Consumption() {
             label="Production Information"
             onChange={(e) => setselectedOption(e.target.value)}
           >
-            <MenuItem value="ideal">Ideal Quantity Healthy Diet</MenuItem>
+            <MenuItem value="consumption-production">
+              Consumption From Production
+            </MenuItem>
+            <MenuItem value="self-grown">Self Grown & Consumed</MenuItem>
+            <MenuItem value="purchased-neighbours">
+              Purchased From Neighbours
+            </MenuItem>
+            <MenuItem value="purchased-outside">
+              Purchased From Outside
+            </MenuItem>
+            <MenuItem value="ideal-diet">Ideal Quantity Healthy Diet</MenuItem>
           </Select>
-        </FormControl> */}
-
-        <FormControl>
+        </FormControl>
+        <FormControl size="small">
           <InputLabel id="demo-simple-select-label">Tags</InputLabel>
           <Select
             labelId="demo-simple-select-label"
@@ -111,30 +89,46 @@ function Consumption() {
             <MenuItem value="alocohol-tobacco">Alcohol/Tobacco</MenuItem>
           </Select>
         </FormControl>
-        <FormControl>
-          <InputLabel id="demo-simple-select-label">Crops</InputLabel>
+        {selectedOption === "consumption-production" && (
+          <FormControl size="small">
+            <InputLabel id="demo-simple-select-label">Crops</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectedCrop}
+              style={{ width: 200 }}
+              label="Production Information"
+              onChange={(e) => setselectedCrop(e.target.value)}
+            >
+              <MenuItem value="">Select</MenuItem>
+              <MenuItem value="almonds">Almonds</MenuItem>
+              <MenuItem value="walnuts">Walnuts</MenuItem>
+              <MenuItem value="cashew">Cashew Nuts</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+
+        <FormControl size="small" style={{ marginLeft: "auto" }}>
+          <InputLabel id="demo-simple-select-label">Weight</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={selectedCrop}
-            style={{ width: 300 }}
+            value={selectedWeight}
+            style={{ width: 200 }}
             label="Production Information"
-            onChange={(e) => setselectedCrop(e.target.value)}
+            onChange={(e) => setselectedWeight(e.target.value)}
           >
-            <MenuItem value="almonds">Almonds</MenuItem>
-            <MenuItem value="walnuts">Walnuts</MenuItem>
-            <MenuItem value="cashew">Cashew Nuts</MenuItem>
+            <MenuItem value="tonne">Tonne</MenuItem>
+            <MenuItem value="kg">Kilogram</MenuItem>
+            <MenuItem value="g">Gram</MenuItem>
+            <MenuItem value="mg">Miligram</MenuItem>
+            <MenuItem value="stone">Stone</MenuItem>
+            <MenuItem value="pound">Pound</MenuItem>
+            <MenuItem value="ounce">Ounce</MenuItem>
           </Select>
         </FormControl>
       </Stack>
-      <CustomBarChart
-        header="Ideal Quantity Consumption (Tags)"
-        data={tagsData}
-      />
-      <CustomBarChart
-        header="Ideal Quantity Consumption (Crops)"
-        data={cropsData}
-      />
+      {renderItems()}
     </Stack>
   );
 }

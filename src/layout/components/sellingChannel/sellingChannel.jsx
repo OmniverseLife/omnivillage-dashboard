@@ -5,24 +5,11 @@ import { Stack } from "@mui/material";
 
 function SellingChannel() {
   const sellingChannel = {
-    labels: [
-      "Grains & Nuts",
-      "Vegetables",
-      "Herbs",
-      "Legumes",
-      "Fruits",
-      "Dairy",
-      "Meat",
-      "Spices & Condiments",
-      "DaiTea/Coffeery",
-      "Oils",
-      "Processed Food & Beverages",
-      "Alcohol/Tobacco",
-    ],
+    labels: ["Local Market", "Agent", "Ecommerce", "Export", "None"],
     datasets: [
       {
         label: "Selling Channel",
-        data: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20],
+        data: [20, 20, 20, 20, 20],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -31,7 +18,7 @@ function SellingChannel() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"}>
-      <CustomPieChart header="Lands In Selling Channel" data={sellingChannel} />
+      <CustomPieChart header="Selling Channel" data={sellingChannel} />
     </Stack>
   );
 }
