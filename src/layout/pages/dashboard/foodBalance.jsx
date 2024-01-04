@@ -16,7 +16,7 @@ function FoodBalance() {
   return (
     <Stack className="container">
       <Stack direction={"row"} spacing={3} marginBottom={3}>
-        <FormControl>
+        <FormControl size="small">
           <InputLabel id="demo-simple-select-label">
             Food Balance Information
           </InputLabel>
@@ -33,7 +33,7 @@ function FoodBalance() {
           </Select>
         </FormControl>
         {selectedOption === "analytics" && (
-          <FormControl>
+          <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
               labelId="demo-simple-select-label"

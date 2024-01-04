@@ -45,6 +45,13 @@
 .rightSide .css-ptkaw2-MuiDataGrid-root .MuiDataGrid-row:nth-child(odd) {
   background-color: rgb(240, 240, 240);
 }
+.rightSide .css-4rnjzp-MuiFormLabel-root-MuiInputLabel-root {
+  color: rgba(62, 62, 62, 0.6);
+}
+.rightSide .css-v4u5dn-MuiInputBase-root-MuiInput-root:before {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  /* bottom: -3px; */
+}
 /* .rightSide .css-1ygcj2i-MuiTableCell-root,
 .rightSide .css-1azl6jz-MuiTableCell-root {
   font-size: 17px;
