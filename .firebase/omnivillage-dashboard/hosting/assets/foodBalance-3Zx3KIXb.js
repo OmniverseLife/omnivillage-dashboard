@@ -1,0 +1,1 @@
+import{j as a}from"./index-zjLlSkh-.js";function o(){return a.jsxDEV("div",{children:"FoodBalance"},void 0,!1,{fileName:"/Users/aannaassalam/Documents/Github/omni-village-dashboard/src/layout/pages/dashboard/foodBalance.jsx",lineNumber:4,columnNumber:10},this)}export{o as default};

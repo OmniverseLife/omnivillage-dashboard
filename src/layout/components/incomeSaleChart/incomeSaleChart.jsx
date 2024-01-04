@@ -44,8 +44,8 @@ function IncomeSaleChart() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
-      <CustomBarChart header="Income By Labels" data={incomeByLabelsData} />
-      <CustomPieChart header="Income By Crops" data={incomeByCrops} />
+      <CustomBarChart header="a. Income By Labels" data={incomeByLabelsData} />
+      <CustomPieChart header="b. Income By Crops" data={incomeByCrops} />
     </Stack>
   );
 }

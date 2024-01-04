@@ -45,10 +45,13 @@ function ExpenditureSaleChart() {
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <CustomBarChart
-        header="Expenditure By Labels"
+        header="a. Expenditure By Labels"
         data={expenditureByLabelsData}
       />
-      <CustomPieChart header="Expenditure By Crops" data={expenditureByCrops} />
+      <CustomPieChart
+        header="b. Expenditure By Crops"
+        data={expenditureByCrops}
+      />
     </Stack>
   );
 }

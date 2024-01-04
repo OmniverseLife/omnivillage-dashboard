@@ -1,0 +1,1 @@
+import{j as a}from"./index-zjLlSkh-.js";import{P as o}from"./production-_vy1lDTx.js";function r(){return a.jsxDEV(o,{},void 0,!1,{fileName:"/Users/aannaassalam/Documents/Github/omni-village-dashboard/src/layout/pages/production/storage.jsx",lineNumber:5,columnNumber:10},this)}export{r as default};

@@ -51,13 +51,13 @@ function Production() {
             label="Production Information"
             onChange={(e) => setselectedOption(e.target.value)}
           >
-            <MenuItem value="land-allocated">Land Allocated</MenuItem>
-            <MenuItem value="land-chart">Land Chart</MenuItem>
-            <MenuItem value="bifurcated">Bifurcated Chart By Tags</MenuItem>
-            <MenuItem value="income-chart">Income Chart</MenuItem>
-            <MenuItem value="expenditure-chart">Expenditure Chart</MenuItem>
-            <MenuItem value="selling-channel">Selling Channel</MenuItem>
-            <MenuItem value="storage-facility">Storage Facility</MenuItem>
+            <MenuItem value="land-allocated">1. Land Allocated</MenuItem>
+            <MenuItem value="land-chart">2. Land Chart</MenuItem>
+            <MenuItem value="bifurcated">3. Bifurcated Chart By Tags</MenuItem>
+            <MenuItem value="income-chart">4. Income Chart</MenuItem>
+            <MenuItem value="expenditure-chart">5. Expenditure Chart</MenuItem>
+            <MenuItem value="selling-channel">6. Selling Channel</MenuItem>
+            <MenuItem value="storage-facility">7. Storage Facility</MenuItem>
           </Select>
         </FormControl>
         {selectedOption === "bifurcated" ||
@@ -74,19 +74,21 @@ function Production() {
               onChange={(e) => setselectedTag(e.target.value)}
             >
               <MenuItem value="grains-nuts">Grains & Nuts</MenuItem>
-              <MenuItem value="vegetables">Vegetables</MenuItem>
-              <MenuItem value="herbs">Herbs</MenuItem>
               <MenuItem value="legumes">Legumes</MenuItem>
-              <MenuItem value="fruits">Fruits</MenuItem>
-              <MenuItem value="dairy">Dairy</MenuItem>
-              <MenuItem value="meat">Meat</MenuItem>
-              <MenuItem value="spices-condiments">Spices & Condiments</MenuItem>
+              <MenuItem value="fruits-vegetables-herbs">
+                Fruits, Vegetables & Herbs
+              </MenuItem>
+              <MenuItem value="dairy-animal-based">
+                Dairy & Animal based
+              </MenuItem>
+              <MenuItem value="meat-seafood">Meat & Seafood</MenuItem>
+              <MenuItem value="sauce">Sauce</MenuItem>
               <MenuItem value="tea-coffee">Tea/Coffee</MenuItem>
               <MenuItem value="oils">Oils</MenuItem>
               <MenuItem value="food-beverage">
                 Processed Food & Beverages
               </MenuItem>
-              <MenuItem value="alocohol-tobacco">Alcohol/Tobacco</MenuItem>
+              <MenuItem value="alocohol-tobacco">Tobacco and Alcohol</MenuItem>
             </Select>
           </FormControl>
         ) : null}

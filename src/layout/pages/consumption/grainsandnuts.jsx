@@ -21,6 +21,7 @@ function GrainsAndNuts() {
     queryKey: ["grains_and_nuts"],
     queryFn: fetchGrains,
   });
+
   function deepFlattenToObject(obj, prefix = "") {
     return Object.keys(obj).reduce((acc, k) => {
       const pre = prefix.length ? prefix + "#" : "";
@@ -32,6 +33,7 @@ function GrainsAndNuts() {
       return acc;
     }, {});
   }
+
   const selectData = (data) => {
     let obj = deepFlattenToObject(data);
     console.log(obj);
@@ -123,8 +125,6 @@ function GrainsAndNuts() {
       },
     },
   ];
-
-  console.log(isLoading);
 
   return (
     <div>

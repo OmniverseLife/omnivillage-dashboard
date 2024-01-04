@@ -18,7 +18,7 @@ function LandAllocated() {
   };
   return (
     <Stack>
-      <CustomPieChart header="Land Allocated" data={data} />
+      <CustomPieChart header="a. Land Allocated" data={data} />
     </Stack>
   );
 }

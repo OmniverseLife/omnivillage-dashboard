@@ -212,21 +212,21 @@ const BifurcatedChart = ({ tag }) => {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
-      <CustomPieChart header="Quantity Produced(Types)" data={tagData} />
-      <CustomPieChart header="Quantity Produced(Crops)" data={cropData} />
-      <CustomPieChart header="Soil Health" data={soilHealth} />
-      <CustomPieChart header="Self Consumed" data={selfConsumed} />
-      <CustomPieChart header="Sold To Neighbours" data={soldToNeighbours} />
-      <CustomPieChart header="Sold To Market" data={soldToMarket} />
-      <CustomPieChart header="Fed To Live Stock" data={fedToLiveStock} />
-      <CustomPieChart header="Wastage" data={wastage} />
-      <CustomPieChart header="Processing" data={processing} />
-      <CustomBarChart header="Organic Fertilizer" data={fertilizerData} />
-      <CustomPieChart header="Fertilizer A" data={organicFetilizerCrops} />
-      <CustomPieChart header="Fertilizer B" data={organicFetilizerCrops} />
-      <CustomBarChart header="Organic Pesticides" data={pesticideData} />
-      <CustomPieChart header="Pesticide A" data={organicPesticidesCrops} />
-      <CustomPieChart header="Pesticide B" data={organicPesticidesCrops} />
+      <CustomPieChart header="a.i. Quantity Produced(Types)" data={tagData} />
+      <CustomPieChart header="a.ii. Quantity Produced(Crops)" data={cropData} />
+      <CustomPieChart header="b. Soil Health" data={soilHealth} />
+      <CustomPieChart header="c. Self Consumed" data={selfConsumed} />
+      <CustomPieChart header="d. Sold To Neighbours" data={soldToNeighbours} />
+      <CustomPieChart header="e. Sold To Market" data={soldToMarket} />
+      <CustomPieChart header="f. Fed To Live Stock" data={fedToLiveStock} />
+      <CustomPieChart header="g. Wastage" data={wastage} />
+      <CustomPieChart header="h. Processing" data={processing} />
+      <CustomBarChart header="i. Organic Fertilizer" data={fertilizerData} />
+      <CustomPieChart header="i.i Fertilizer A" data={organicFetilizerCrops} />
+      <CustomPieChart header="i.ii Fertilizer B" data={organicFetilizerCrops} />
+      <CustomBarChart header="j. Organic Pesticides" data={pesticideData} />
+      <CustomPieChart header="j.i Pesticide A" data={organicPesticidesCrops} />
+      <CustomPieChart header="j.ii Pesticide B" data={organicPesticidesCrops} />
     </Stack>
   );
 };
