@@ -28,24 +28,17 @@ function IncomeSaleChart() {
         data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
         backgroundColor: backgroundColor[2],
       },
-    ],
-  };
-  const incomeByCrops = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
-    datasets: [
       {
-        label: "Income Generated",
-        data: [10, 40, 20, 30, 25, 35],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
+        label: "Expenditure",
+        data: [40, 50, 80, 20, 80, 90, 10, 50, 65, 15, 70, 35],
+        backgroundColor: backgroundColor[1],
       },
     ],
   };
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
-      <CustomBarChart header="a. Income By Labels" data={incomeByLabelsData} />
-      <CustomPieChart header="b. Income By Crops" data={incomeByCrops} />
+      <CustomBarChart header="Income & Expenditure" data={incomeByLabelsData} />
     </Stack>
   );
 }

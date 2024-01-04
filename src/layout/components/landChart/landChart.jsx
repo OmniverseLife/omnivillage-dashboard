@@ -27,8 +27,7 @@ function LandChart() {
       },
     ],
   };
-
-  const data_used = {
+  const tagData = {
     labels: [
       "Grains and Nuts",
       "Legumes",
@@ -51,11 +50,24 @@ function LandChart() {
       },
     ],
   };
-
   return (
-    <Stack direction={"row"} justifyContent={"space-between"}>
-      <CustomPieChart header="a. Land Allocated" data={data} />
-      <CustomPieChart header="b. Land Used" data={data_used} />
+    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <CustomPieChart
+        header="Land Allocated"
+        data={data}
+        measurement={"100km"}
+      />
+      <CustomPieChart header="Land Used" data={data} measurement={"100km"} />
+      <CustomPieChart
+        header="Land Allocated (Tags)"
+        data={tagData}
+        measurement={"100km"}
+      />
+      <CustomPieChart
+        header="Land Used (Tags)"
+        data={tagData}
+        measurement={"100km"}
+      />
     </Stack>
   );
 }

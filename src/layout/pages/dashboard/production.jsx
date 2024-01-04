@@ -7,14 +7,13 @@ import {
   Stack,
 } from "@mui/material";
 import React, { useState } from "react";
-import CustomPieChart from "../../components/customPieChart/customPieChart";
+
 import BifurcatedChart from "../../components/bifurcatedChart/bifurcatedChart";
 import IncomeSaleChart from "../../components/incomeSaleChart/incomeSaleChart";
-import ExpenditureSaleChart from "../../components/expenditureSaleChart /expenditureSaleChart";
-import LandAllocated from "../../components/landAllocated/landAllocated";
 import LandChart from "../../components/landChart/landChart";
 import SellingChannel from "../../components/sellingChannel/sellingChannel";
 import StorageFacility from "../../components/storageFacility/storageFacility";
+import UtilityChart from "../../components/utilityChart/utilityChart";
 
 export const backgroundColor = [
   "rgba(255, 99, 132, 0.35)",
@@ -34,16 +33,20 @@ export const borderColor = [
 ];
 
 function Production() {
-  const [selectedOption, setselectedOption] = useState("land-allocated");
+  const [selectedOption, setselectedOption] = useState("land-chart");
   const [selectedTag, setselectedTag] = useState("grains-nuts");
+  const [selectedCrop, setselectedCrop] = useState("");
+  const [selectedWeight, setselectedWeight] = useState("kg");
+  const [selectedArea, setselectedArea] = useState("km");
   return (
     <Stack className="container">
-      <Stack direction={"row"} spacing={3} marginBottom={3}>
+      <Stack direction={"row"} gap={3} marginBottom={3} flexWrap={"wrap"}>
         <FormControl>
           <InputLabel id="demo-simple-select-label">
             Production Information
           </InputLabel>
           <Select
+            size="small"
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             value={selectedOption}
@@ -51,26 +54,24 @@ function Production() {
             label="Production Information"
             onChange={(e) => setselectedOption(e.target.value)}
           >
-            <MenuItem value="land-allocated">1. Land Allocated</MenuItem>
-            <MenuItem value="land-chart">2. Land Chart</MenuItem>
-            <MenuItem value="bifurcated">3. Bifurcated Chart By Tags</MenuItem>
-            <MenuItem value="income-chart">4. Income Chart</MenuItem>
-            <MenuItem value="expenditure-chart">5. Expenditure Chart</MenuItem>
-            <MenuItem value="selling-channel">6. Selling Channel</MenuItem>
-            <MenuItem value="storage-facility">7. Storage Facility</MenuItem>
+            <MenuItem value="land-chart">Land Chart</MenuItem>
+            <MenuItem value="bifurcated">Bifurcated Chart By Tags</MenuItem>
+            <MenuItem value="utility">Utilisation Chart</MenuItem>
+            <MenuItem value="income-chart">Income & Expenditure Chart</MenuItem>
+            <MenuItem value="selling-channel">Selling Channel</MenuItem>
+            <MenuItem value="storage-facility">Storage Facility</MenuItem>
           </Select>
         </FormControl>
-        {selectedOption === "bifurcated" ||
-        selectedOption === "income-chart" ||
-        selectedOption === "expenditure-chart" ? (
+        {selectedOption === "bifurcated" ? (
           <FormControl>
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
+              size="small"
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={selectedTag}
               style={{ width: 300 }}
-              label="Production Information"
+              label="Tags"
               onChange={(e) => setselectedTag(e.target.value)}
             >
               <MenuItem value="grains-nuts">Grains & Nuts</MenuItem>
@@ -92,21 +93,76 @@ function Production() {
             </Select>
           </FormControl>
         ) : null}
+        {selectedOption === "bifurcated" && (
+          <FormControl size="small">
+            <InputLabel id="demo-simple-select-label">Crops</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectedCrop}
+              style={{ width: 200 }}
+              label="Crops"
+              onChange={(e) => setselectedCrop(e.target.value)}
+            >
+              <MenuItem value="">Select</MenuItem>
+              <MenuItem value="almonds">Almonds</MenuItem>
+              <MenuItem value="walnuts">Walnuts</MenuItem>
+              <MenuItem value="cashew">Cashew Nuts</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+        {selectedOption === "bifurcated" || selectedOption === "land-chart" ? (
+          <FormControl style={{ marginLeft: "auto" }}>
+            <InputLabel id="demo-simple-select-label">Area</InputLabel>
+            <Select
+              size="small"
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectedArea}
+              style={{ width: 200 }}
+              label="Area"
+              onChange={(e) => setselectedArea(e.target.value)}
+            >
+              <MenuItem value="km">Kilometer</MenuItem>
+              <MenuItem value="hectare">Hectare</MenuItem>
+            </Select>
+          </FormControl>
+        ) : null}
+        {selectedOption === "bifurcated" ? (
+          <FormControl style={{ marginLeft: "auto" }}>
+            <InputLabel id="demo-simple-select-label">Weight</InputLabel>
+            <Select
+              size="small"
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectedWeight}
+              style={{ width: 200 }}
+              label="Weight"
+              onChange={(e) => setselectedWeight(e.target.value)}
+            >
+              <MenuItem value="tonne">Tonne</MenuItem>
+              <MenuItem value="kg">Kilogram</MenuItem>
+              <MenuItem value="g">Gram</MenuItem>
+              <MenuItem value="mg">Miligram</MenuItem>
+              <MenuItem value="stone">Stone</MenuItem>
+              <MenuItem value="pound">Pound</MenuItem>
+              <MenuItem value="ounce">Ounce</MenuItem>
+            </Select>
+          </FormControl>
+        ) : null}
       </Stack>
-      {selectedOption === "land-allocated" ? (
-        <LandAllocated />
-      ) : selectedOption === "land-chart" ? (
+      {selectedOption === "land-chart" ? (
         <LandChart />
       ) : selectedOption === "bifurcated" ? (
-        <BifurcatedChart tag={selectedTag} />
+        <BifurcatedChart crop={selectedCrop} />
       ) : selectedOption === "income-chart" ? (
         <IncomeSaleChart />
-      ) : selectedOption === "expenditure-chart" ? (
-        <ExpenditureSaleChart />
       ) : selectedOption === "selling-channel" ? (
         <SellingChannel />
       ) : selectedOption === "storage-facility" ? (
         <StorageFacility />
+      ) : selectedOption === "utility" ? (
+        <UtilityChart />
       ) : null}
     </Stack>
   );

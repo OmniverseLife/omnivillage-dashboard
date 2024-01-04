@@ -3,7 +3,7 @@ import React from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Pie } from "react-chartjs-2";
-function CustomPieChart({ header, data }) {
+function CustomPieChart({ header, data, measurement }) {
   ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
   const options = {
@@ -28,7 +28,17 @@ function CustomPieChart({ header, data }) {
   };
   return (
     <div className="pieChartContainer">
-      <h3 style={{ marginBottom: 20, alignSelf: "flex-start" }}>{header}</h3>
+      <h3
+        style={{
+          marginBottom: 20,
+          alignSelf: "flex-start",
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
+        {header} <p style={{ color: "#888" }}>{measurement}</p>
+      </h3>
       <Pie options={options} data={data} className="pieChart" />
     </div>
   );

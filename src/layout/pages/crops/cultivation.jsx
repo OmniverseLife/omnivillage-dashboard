@@ -47,7 +47,7 @@ function Cultivation() {
       width: 200,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-          {params.row.label?.name}
+          {params.row.label?.name.en}
         </Typography>
       ),
     },

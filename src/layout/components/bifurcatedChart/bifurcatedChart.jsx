@@ -4,26 +4,31 @@ import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
 // import * as faker from "@faker-js/faker";
-const BifurcatedChart = ({ tag }) => {
-  const tagData = {
+const BifurcatedChart = ({ crop }) => {
+  const landAllocated = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Land Allocated (Crops)",
+        data: [10, 40, 20, 30, 25, 35],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const singleCropInfo = {
     labels: [
-      "Grains & Nuts",
-      "Vegetables",
-      "Herbs",
-      "Legumes",
-      "Fruits",
-      "Dairy",
-      "Meat",
-      "Spices & Condiments",
-      "DaiTea/Coffeery",
-      "Oils",
-      "Processed Food & Beverages",
-      "Alcohol/Tobacco",
+      "Sold To Neighbour",
+      "Self Consumed",
+      "Sold To Market",
+      "Fed To Livestock",
+      "Wastage",
     ],
     datasets: [
       {
-        label: "Quantity Produced",
-        data: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20],
+        label: `${crop} Information`,
+        data: [30, 40, 50, 30, 20],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -42,12 +47,24 @@ const BifurcatedChart = ({ tag }) => {
       },
     ],
   };
-  const soilHealth = {
-    labels: ["Land In Stable Condition", "Land Under Decreasing Yeild"],
+  const soilHealthStable = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
     datasets: [
       {
-        label: "Soil Health",
-        data: [15, 35],
+        label: "Soil Health (Stable)",
+        data: [10, 40, 20, 30, 25, 35],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const soilHealthDecreasing = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Soil Health (Decreasing Yeild)",
+        data: [10, 40, 70, 10, 25, 55],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -210,23 +227,124 @@ const BifurcatedChart = ({ tag }) => {
       },
     ],
   };
+  const incomeByCrops = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Income Generated",
+        data: [10, 40, 20, 30, 25, 35],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const expenditureByCrops = {
+    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    datasets: [
+      {
+        label: "Expenditure",
+        data: [10, 40, 20, 30, 25, 35],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
-      <CustomPieChart header="a.i. Quantity Produced(Types)" data={tagData} />
-      <CustomPieChart header="a.ii. Quantity Produced(Crops)" data={cropData} />
-      <CustomPieChart header="b. Soil Health" data={soilHealth} />
-      <CustomPieChart header="c. Self Consumed" data={selfConsumed} />
-      <CustomPieChart header="d. Sold To Neighbours" data={soldToNeighbours} />
-      <CustomPieChart header="e. Sold To Market" data={soldToMarket} />
-      <CustomPieChart header="f. Fed To Live Stock" data={fedToLiveStock} />
-      <CustomPieChart header="g. Wastage" data={wastage} />
-      <CustomPieChart header="h. Processing" data={processing} />
-      <CustomBarChart header="i. Organic Fertilizer" data={fertilizerData} />
-      <CustomPieChart header="i.i Fertilizer A" data={organicFetilizerCrops} />
-      <CustomPieChart header="i.ii Fertilizer B" data={organicFetilizerCrops} />
-      <CustomBarChart header="j. Organic Pesticides" data={pesticideData} />
-      <CustomPieChart header="j.i Pesticide A" data={organicPesticidesCrops} />
-      <CustomPieChart header="j.ii Pesticide B" data={organicPesticidesCrops} />
+      {crop ? (
+        <CustomPieChart
+          header={`${String(crop).toUpperCase()} Information`}
+          data={singleCropInfo}
+          measurement={"200kg"}
+        />
+      ) : (
+        <>
+          <CustomPieChart
+            header="Quantity Produced(Crops)"
+            data={cropData}
+            measurement={"200kg"}
+          />
+          <CustomPieChart
+            header="Land Allocated (Crops)"
+            data={selfConsumed}
+            measurement={"100km"}
+          />
+          <CustomPieChart
+            header="Soil Health (Stable)"
+            data={soilHealthStable}
+            measurement={"100Km"}
+          />
+          <CustomPieChart
+            header="Soil Health (Decreasing Yeild)"
+            data={soilHealthDecreasing}
+            measurement={"70Km"}
+          />
+          <CustomPieChart
+            header="Self Consumed"
+            data={selfConsumed}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Sold To Neighbours"
+            data={soldToNeighbours}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Sold To Market"
+            data={soldToMarket}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Fed To Live Stock"
+            data={fedToLiveStock}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Wastage"
+            data={wastage}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Income By Crops"
+            data={incomeByCrops}
+            measurement={"500USD"}
+          />
+          <CustomPieChart
+            header="Expenditure By Crops"
+            data={expenditureByCrops}
+            measurement={"200USD"}
+          />
+          <CustomPieChart
+            header="Processing"
+            data={processing}
+            measurement={"Count 100"}
+          />
+          <CustomBarChart header="Organic Fertilizer" data={fertilizerData} />
+          <CustomPieChart
+            header="Fertilizer A"
+            data={organicFetilizerCrops}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Fertilizer B"
+            data={organicFetilizerCrops}
+            measurement={"100kg"}
+          />
+          <CustomBarChart header="Organic Pesticides" data={pesticideData} />
+          <CustomPieChart
+            header="Pesticide A"
+            data={organicPesticidesCrops}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Pesticide B"
+            data={organicPesticidesCrops}
+            measurement={"100kg"}
+          />
+        </>
+      )}
     </Stack>
   );
 };
