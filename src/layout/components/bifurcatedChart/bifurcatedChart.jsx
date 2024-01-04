@@ -319,7 +319,7 @@ const BifurcatedChart = ({ crop }) => {
           <CustomPieChart
             header="Processing"
             data={processing}
-            measurement={"100kg"}
+            measurement={"Count 100"}
           />
           <CustomBarChart header="Organic Fertilizer" data={fertilizerData} />
           <CustomPieChart

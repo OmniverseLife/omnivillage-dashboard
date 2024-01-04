@@ -189,7 +189,7 @@ export default function Sidebar() {
             to="/consumption/spices"
             className={paths.includes("spices") ? "link active" : "link"}
           >
-            Spices
+            Sauces
           </Link>
           <Link
             to="/consumption/tea-coffee"
@@ -215,7 +215,7 @@ export default function Sidebar() {
             to="/consumption/alcohol"
             className={paths.includes("alcohol") ? "link active" : "link"}
           >
-            Alcohol
+            Tobacco & Alcohol
           </Link>
         </div>
       )}

@@ -57,22 +57,22 @@ function StorageFacility() {
       <CustomPieChart
         header="Storage Facility Grains"
         data={grains}
-        // measurement={"10km"}
+        measurement={"80 km²"}
       />
       <CustomPieChart
         header="Storage Facility Poultry"
         data={poultry}
-        // measurement={"10km"}
+        measurement={"70 km²"}
       />
       <CustomPieChart
         header="Storage Facility Meat"
         data={meat}
-        // measurement={"10km"}
+        measurement={"70 km²"}
       />
       <CustomPieChart
         header="Storage Facility Fruits & Vegetables"
         data={fruits}
-        // measurement={"10km"}
+        measurement={"95 km²"}
       />
     </Stack>
   );

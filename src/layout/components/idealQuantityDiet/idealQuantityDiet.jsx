@@ -29,7 +29,7 @@ function IdealQuantityDiet() {
         backgroundColor: backgroundColor[2],
       },
       {
-        label: "Currently Quantity Consumed",
+        label: "Current Consumed Quantity",
         data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
         backgroundColor: backgroundColor[1],
       },
@@ -71,7 +71,7 @@ function IdealQuantityDiet() {
         data={quantityToBeConsumed}
       />
       <CustomPieChart
-        header="Currently Quantity Consumed"
+        header="Current Consumed Quantity"
         data={currentlyQuantityConsumed}
       />
     </Stack>

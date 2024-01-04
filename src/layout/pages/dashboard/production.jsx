@@ -62,7 +62,7 @@ function Production() {
             <MenuItem value="storage-facility">Storage Facility</MenuItem>
           </Select>
         </FormControl>
-        {selectedOption === "bifurcated" || selectedOption === "utility" ? (
+        {selectedOption === "bifurcated" ? (
           <FormControl>
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
@@ -75,19 +75,21 @@ function Production() {
               onChange={(e) => setselectedTag(e.target.value)}
             >
               <MenuItem value="grains-nuts">Grains & Nuts</MenuItem>
-              <MenuItem value="vegetables">Vegetables</MenuItem>
-              <MenuItem value="herbs">Herbs</MenuItem>
               <MenuItem value="legumes">Legumes</MenuItem>
-              <MenuItem value="fruits">Fruits</MenuItem>
-              <MenuItem value="dairy">Dairy</MenuItem>
-              <MenuItem value="meat">Meat</MenuItem>
-              <MenuItem value="spices-condiments">Spices & Condiments</MenuItem>
+              <MenuItem value="fruits-vegetables-herbs">
+                Fruits, Vegetables & Herbs
+              </MenuItem>
+              <MenuItem value="dairy-animal-based">
+                Dairy & Animal based
+              </MenuItem>
+              <MenuItem value="meat-seafood">Meat & Seafood</MenuItem>
+              <MenuItem value="sauce">Sauce</MenuItem>
               <MenuItem value="tea-coffee">Tea/Coffee</MenuItem>
               <MenuItem value="oils">Oils</MenuItem>
               <MenuItem value="food-beverage">
                 Processed Food & Beverages
               </MenuItem>
-              <MenuItem value="alocohol-tobacco">Alcohol/Tobacco</MenuItem>
+              <MenuItem value="alocohol-tobacco">Tobacco and Alcohol</MenuItem>
             </Select>
           </FormControl>
         ) : null}

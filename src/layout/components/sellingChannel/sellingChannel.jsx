@@ -18,7 +18,11 @@ function SellingChannel() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"}>
-      <CustomPieChart header="Selling Channel" data={sellingChannel} />
+      <CustomPieChart
+        header="Selling Channel"
+        data={sellingChannel}
+        measurement="Total 100"
+      />
     </Stack>
   );
 }
