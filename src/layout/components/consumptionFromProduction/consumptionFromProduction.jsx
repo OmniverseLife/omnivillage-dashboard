@@ -3,8 +3,23 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
+import { useQuery } from "@tanstack/react-query";
+import { getConsumptionFromProductionData } from "../../../functions/dashboard";
+import Loading from "../loading";
 
-function ConsumptionFromProduction() {
+function ConsumptionFromProduction({ crop_id, type_id }) {
+  const { data: consumptionFromProduction, isLoading } = useQuery({
+    queryKey: ["consumption-from-production", crop_id],
+    queryFn: () => getConsumptionFromProductionData(type_id, crop_id),
+    enabled: !!crop_id && !!type_id,
+    // placeholderData: {
+    //   self_grown: 0,
+    //   self_consumed: 0,
+    //   purchased_from_neighbours: 0,
+    //   purchased_from_market: 0,
+    // },
+  });
+
   const data = {
     labels: [
       "Self Grown",
@@ -15,15 +30,24 @@ function ConsumptionFromProduction() {
     datasets: [
       {
         label: "Consumption From Production",
-        data: [30, 40, 50, 30],
+        data: isLoading
+          ? [0, 0, 0, 0]
+          : [
+              consumptionFromProduction?.self_grown,
+              consumptionFromProduction?.self_consumed,
+              consumptionFromProduction?.purchased_from_neighbours,
+              consumptionFromProduction?.purchased_from_market,
+            ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
       },
     ],
   };
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isLoading} />
       <CustomPieChart header="Consumption From Production" data={data} />
     </Stack>
   );

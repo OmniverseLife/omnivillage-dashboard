@@ -5,7 +5,7 @@ import {
   Select,
   Stack,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { backgroundColor } from "./production";
 import CustomBarChart from "../../components/customBarChart/customBarChart";
 import ConsumptionFromProduction from "../../components/consumptionFromProduction/consumptionFromProduction";
@@ -13,18 +13,44 @@ import SelfGrown from "../../components/selfGrown/selfGrown";
 import PurchasedNeighbour from "../../components/purchasedNeighbour/purchasedNeighbour";
 import PurchasedOutside from "../../components/purchasedOutside/purchasedOutside";
 import IdealQuantityDiet from "../../components/idealQuantityDiet/idealQuantityDiet";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLabels } from "../../../functions/others";
+import Loading from "../../components/loading";
+import { fetchTagWiseCrops } from "../../../functions/consumption";
 
 function Consumption() {
   const [selectedOption, setselectedOption] = useState(
     "consumption-production"
   );
-  const [selectedTag, setselectedTag] = useState("grains-nuts");
+  const [selectedTag, setselectedTag] = useState("");
   const [selectedCrop, setselectedCrop] = useState("");
   const [selectedWeight, setselectedWeight] = useState("kg");
+
+  const { data: labels = [], isLoading } = useQuery({
+    queryKey: ["labels"],
+    queryFn: fetchLabels,
+  });
+
+  const { data: crops = [], isCropsLoading } = useQuery({
+    queryKey: ["crops", selectedTag],
+    queryFn: () => fetchTagWiseCrops(selectedTag),
+    enabled: Boolean(selectedTag),
+  });
+
+  useEffect(() => {
+    setselectedTag(labels[0]?._id ?? "");
+    setselectedCrop(crops[0]?._id ?? "");
+  }, [labels, crops]);
+
   const renderItems = () => {
     switch (selectedOption) {
       case "consumption-production":
-        return <ConsumptionFromProduction />;
+        return (
+          <ConsumptionFromProduction
+            type_id={selectedTag}
+            crop_id={selectedCrop}
+          />
+        );
       case "self-grown":
         return <SelfGrown />;
       case "purchased-neighbours":
@@ -37,6 +63,7 @@ function Consumption() {
   };
   return (
     <Stack className="container">
+      <Loading isLoading={isLoading || isCropsLoading} />
       <Stack direction={"row"} spacing={3} marginBottom={3}>
         <FormControl size="small">
           <InputLabel id="demo-simple-select-label">
@@ -73,20 +100,13 @@ function Consumption() {
             label="Production Information"
             onChange={(e) => setselectedTag(e.target.value)}
           >
-            <MenuItem value="grains-nuts">Grains & Nuts</MenuItem>
-            <MenuItem value="vegetables">Vegetables</MenuItem>
-            <MenuItem value="herbs">Herbs</MenuItem>
-            <MenuItem value="legumes">Legumes</MenuItem>
-            <MenuItem value="fruits">Fruits</MenuItem>
-            <MenuItem value="dairy">Dairy</MenuItem>
-            <MenuItem value="meat">Meat</MenuItem>
-            <MenuItem value="spices-condiments">Spices & Condiments</MenuItem>
-            <MenuItem value="tea-coffee">Tea/Coffee</MenuItem>
-            <MenuItem value="oils">Oils</MenuItem>
-            <MenuItem value="food-beverage">
-              Processed Food & Beverages
-            </MenuItem>
-            <MenuItem value="alocohol-tobacco">Alcohol/Tobacco</MenuItem>
+            {labels.map((_label) => {
+              return (
+                <MenuItem value={_label._id} key={_label._id}>
+                  {_label.name}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
         {selectedOption === "consumption-production" && (
@@ -100,10 +120,13 @@ function Consumption() {
               label="Production Information"
               onChange={(e) => setselectedCrop(e.target.value)}
             >
-              <MenuItem value="">Select</MenuItem>
-              <MenuItem value="almonds">Almonds</MenuItem>
-              <MenuItem value="walnuts">Walnuts</MenuItem>
-              <MenuItem value="cashew">Cashew Nuts</MenuItem>
+              {crops.map((_crop) => {
+                return (
+                  <MenuItem value={_crop._id} key={_crop._id}>
+                    {_crop.name}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         )}

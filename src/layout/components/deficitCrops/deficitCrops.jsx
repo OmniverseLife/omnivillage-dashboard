@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import Loading from "../loading";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFoodBalance } from "../../../functions/others";
+import { fetchFoodBalance } from "../../../functions/dashboard";
 
 function DeficitCrops({ parentLoading, tag }) {
   const [rows, setRows] = useState([]);

@@ -1,6 +1,15 @@
 import axiosInstance from "../axios/axiosInstance";
 import { endpoints } from "../axios/endpoints";
 
+export const fetchTagWiseCrops = async (type_id) => {
+  const res = await axiosInstance.get(endpoints.consumption.dashboard, {
+    params: {
+      consumption_type_id: type_id,
+    },
+  });
+  return res?.data;
+};
+
 export const fetchGrains = async () => {
   const res = await axiosInstance.get(endpoints.grains.get_all);
   return res.data;

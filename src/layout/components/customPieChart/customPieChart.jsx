@@ -16,7 +16,7 @@ function CustomPieChart({ header, data, measurement }) {
       },
       datalabels: {
         formatter: (value) => {
-          return `${value}`;
+          return value ? value : null;
         },
         color: "#333",
         font: {
