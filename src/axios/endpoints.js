@@ -105,4 +105,29 @@ export const endpoints = {
       "/consumption/get_all?consumption_type_id=6506e28481f75fd724a743cb",
     // delete: "/consumption/delete_hunting",
   },
+
+  dashboard: {
+    production: {
+      land_allocation_category_data: "/dashboard/land_allocation_category_data",
+      land_used_category_data: "/dashboard/land_used_category_data",
+      bifurcated_chart_label: "/dashboard/bifurcated_chart_label",
+      bifurcated_chart_crop: "/dashboard/bifurcated_chart_crop",
+      utilization_chart: "/dashboard/utilization_chart",
+      income_expenditure: "/dashboard/income_expenditure",
+      selling_channel_data: "/dashboard/selling_channel_data",
+      storage_data: "/dashboard/storage_data",
+    },
+    consumption: {
+      consumption_from_production: "/dashboard/consumption_from_production",
+      self_grown_by_tag: "/dashboard/self_grown_by_tag",
+      self_consumed_data: "/dashboard/self_consumed_data",
+      purchased_from_neighbours_consumed:
+        "/dashboard/purchased_from_neighbours_consumed",
+      purchased_from_market_consumed:
+        "/dashboard/purchased_from_market_consumed",
+      ideal_consumption_by_label: "/dashboard/ideal_consumption_by_label",
+      ideal_consumption_expected: "/dashboard/ideal_consumption_expected",
+    },
+    food_balance: "/dashboard/food-balance",
+  },
 };
