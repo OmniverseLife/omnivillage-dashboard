@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FoodBalanceAnalytics from "../../components/foodBalanceAnalytics/foodBalanceAnalytics";
 import DeficitCrops from "../../components/deficitCrops/deficitCrops";
 import {
@@ -9,30 +9,51 @@ import {
   Select,
   Stack,
 } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLabels } from "../../../functions/others";
+import Loading from "../../components/loading";
 function FoodBalance() {
   const [selectedOption, setselectedOption] = useState("analytics");
-  const [selectedTag, setselectedTag] = useState("grains-nuts");
+  const [selectedTag, setselectedTag] = useState("");
+
+  const { data: labels = [], isLoading } = useQuery({
+    queryKey: ["labels"],
+    queryFn: fetchLabels,
+  });
+
+  useEffect(() => {
+    if (!isLoading) {
+      setselectedOption(labels[0]._id);
+    }
+  }, [isLoading, labels]);
 
   return (
     <Stack className="container">
       <Stack direction={"row"} spacing={3} marginBottom={3}>
         <FormControl size="small">
-          <InputLabel id="demo-simple-select-label">
-            Food Balance Information
-          </InputLabel>
+          <InputLabel id="demo-simple-select-label">Tags</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             value={selectedOption}
-            style={{ width: 300 }}
-            label="Production Information"
+            style={{ width: 300, textTransform: "capitalize" }}
+            label="Tags"
             onChange={(e) => setselectedOption(e.target.value)}
           >
-            <MenuItem value="analytics">Analytics</MenuItem>
-            <MenuItem value="deficit">Deficit Crops</MenuItem>
+            {labels.map((_label) => {
+              return (
+                <MenuItem
+                  value={_label._id}
+                  key={_label._id}
+                  sx={{ textTransform: "capitalize" }}
+                >
+                  {_label.name}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
-        {selectedOption === "analytics" && (
+        {/* {selectedOption === "analytics" && (
           <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
@@ -59,13 +80,14 @@ function FoodBalance() {
               <MenuItem value="alocohol-tobacco">Alcohol/Tobacco</MenuItem>
             </Select>
           </FormControl>
-        )}
+        )} */}
       </Stack>
-      {selectedOption === "analytics" ? (
+      {/* {selectedOption === "analytics" ? (
         <FoodBalanceAnalytics />
       ) : selectedOption === "deficit" ? (
         <DeficitCrops />
-      ) : null}
+        ) : null} */}
+      <DeficitCrops parentLoading={isLoading} tag={selectedOption} />
     </Stack>
   );
 }

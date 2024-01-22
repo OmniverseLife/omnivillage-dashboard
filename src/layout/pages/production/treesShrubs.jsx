@@ -40,7 +40,7 @@ function TreesShrubs() {
     id: index + 1,
     _id: _tree._id,
     name: `${_tree.user.first_name} ${_tree.user.last_name}`,
-    phone: `${_tree.country_code} ${_tree.phone}`,
+    phone: `${_tree.user.country_code} ${_tree.user.phone}`,
     crop_name: _tree.crop.name.en,
     date: moment(_tree.created_at).format("ll"),
   }));

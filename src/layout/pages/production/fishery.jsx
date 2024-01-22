@@ -44,7 +44,7 @@ function Fishery() {
     id: index + 1,
     _id: _fishery._id,
     name: `${_fishery.user.first_name} ${_fishery.user.last_name}`,
-    phone: `${_fishery.country_code} ${_fishery.phone}`,
+    phone: `${_fishery.user.country_code} ${_fishery.user.phone}`,
     crop_name: _fishery.crop.name.en,
     date: moment(_fishery.created_at).format("ll"),
   }));

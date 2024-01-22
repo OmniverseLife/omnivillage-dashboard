@@ -105,4 +105,7 @@ export const endpoints = {
       "/consumption/get_all?consumption_type_id=6506e28481f75fd724a743cb",
     // delete: "/consumption/delete_hunting",
   },
+  dashboard: {
+    food_balance: "/dashboard/food-balance",
+  },
 };

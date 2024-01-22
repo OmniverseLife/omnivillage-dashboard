@@ -40,7 +40,7 @@ function Poultry() {
     id: index + 1,
     _id: _poultry._id,
     name: `${_poultry.user.first_name} ${_poultry.user.last_name}`,
-    phone: `${_poultry.country_code} ${_poultry.phone}`,
+    phone: `${_poultry.user.country_code} ${_poultry.user.phone}`,
     crop_name: _poultry.crop.name.en,
     date: moment(_poultry.created_at).format("ll"),
   }));

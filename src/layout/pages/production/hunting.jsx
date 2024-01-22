@@ -40,7 +40,7 @@ function Hunting() {
     id: index + 1,
     _id: _hunting._id,
     name: `${_hunting.user.first_name} ${_hunting.user.last_name}`,
-    phone: `${_hunting.country_code} ${_hunting.phone}`,
+    phone: `${_hunting.user.country_code} ${_hunting.user.phone}`,
     crop_name: _hunting.crop.name.en,
     date: moment(_hunting.created_at).format("ll"),
   }));
