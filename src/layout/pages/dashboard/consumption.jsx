@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchLabels } from "../../../functions/others";
 import Loading from "../../components/loading";
 import { fetchTagWiseCrops } from "../../../functions/consumption";
+import convert from "convert-units";
 
 function Consumption() {
   const [selectedOption, setselectedOption] = useState(
@@ -52,13 +53,28 @@ function Consumption() {
           />
         );
       case "self-grown":
-        return <SelfGrown type_id={selectedTag} />;
+        return <SelfGrown type_id={selectedTag} weight_unit={selectedWeight} />;
       case "purchased-neighbours":
-        return <PurchasedNeighbour type_id={selectedTag} />;
+        return (
+          <PurchasedNeighbour
+            type_id={selectedTag}
+            weight_unit={selectedWeight}
+          />
+        );
       case "purchased-outside":
-        return <PurchasedOutside type_id={selectedTag} />;
+        return (
+          <PurchasedOutside
+            type_id={selectedTag}
+            weight_unit={selectedWeight}
+          />
+        );
       case "ideal-diet":
-        return <IdealQuantityDiet type_id={selectedTag} />;
+        return (
+          <IdealQuantityDiet
+            type_id={selectedTag}
+            weight_unit={selectedWeight}
+          />
+        );
     }
   };
   return (
@@ -145,13 +161,13 @@ function Consumption() {
             label="Production Information"
             onChange={(e) => setselectedWeight(e.target.value)}
           >
-            <MenuItem value="tonne">Tonne</MenuItem>
-            <MenuItem value="kg">Kilogram</MenuItem>
-            <MenuItem value="g">Gram</MenuItem>
-            <MenuItem value="mg">Miligram</MenuItem>
-            <MenuItem value="stone">Stone</MenuItem>
-            <MenuItem value="pound">Pound</MenuItem>
-            <MenuItem value="ounce">Ounce</MenuItem>
+            {convert()
+              .list("mass")
+              .map((_unit) => (
+                <MenuItem value={_unit.abbr} key={_unit.abbr}>
+                  {_unit.plural}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
       </Stack>

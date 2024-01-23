@@ -10,7 +10,7 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 
-function IdealQuantityDiet({ type_id }) {
+function IdealQuantityDiet({ type_id, weight_unit }) {
   const { data: ideal_consumption_bar, isIdealConsumptionBarLoading } =
     useQuery({
       queryKey: ["ideal_consumption_bar", type_id],

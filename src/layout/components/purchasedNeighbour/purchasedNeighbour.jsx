@@ -6,7 +6,7 @@ import CustomBarChart from "../customBarChart/customBarChart";
 import { useQuery } from "@tanstack/react-query";
 import { getPurchasedFromNeighboursData } from "../../../functions/dashboard";
 import Loading from "../loading";
-function PurchasedNeighbour({ type_id }) {
+function PurchasedNeighbour({ type_id, weight_unit }) {
   const { data: purchased_from_neighbour, isLoading } = useQuery({
     queryKey: ["purchased from neighbour", type_id],
     queryFn: () => getPurchasedFromNeighboursData(type_id),

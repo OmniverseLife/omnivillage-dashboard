@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getPurchasedFromMarketData } from "../../../functions/dashboard";
 import Loading from "../loading";
 
-function PurchasedOutside({ type_id }) {
+function PurchasedOutside({ type_id, weight_unit }) {
   const { data: purchased_from_market, isLoading } = useQuery({
     queryKey: ["purchased from market", type_id],
     queryFn: () => getPurchasedFromMarketData(type_id),

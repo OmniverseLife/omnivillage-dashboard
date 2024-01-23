@@ -10,7 +10,7 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 
-function SelfGrown({ type_id }) {
+function SelfGrown({ type_id, weight_unit }) {
   const { data: self_grown, isSelfGrownLoading } = useQuery({
     queryKey: ["self grown", type_id],
     queryFn: () => getSelfGrownByTagsData(type_id),
