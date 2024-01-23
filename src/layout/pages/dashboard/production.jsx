@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchLabels } from "../../../functions/others";
 import { fetchTagWiseCrops } from "../../../functions/consumption";
 import Loading from "../../components/loading";
+import convert from "convert-units";
 
 export const backgroundColor = [
   "rgba(255, 99, 132, 0.35)",
@@ -41,7 +42,7 @@ function Production() {
   const [selectedTag, setselectedTag] = useState("");
   const [selectedCrop, setselectedCrop] = useState("");
   const [selectedWeight, setselectedWeight] = useState("kg");
-  const [selectedArea, setselectedArea] = useState("km");
+  const [selectedArea, setselectedArea] = useState("km2");
 
   const { data: labels = [], isLoading } = useQuery({
     queryKey: ["labels"],
@@ -139,8 +140,13 @@ function Production() {
               label="Area"
               onChange={(e) => setselectedArea(e.target.value)}
             >
-              <MenuItem value="km">Kilometer</MenuItem>
-              <MenuItem value="hectare">Hectare</MenuItem>
+              {convert()
+                .list("area")
+                .map((_unit) => (
+                  <MenuItem value={_unit.abbr} key={_unit.abbr}>
+                    {_unit.singular}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         ) : null}
@@ -156,21 +162,26 @@ function Production() {
               label="Weight"
               onChange={(e) => setselectedWeight(e.target.value)}
             >
-              <MenuItem value="tonne">Tonne</MenuItem>
-              <MenuItem value="kg">Kilogram</MenuItem>
-              <MenuItem value="g">Gram</MenuItem>
-              <MenuItem value="mg">Miligram</MenuItem>
-              <MenuItem value="stone">Stone</MenuItem>
-              <MenuItem value="pound">Pound</MenuItem>
-              <MenuItem value="ounce">Ounce</MenuItem>
+              {convert()
+                .list("mass")
+                .map((_unit) => (
+                  <MenuItem value={_unit.abbr} key={_unit.abbr}>
+                    {_unit.singular}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         ) : null}
       </Stack>
       {selectedOption === "land-chart" ? (
-        <LandChart />
+        <LandChart land_unit={selectedArea} />
       ) : selectedOption === "bifurcated" ? (
-        <BifurcatedChart type_id={selectedTag} crop_id={selectedCrop} />
+        <BifurcatedChart
+          type_id={selectedTag}
+          crop_id={selectedCrop}
+          land_unit={selectedArea}
+          weight_unit={selectedWeight}
+        />
       ) : selectedOption === "income-chart" ? (
         <IncomeSaleChart />
       ) : selectedOption === "selling-channel" ? (

@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getBifurcatedLabelData } from "../../../functions/dashboard";
 import Loading from "../loading";
 // import * as faker from "@faker-js/faker";
-const BifurcatedChart = ({ crop_id, type_id }) => {
+const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
   const { data: bifurcated_data_label, isBifurcatedDataLabelLoading } =
     useQuery({
       queryKey: ["bifurcated_data", type_id],

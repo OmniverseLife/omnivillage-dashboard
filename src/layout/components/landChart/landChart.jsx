@@ -9,7 +9,7 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 
-function LandChart() {
+function LandChart({ land_unit }) {
   const { data: land_allocation, isLandAllocationLoading } = useQuery({
     queryKey: ["land_allocation"],
     queryFn: getLandAllocationData,
