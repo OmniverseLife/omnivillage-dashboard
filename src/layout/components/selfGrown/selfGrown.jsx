@@ -11,21 +11,23 @@ import {
 import Loading from "../loading";
 
 function SelfGrown({ type_id, weight_unit }) {
-  const { data: self_grown, isSelfGrownLoading } = useQuery({
+  const { data: self_grown = [], isSelfGrownLoading } = useQuery({
     queryKey: ["self grown", type_id],
     queryFn: () => getSelfGrownByTagsData(type_id),
   });
-  const { data: self_consumed, isSelfConsumedLoading } = useQuery({
+  const { data: self_consumed = [], isSelfConsumedLoading } = useQuery({
     queryKey: ["self consumed", type_id],
     queryFn: () => getSelfConsumedData(type_id),
   });
 
   const selfGrownData = {
-    labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels: self_grown
+      .map((_item) => _item.crop_name)
+      .sort((a, b) => a.localeCompare(b)),
     datasets: [
       {
         label: "Self Grown",
-        data: [10, 40, 20, 30, 25, 35],
+        data: self_grown.map((_item) => _item.output),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -33,11 +35,13 @@ function SelfGrown({ type_id, weight_unit }) {
     ],
   };
   const selfConsumedData = {
-    labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels: self_consumed
+      .map((_item) => _item.crop_name)
+      .sort((a, b) => a.localeCompare(b)),
     datasets: [
       {
         label: "Self Consumed",
-        data: [10, 40, 20, 30, 25, 35],
+        data: self_consumed.map((_item) => _item.output),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,

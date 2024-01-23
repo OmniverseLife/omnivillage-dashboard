@@ -126,14 +126,9 @@ export const getPurchasedFromMarketData = async (type_id) => {
   return res?.data;
 };
 
-export const getIdealConsumptionByLabelData = async (type_id) => {
+export const getIdealConsumptionByLabelData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.consumption.ideal_consumption_by_label,
-    {
-      params: {
-        type_id,
-      },
-    }
+    endpoints.dashboard.consumption.ideal_consumption_by_label
   );
   return res?.data;
 };

@@ -32,16 +32,24 @@ function Consumption() {
     queryFn: fetchLabels,
   });
 
-  const { data: crops = [], isCropsLoading } = useQuery({
+  const {
+    data: crops = [],
+    isCropsLoading,
+    isFetching,
+  } = useQuery({
     queryKey: ["crops", selectedTag],
     queryFn: () => fetchTagWiseCrops(selectedTag),
-    enabled: Boolean(selectedTag),
+    enabled:
+      Boolean(selectedTag) && selectedOption === "consumption-production",
   });
 
   useEffect(() => {
     setselectedTag(labels[0]?._id ?? "");
+  }, [labels]);
+
+  useEffect(() => {
     setselectedCrop(crops[0]?._id ?? "");
-  }, [labels, crops]);
+  }, [crops]);
 
   const renderItems = () => {
     switch (selectedOption) {
@@ -77,9 +85,10 @@ function Consumption() {
         );
     }
   };
+
   return (
     <Stack className="container">
-      <Loading isLoading={isLoading || isCropsLoading} />
+      <Loading isLoading={isLoading || isCropsLoading || isFetching} />
       <Stack direction={"row"} spacing={3} marginBottom={3}>
         <FormControl size="small">
           <InputLabel id="demo-simple-select-label">

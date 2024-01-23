@@ -4,10 +4,19 @@ import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
 import { useQuery } from "@tanstack/react-query";
-import { getBifurcatedLabelData } from "../../../functions/dashboard";
+import {
+  getBifurcatedCropData,
+  getBifurcatedLabelData,
+} from "../../../functions/dashboard";
 import Loading from "../loading";
 // import * as faker from "@faker-js/faker";
-const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
+const BifurcatedChart = ({
+  crop_id,
+  type_id,
+  land_unit,
+  weight_unit,
+  crops,
+}) => {
   const { data: bifurcated_data_label, isBifurcatedDataLabelLoading } =
     useQuery({
       queryKey: ["bifurcated_data", type_id],
@@ -16,22 +25,10 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
 
   const { data: bifurcated_data_crop, isBifurcatedDataCropLoading } = useQuery({
     queryKey: ["bifurcated_data_crop", crop_id],
-    queryFn: () => getBifurcatedLabelData(crop_id),
+    queryFn: () => getBifurcatedCropData(crop_id),
     enabled: Boolean(crop_id),
   });
 
-  const landAllocated = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
-    datasets: [
-      {
-        label: "Land Allocated (Crops)",
-        data: [10, 40, 20, 30, 25, 35],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
   const singleCropInfo = {
     labels: [
       "Sold To Neighbour",
@@ -42,8 +39,16 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
     datasets: [
       {
-        label: `${crop} Information`,
-        data: [30, 40, 50, 30, 20],
+        label: `${
+          crops?.find((_crop) => _crop._id === crop_id)?.name
+        } Information`,
+        data: [
+          bifurcated_data_crop?.sold_to_neighbour,
+          bifurcated_data_crop?.self_consumed,
+          bifurcated_data_crop?.sold_to_market,
+          bifurcated_data_crop?.fed_to_livestock,
+          bifurcated_data_crop?.wastage,
+        ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -51,11 +56,11 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const cropData = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels: bifurcated_data_label?.output.map((_item) => _item.crop_name) || [],
     datasets: [
       {
         label: "Quantity Produced",
-        data: [10, 40, 20, 30, 25, 35],
+        data: bifurcated_data_label?.output.map((_item) => _item.output) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -63,11 +68,17 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const soilHealthStable = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.soil_health_stable.map(
+        (_item) => _item.crop_name
+      ) || [],
     datasets: [
       {
         label: "Soil Health (Stable)",
-        data: [10, 40, 20, 30, 25, 35],
+        data:
+          bifurcated_data_label?.soil_health_stable.map(
+            (_item) => _item.count
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -75,11 +86,17 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const soilHealthDecreasing = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.soil_health_decreasing_yeild.map(
+        (_item) => _item.crop_name
+      ) || [],
     datasets: [
       {
         label: "Soil Health (Decreasing Yeild)",
-        data: [10, 40, 70, 10, 25, 55],
+        data:
+          bifurcated_data_label?.soil_health_decreasing_yeild.map(
+            (_item) => _item.count
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -87,11 +104,16 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const selfConsumed = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.self_consumed.map((_item) => _item.crop_name) ||
+      [],
     datasets: [
       {
         label: "Self Consumed",
-        data: [10, 40, 30, 30, 15, 5],
+        data:
+          bifurcated_data_label?.self_consumed.map(
+            (_item) => _item.self_consumed
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -99,11 +121,17 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const soldToNeighbours = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.sold_to_neighbour.map(
+        (_item) => _item.crop_name
+      ) || [],
     datasets: [
       {
         label: "Sold To Neighbours",
-        data: [10, 40, 10, 30, 15, 35],
+        data:
+          bifurcated_data_label?.sold_to_neighbour.map(
+            (_item) => _item.sold_to_neighbour
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -111,11 +139,16 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const soldToMarket = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.sold_to_market.map((_item) => _item.crop_name) ||
+      [],
     datasets: [
       {
         label: "Sold To Market",
-        data: [20, 40, 28, 30, 25, 35],
+        data:
+          bifurcated_data_label?.sold_to_market.map(
+            (_item) => _item.sold_to_market
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -123,11 +156,16 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const fedToLiveStock = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.fed_to_livestock.map((_item) => _item.crop_name) ||
+      [],
     datasets: [
       {
         label: "Fed To Live Stock",
-        data: [10, 40, 20, 30, 25, 15],
+        data:
+          bifurcated_data_label?.fed_to_livestock.map(
+            (_item) => _item.fed_to_livestock
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -135,29 +173,34 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const wastage = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.wastage.map((_item) => _item.crop_name) || [],
     datasets: [
       {
         label: "Wastage",
-        data: [10, 30, 25, 15, 25, 25],
+        data:
+          bifurcated_data_label?.wastage.map((_item) => _item.wastage) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
       },
     ],
   };
-  const processing = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
-    datasets: [
-      {
-        label: "Processing",
-        data: [30, 40, 50, 30, 25, 35],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const processing = {
+  //   labels: bifurcated_data_label?.wastage.map((_item) => _item.crop_name) ||
+  //   [],
+  //   datasets: [
+  //     {
+  //       label: "Processing",
+  //       data: bifurcated_data_label?.wastage.map(
+  //         (_item) => _item.wastage
+  //       ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
   const Organiclabels = [
     "Grains & Nuts",
     "Vegetables",
@@ -218,36 +261,162 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
       },
     ],
   };
-  const organicFetilizerCrops = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+
+  const fertilizerChemicalBasedCrops = {
+    labels:
+      bifurcated_data_label?.fertilizer_used_chemical_based.map(
+        (_item) => _item.crop_name
+      ) || [],
     datasets: [
       {
-        label: "Fertilizer A",
-        data: [10, 30, 25, 15, 25, 25],
+        label: "Chemical Based",
+        data:
+          bifurcated_data_label?.fertilizer_used_chemical_based.map(
+            (_item) => _item.count
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
       },
     ],
   };
-  const organicPesticidesCrops = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+  const fertilizerOrganicSelfMadeCrops = {
+    labels:
+      bifurcated_data_label?.fertilizer_used_organic_self_made.map(
+        (_item) => _item.crop_name
+      ) || [],
     datasets: [
       {
-        label: "Processing",
-        data: [30, 40, 50, 30, 25, 35],
+        label: "Organic Self Made",
+        data:
+          bifurcated_data_label?.fertilizer_used_organic_self_made.map(
+            (_item) => _item.count
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
       },
     ],
   };
+  const fertilizerOrganicPurchasedCrops = {
+    labels:
+      bifurcated_data_label?.fertilizer_used_organic_purchased.map(
+        (_item) => _item.crop_name
+      ) || [],
+    datasets: [
+      {
+        label: "Organic Self Made",
+        data:
+          bifurcated_data_label?.fertilizer_used_organic_purchased.map(
+            (_item) => _item.count
+          ) || [],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const fertilizerNoneCrops = {
+    labels:
+      bifurcated_data_label?.fertilizer_used_none.map(
+        (_item) => _item.crop_name
+      ) || [],
+    datasets: [
+      {
+        label: "None",
+        data:
+          bifurcated_data_label?.fertilizer_used_none.map(
+            (_item) => _item.count
+          ) || [],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const pesticideChemicalBasedCrops = {
+    labels:
+      bifurcated_data_label?.pesticide_used_chemical_based.map(
+        (_item) => _item.crop_name
+      ) || [],
+    datasets: [
+      {
+        label: "Chemical Based",
+        data:
+          bifurcated_data_label?.pesticide_used_chemical_based.map(
+            (_item) => _item.count
+          ) || [],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const pesticideOrganicSelfMadeCrops = {
+    labels:
+      bifurcated_data_label?.pesticide_used_organic_self_made.map(
+        (_item) => _item.crop_name
+      ) || [],
+    datasets: [
+      {
+        label: "Organic Self Made",
+        data:
+          bifurcated_data_label?.pesticide_used_organic_self_made.map(
+            (_item) => _item.count
+          ) || [],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const pesticideOrganicPurchasedCrops = {
+    labels:
+      bifurcated_data_label?.pesticide_used_organic_purchased.map(
+        (_item) => _item.crop_name
+      ) || [],
+    datasets: [
+      {
+        label: "Organic Self Made",
+        data:
+          bifurcated_data_label?.pesticide_used_organic_purchased.map(
+            (_item) => _item.count
+          ) || [],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+  const pesticideNoneCrops = {
+    labels:
+      bifurcated_data_label?.pesticide_used_none.map(
+        (_item) => _item.crop_name
+      ) || [],
+    datasets: [
+      {
+        label: "None",
+        data:
+          bifurcated_data_label?.pesticide_used_none.map(
+            (_item) => _item.count
+          ) || [],
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 1,
+      },
+    ],
+  };
+
   const incomeByCrops = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels: bifurcated_data_label?.income.map((_item) => _item.crop_name) || [],
     datasets: [
       {
         label: "Income Generated",
-        data: [10, 40, 20, 30, 25, 35],
+        data:
+          bifurcated_data_label?.income.map((_item) =>
+            Math.round(_item.income)
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -255,11 +424,15 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
     ],
   };
   const expenditureByCrops = {
-    labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels:
+      bifurcated_data_label?.expenditure.map((_item) => _item.crop_name) || [],
     datasets: [
       {
         label: "Expenditure",
-        data: [10, 40, 20, 30, 25, 35],
+        data:
+          bifurcated_data_label?.expenditure.map((_item) =>
+            Math.round(_item.expenditure)
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -273,7 +446,9 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
       />
       {crop_id ? (
         <CustomPieChart
-          header={`${String(crop_id).toUpperCase()} Information`}
+          header={`${crops
+            ?.find((_crop) => _crop._id === crop_id)
+            ?.name.toUpperCase()} Information`}
           data={singleCropInfo}
           measurement={"200kg"}
         />
@@ -334,31 +509,51 @@ const BifurcatedChart = ({ crop_id, type_id, land_unit, weight_unit }) => {
             data={expenditureByCrops}
             measurement={"200USD"}
           />
-          <CustomPieChart
+          {/* <CustomPieChart
             header="Processing"
             data={processing}
             measurement={"Count 100"}
-          />
-          <CustomBarChart header="Organic Fertilizer" data={fertilizerData} />
+          /> */}
+          {/* <CustomBarChart header="Organic Fertilizer" data={fertilizerData} /> */}
           <CustomPieChart
-            header="Fertilizer A"
-            data={organicFetilizerCrops}
+            header="Fertilizer - Chemical Based"
+            data={fertilizerChemicalBasedCrops}
             measurement={"100kg"}
           />
           <CustomPieChart
-            header="Fertilizer B"
-            data={organicFetilizerCrops}
-            measurement={"100kg"}
-          />
-          <CustomBarChart header="Organic Pesticides" data={pesticideData} />
-          <CustomPieChart
-            header="Pesticide A"
-            data={organicPesticidesCrops}
+            header="Fertilizer - Organic Purchased"
+            data={fertilizerOrganicPurchasedCrops}
             measurement={"100kg"}
           />
           <CustomPieChart
-            header="Pesticide B"
-            data={organicPesticidesCrops}
+            header="Fertilizer - Organic Self Made"
+            data={fertilizerOrganicSelfMadeCrops}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Fertilizer - None"
+            data={fertilizerNoneCrops}
+            measurement={"100kg"}
+          />
+          {/* <CustomBarChart header="Organic Pesticides" data={pesticideData} /> */}
+          <CustomPieChart
+            header="Pesticide - Chemical Based"
+            data={pesticideChemicalBasedCrops}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Pesticide - Organic Purchased"
+            data={pesticideOrganicPurchasedCrops}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Pesticide - Organic Self Made"
+            data={pesticideOrganicSelfMadeCrops}
+            measurement={"100kg"}
+          />
+          <CustomPieChart
+            header="Pesticide - None"
+            data={pesticideNoneCrops}
             measurement={"100kg"}
           />
         </>

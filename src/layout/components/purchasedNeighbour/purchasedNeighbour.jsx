@@ -7,17 +7,17 @@ import { useQuery } from "@tanstack/react-query";
 import { getPurchasedFromNeighboursData } from "../../../functions/dashboard";
 import Loading from "../loading";
 function PurchasedNeighbour({ type_id, weight_unit }) {
-  const { data: purchased_from_neighbour, isLoading } = useQuery({
+  const { data: purchased_from_neighbour = [], isLoading } = useQuery({
     queryKey: ["purchased from neighbour", type_id],
     queryFn: () => getPurchasedFromNeighboursData(type_id),
   });
 
   const data = {
-    labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels: purchased_from_neighbour.map((_item) => _item.crop_name),
     datasets: [
       {
         label: "Purchased From Neighbours",
-        data: [10, 40, 20, 30, 25, 35],
+        data: purchased_from_neighbour.map((_item) => _item.output),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,

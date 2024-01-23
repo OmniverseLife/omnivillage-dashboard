@@ -11,54 +11,49 @@ import {
 import Loading from "../loading";
 
 function IdealQuantityDiet({ type_id, weight_unit }) {
-  const { data: ideal_consumption_bar, isIdealConsumptionBarLoading } =
+  const { data: ideal_consumption_bar = [], isIdealConsumptionBarLoading } =
     useQuery({
-      queryKey: ["ideal_consumption_bar", type_id],
-      queryFn: () => getIdealConsumptionByLabelData(type_id),
+      queryKey: ["ideal_consumption_bar"],
+      queryFn: getIdealConsumptionByLabelData,
     });
 
-  const { data: ideal_consumption_expected, isIdealConsumptionCropLoading } =
-    useQuery({
-      queryKey: ["ideal_consumption_bar", type_id],
-      queryFn: () => getIdealConsumptionExpectedData(type_id),
-    });
+  const {
+    data: ideal_consumption_expected = [],
+    isIdealConsumptionCropLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["ideal_consumption_expected", type_id],
+    queryFn: () => getIdealConsumptionExpectedData(type_id),
+  });
 
-  const tags = [
-    "Grains & Nuts",
-    "Vegetables",
-    "Herbs",
-    "Legumes",
-    "Fruits",
-    "Dairy",
-    "Meat",
-    "Spices & Condiments",
-    "DaiTea/Coffeery",
-    "Oils",
-    "Processed Food & Beverages",
-    "Alcohol/Tobacco",
-  ];
+  const tags = ideal_consumption_bar.map((_item) => _item.label_name);
 
   const tagsData = {
     labels: tags,
     datasets: [
       {
         label: "Ideal Quantity To Be Consumed",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        data: ideal_consumption_bar.map((_item) => _item.ideal_consumption),
         backgroundColor: backgroundColor[2],
       },
       {
         label: "Current Consumed Quantity",
-        data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
+        data: ideal_consumption_bar.map((_item) => _item.total_consumed),
         backgroundColor: backgroundColor[1],
       },
     ],
   };
+
+  const labels = ideal_consumption_expected.map((_item) => _item.crop_name);
+
   const quantityToBeConsumed = {
-    labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels: labels,
     datasets: [
       {
         label: "Ideal Quantity To Be Consumed",
-        data: [10, 40, 20, 30, 25, 35],
+        data: ideal_consumption_expected.map(
+          (_item) => _item.ideal_consumption
+        ),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -66,11 +61,11 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
     ],
   };
   const currentlyQuantityConsumed = {
-    labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
+    labels: labels,
     datasets: [
       {
         label: "Currently Quantity Consumed",
-        data: [10, 40, 20, 30, 25, 35],
+        data: ideal_consumption_expected.map((_item) => _item.total_consumed),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -82,7 +77,9 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <Loading
         isLoading={
-          isIdealConsumptionBarLoading || isIdealConsumptionCropLoading
+          isIdealConsumptionBarLoading ||
+          isIdealConsumptionCropLoading ||
+          isFetching
         }
       />
       <CustomBarChart

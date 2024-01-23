@@ -21,45 +21,35 @@ function LandChart({ land_unit }) {
   });
 
   const data = {
-    labels: [
-      "Grains and Nuts",
-      "Legumes",
-      "Fruits, Vegetables & Herbs",
-      "Dairy & Animal based",
-      "Meat & Seafood",
-      "Sauce",
-      "Tea/Coffee",
-      "Oils",
-      "Processed foods & Beverages",
-      "Tobacco and Alcohol",
-    ],
+    labels: ["Cultivation", "Fishery", "Poultry", "Storage", "trees"],
     datasets: [
       {
         label: "Land Allocated",
-        data: [40, 50, 10, 15, 10, 10, 25, 15, 10, 20],
+        data: [
+          Math.round(land_allocation?.cultivation),
+          Math.round(land_allocation?.fishery),
+          Math.round(land_allocation?.poultry),
+          Math.round(land_allocation?.storage),
+          Math.round(land_allocation?.trees),
+        ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
       },
     ],
   };
-  const tagData = {
-    labels: [
-      "Grains and Nuts",
-      "Legumes",
-      "Fruits, Vegetables & Herbs",
-      "Dairy & Animal based",
-      "Meat & Seafood",
-      "Sauce",
-      "Tea/Coffee",
-      "Oils",
-      "Processed foods & Beverages",
-      "Tobacco and Alcohol",
-    ],
+  const usedLand = {
+    labels: ["Cultivation", "Fishery", "Poultry", "Storage", "trees"],
     datasets: [
       {
         label: "Land Allocated",
-        data: [30, 40, 10, 10, 10, 10, 20, 10, 10, 40],
+        data: [
+          Math.round(land_used?.cultivation),
+          Math.round(land_used?.fishery),
+          Math.round(land_used?.poultry),
+          Math.round(land_used?.storage),
+          Math.round(land_used?.trees),
+        ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -74,7 +64,11 @@ function LandChart({ land_unit }) {
         data={data}
         measurement={"100km"}
       />
-      <CustomPieChart header="Land Used" data={data} measurement={"100km"} />
+      <CustomPieChart
+        header="Land Used"
+        data={usedLand}
+        measurement={"100km"}
+      />
       {/* <CustomPieChart
         header="Land Allocated (Tags)"
         data={tagData}

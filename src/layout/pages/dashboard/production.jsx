@@ -181,6 +181,7 @@ function Production() {
           crop_id={selectedCrop}
           land_unit={selectedArea}
           weight_unit={selectedWeight}
+          crops={crops}
         />
       ) : selectedOption === "income-chart" ? (
         <IncomeSaleChart />
