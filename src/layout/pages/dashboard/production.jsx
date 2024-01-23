@@ -6,7 +6,7 @@ import {
   Select,
   Stack,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import BifurcatedChart from "../../components/bifurcatedChart/bifurcatedChart";
 import IncomeSaleChart from "../../components/incomeSaleChart/incomeSaleChart";
@@ -14,6 +14,11 @@ import LandChart from "../../components/landChart/landChart";
 import SellingChannel from "../../components/sellingChannel/sellingChannel";
 import StorageFacility from "../../components/storageFacility/storageFacility";
 import UtilityChart from "../../components/utilityChart/utilityChart";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLabels } from "../../../functions/others";
+import { fetchTagWiseCrops } from "../../../functions/consumption";
+import Loading from "../../components/loading";
+import convert from "convert-units";
 
 export const backgroundColor = [
   "rgba(255, 99, 132, 0.35)",
@@ -34,12 +39,29 @@ export const borderColor = [
 
 function Production() {
   const [selectedOption, setselectedOption] = useState("land-chart");
-  const [selectedTag, setselectedTag] = useState("grains-nuts");
+  const [selectedTag, setselectedTag] = useState("");
   const [selectedCrop, setselectedCrop] = useState("");
   const [selectedWeight, setselectedWeight] = useState("kg");
-  const [selectedArea, setselectedArea] = useState("km");
+  const [selectedArea, setselectedArea] = useState("km2");
+
+  const { data: labels = [], isLoading } = useQuery({
+    queryKey: ["labels"],
+    queryFn: fetchLabels,
+  });
+
+  const { data: crops = [], isCropsLoading } = useQuery({
+    queryKey: ["crops", selectedTag],
+    queryFn: () => fetchTagWiseCrops(selectedTag),
+    enabled: Boolean(selectedTag),
+  });
+
+  useEffect(() => {
+    setselectedTag(labels[0]?._id ?? "");
+  }, [labels]);
+
   return (
     <Stack className="container">
+      <Loading isLoading={isLoading || isCropsLoading} />
       <Stack direction={"row"} gap={3} marginBottom={3} flexWrap={"wrap"}>
         <FormControl>
           <InputLabel id="demo-simple-select-label">
@@ -52,7 +74,11 @@ function Production() {
             value={selectedOption}
             style={{ width: 300 }}
             label="Production Information"
-            onChange={(e) => setselectedOption(e.target.value)}
+            onChange={(e) => {
+              setselectedTag(labels[0]._id);
+              setselectedCrop("");
+              setselectedOption(e.target.value);
+            }}
           >
             <MenuItem value="land-chart">Land Chart</MenuItem>
             <MenuItem value="bifurcated">Bifurcated Chart By Tags</MenuItem>
@@ -74,22 +100,11 @@ function Production() {
               label="Tags"
               onChange={(e) => setselectedTag(e.target.value)}
             >
-              <MenuItem value="grains-nuts">Grains & Nuts</MenuItem>
-              <MenuItem value="legumes">Legumes</MenuItem>
-              <MenuItem value="fruits-vegetables-herbs">
-                Fruits, Vegetables & Herbs
-              </MenuItem>
-              <MenuItem value="dairy-animal-based">
-                Dairy & Animal based
-              </MenuItem>
-              <MenuItem value="meat-seafood">Meat & Seafood</MenuItem>
-              <MenuItem value="sauce">Sauce</MenuItem>
-              <MenuItem value="tea-coffee">Tea/Coffee</MenuItem>
-              <MenuItem value="oils">Oils</MenuItem>
-              <MenuItem value="food-beverage">
-                Processed Food & Beverages
-              </MenuItem>
-              <MenuItem value="alocohol-tobacco">Tobacco and Alcohol</MenuItem>
+              {labels.map((_label) => (
+                <MenuItem value={_label._id} key={_label._id}>
+                  {_label.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         ) : null}
@@ -105,9 +120,11 @@ function Production() {
               onChange={(e) => setselectedCrop(e.target.value)}
             >
               <MenuItem value="">Select</MenuItem>
-              <MenuItem value="almonds">Almonds</MenuItem>
-              <MenuItem value="walnuts">Walnuts</MenuItem>
-              <MenuItem value="cashew">Cashew Nuts</MenuItem>
+              {crops.map((_crop) => (
+                <MenuItem value={_crop._id} key={_crop._id}>
+                  {_crop.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         )}
@@ -123,8 +140,13 @@ function Production() {
               label="Area"
               onChange={(e) => setselectedArea(e.target.value)}
             >
-              <MenuItem value="km">Kilometer</MenuItem>
-              <MenuItem value="hectare">Hectare</MenuItem>
+              {convert()
+                .list("area")
+                .map((_unit) => (
+                  <MenuItem value={_unit.abbr} key={_unit.abbr}>
+                    {_unit.singular}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         ) : null}
@@ -140,21 +162,26 @@ function Production() {
               label="Weight"
               onChange={(e) => setselectedWeight(e.target.value)}
             >
-              <MenuItem value="tonne">Tonne</MenuItem>
-              <MenuItem value="kg">Kilogram</MenuItem>
-              <MenuItem value="g">Gram</MenuItem>
-              <MenuItem value="mg">Miligram</MenuItem>
-              <MenuItem value="stone">Stone</MenuItem>
-              <MenuItem value="pound">Pound</MenuItem>
-              <MenuItem value="ounce">Ounce</MenuItem>
+              {convert()
+                .list("mass")
+                .map((_unit) => (
+                  <MenuItem value={_unit.abbr} key={_unit.abbr}>
+                    {_unit.singular}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         ) : null}
       </Stack>
       {selectedOption === "land-chart" ? (
-        <LandChart />
+        <LandChart land_unit={selectedArea} />
       ) : selectedOption === "bifurcated" ? (
-        <BifurcatedChart crop={selectedCrop} />
+        <BifurcatedChart
+          type_id={selectedTag}
+          crop_id={selectedCrop}
+          land_unit={selectedArea}
+          weight_unit={selectedWeight}
+        />
       ) : selectedOption === "income-chart" ? (
         <IncomeSaleChart />
       ) : selectedOption === "selling-channel" ? (

@@ -3,8 +3,16 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
+import { useQuery } from "@tanstack/react-query";
+import { getPurchasedFromMarketData } from "../../../functions/dashboard";
+import Loading from "../loading";
 
-function PurchasedOutside() {
+function PurchasedOutside({ type_id, weight_unit }) {
+  const { data: purchased_from_market, isLoading } = useQuery({
+    queryKey: ["purchased from market", type_id],
+    queryFn: () => getPurchasedFromMarketData(type_id),
+  });
+
   const data = {
     labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
     datasets: [
@@ -19,6 +27,7 @@ function PurchasedOutside() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isLoading} />
       <CustomPieChart header="Purchased From Outside" data={data} />
     </Stack>
   );

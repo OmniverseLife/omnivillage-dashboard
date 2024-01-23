@@ -3,8 +3,16 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
+import { useQuery } from "@tanstack/react-query";
+import { getUtilizationData } from "../../../functions/dashboard";
+import Loading from "../loading";
 
 function UtilityChart() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["utilization_data"],
+    queryFn: getUtilizationData,
+  });
+
   const barTags = [
     "Grains & Nuts",
     "Vegetables",
@@ -87,6 +95,7 @@ function UtilityChart() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isLoading} />
       <CustomBarChart header="Soil Health" data={soilHealth} />
       <CustomBarChart header="Self Consumed" data={selfConsumed} />
       <CustomBarChart header="Sold To Neighbour" data={soldToNeighbour} />

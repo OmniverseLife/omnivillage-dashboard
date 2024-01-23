@@ -3,7 +3,15 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
-function PurchasedNeighbour() {
+import { useQuery } from "@tanstack/react-query";
+import { getPurchasedFromNeighboursData } from "../../../functions/dashboard";
+import Loading from "../loading";
+function PurchasedNeighbour({ type_id, weight_unit }) {
+  const { data: purchased_from_neighbour, isLoading } = useQuery({
+    queryKey: ["purchased from neighbour", type_id],
+    queryFn: () => getPurchasedFromNeighboursData(type_id),
+  });
+
   const data = {
     labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
     datasets: [
@@ -18,6 +26,7 @@ function PurchasedNeighbour() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isLoading} />
       <CustomPieChart header="Purchased From Neighbours" data={data} />
     </Stack>
   );

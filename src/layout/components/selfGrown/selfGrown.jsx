@@ -3,8 +3,23 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getSelfConsumedData,
+  getSelfGrownByTagsData,
+} from "../../../functions/dashboard";
+import Loading from "../loading";
 
-function SelfGrown() {
+function SelfGrown({ type_id, weight_unit }) {
+  const { data: self_grown, isSelfGrownLoading } = useQuery({
+    queryKey: ["self grown", type_id],
+    queryFn: () => getSelfGrownByTagsData(type_id),
+  });
+  const { data: self_consumed, isSelfConsumedLoading } = useQuery({
+    queryKey: ["self consumed", type_id],
+    queryFn: () => getSelfConsumedData(type_id),
+  });
+
   const selfGrownData = {
     labels: ["Almonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
     datasets: [
@@ -31,6 +46,7 @@ function SelfGrown() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isSelfConsumedLoading || isSelfGrownLoading} />
       <CustomPieChart header="Self Grown" data={selfGrownData} />
       <CustomPieChart header="Self Consumed" data={selfConsumedData} />
     </Stack>
