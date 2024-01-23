@@ -2,8 +2,16 @@ import React from "react";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { Stack } from "@mui/material";
+import { getStorageData } from "../../../functions/dashboard";
+import { useQuery } from "@tanstack/react-query";
+import Loading from "../loading";
 
 function StorageFacility() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["storage_data"],
+    queryFn: getStorageData,
+  });
+
   const grains = {
     labels: ["Bags", "Containers", "Piles", "Warehouse"],
     datasets: [
@@ -54,6 +62,7 @@ function StorageFacility() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isLoading} />
       <CustomPieChart
         header="Storage Facility Grains"
         data={grains}

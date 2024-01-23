@@ -3,8 +3,23 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
+import { useQuery } from "@tanstack/react-query";
+import { getBifurcatedLabelData } from "../../../functions/dashboard";
+import Loading from "../loading";
 // import * as faker from "@faker-js/faker";
-const BifurcatedChart = ({ crop }) => {
+const BifurcatedChart = ({ crop_id, type_id }) => {
+  const { data: bifurcated_data_label, isBifurcatedDataLabelLoading } =
+    useQuery({
+      queryKey: ["bifurcated_data", type_id],
+      queryFn: () => getBifurcatedLabelData(type_id),
+    });
+
+  const { data: bifurcated_data_crop, isBifurcatedDataCropLoading } = useQuery({
+    queryKey: ["bifurcated_data_crop", crop_id],
+    queryFn: () => getBifurcatedLabelData(crop_id),
+    enabled: Boolean(crop_id),
+  });
+
   const landAllocated = {
     labels: ["Alomonds", "Cashew Nuts", "Walnuts", "Raisins", "Dates", "Figs"],
     datasets: [
@@ -253,9 +268,12 @@ const BifurcatedChart = ({ crop }) => {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
-      {crop ? (
+      <Loading
+        isLoading={isBifurcatedDataCropLoading || isBifurcatedDataLabelLoading}
+      />
+      {crop_id ? (
         <CustomPieChart
-          header={`${String(crop).toUpperCase()} Information`}
+          header={`${String(crop_id).toUpperCase()} Information`}
           data={singleCropInfo}
           measurement={"200kg"}
         />

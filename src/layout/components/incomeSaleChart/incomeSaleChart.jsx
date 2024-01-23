@@ -3,8 +3,16 @@ import React from "react";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
 import CustomPieChart from "../customPieChart/customPieChart";
+import { useQuery } from "@tanstack/react-query";
+import { getIncomeExpenditureData } from "../../../functions/dashboard";
+import Loading from "../loading";
 
 function IncomeSaleChart() {
+  const { data: income_expenditure, isLoading } = useQuery({
+    queryKey: ["income_expenditure"],
+    queryFn: getIncomeExpenditureData,
+  });
+
   const incomeByLabels = [
     "Grains & Nuts",
     "Vegetables",
@@ -38,6 +46,7 @@ function IncomeSaleChart() {
 
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isLoading} />
       <CustomBarChart header="Income & Expenditure" data={incomeByLabelsData} />
     </Stack>
   );

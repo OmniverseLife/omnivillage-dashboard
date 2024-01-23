@@ -2,8 +2,16 @@ import React from "react";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { Stack } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { getSellingChannelData } from "../../../functions/dashboard";
+import Loading from "../loading";
 
 function SellingChannel() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["selling_channel"],
+    queryFn: getSellingChannelData,
+  });
+
   const sellingChannel = {
     labels: ["Local Market", "Agent", "Ecommerce", "Export", "None"],
     datasets: [
@@ -18,6 +26,7 @@ function SellingChannel() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"}>
+      <Loading isLoading={isLoading} />
       <CustomPieChart
         header="Selling Channel"
         data={sellingChannel}

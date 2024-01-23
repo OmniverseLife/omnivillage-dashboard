@@ -3,8 +3,26 @@ import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getIdealConsumptionByLabelData,
+  getIdealConsumptionExpectedData,
+} from "../../../functions/dashboard";
+import Loading from "../loading";
 
-function IdealQuantityDiet() {
+function IdealQuantityDiet({ type_id }) {
+  const { data: ideal_consumption_bar, isIdealConsumptionBarLoading } =
+    useQuery({
+      queryKey: ["ideal_consumption_bar", type_id],
+      queryFn: () => getIdealConsumptionByLabelData(type_id),
+    });
+
+  const { data: ideal_consumption_expected, isIdealConsumptionCropLoading } =
+    useQuery({
+      queryKey: ["ideal_consumption_bar", type_id],
+      queryFn: () => getIdealConsumptionExpectedData(type_id),
+    });
+
   const tags = [
     "Grains & Nuts",
     "Vegetables",
@@ -62,6 +80,11 @@ function IdealQuantityDiet() {
 
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading
+        isLoading={
+          isIdealConsumptionBarLoading || isIdealConsumptionCropLoading
+        }
+      />
       <CustomBarChart
         header="Ideal Quantity Consumption (Tags)"
         data={tagsData}

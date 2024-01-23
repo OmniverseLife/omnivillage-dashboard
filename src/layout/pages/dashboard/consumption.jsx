@@ -52,13 +52,13 @@ function Consumption() {
           />
         );
       case "self-grown":
-        return <SelfGrown />;
+        return <SelfGrown type_id={selectedTag} />;
       case "purchased-neighbours":
-        return <PurchasedNeighbour />;
+        return <PurchasedNeighbour type_id={selectedTag} />;
       case "purchased-outside":
-        return <PurchasedOutside />;
+        return <PurchasedOutside type_id={selectedTag} />;
       case "ideal-diet":
-        return <IdealQuantityDiet />;
+        return <IdealQuantityDiet type_id={selectedTag} />;
     }
   };
   return (
@@ -75,7 +75,11 @@ function Consumption() {
             value={selectedOption}
             style={{ width: 300 }}
             label="Production Information"
-            onChange={(e) => setselectedOption(e.target.value)}
+            onChange={(e) => {
+              setselectedTag(labels[0]._id);
+              setselectedCrop(crops[0]._id);
+              setselectedOption(e.target.value);
+            }}
           >
             <MenuItem value="consumption-production">
               Consumption From Production

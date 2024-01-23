@@ -2,8 +2,24 @@ import { Stack } from "@mui/material";
 import React from "react";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomPieChart from "../customPieChart/customPieChart";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getLandAllocationData,
+  getLandUsedData,
+} from "../../../functions/dashboard";
+import Loading from "../loading";
 
 function LandChart() {
+  const { data: land_allocation, isLandAllocationLoading } = useQuery({
+    queryKey: ["land_allocation"],
+    queryFn: getLandAllocationData,
+  });
+
+  const { data: land_used, isLandUsedLoading } = useQuery({
+    queryKey: ["land_used"],
+    queryFn: getLandUsedData,
+  });
+
   const data = {
     labels: [
       "Grains and Nuts",
@@ -52,13 +68,14 @@ function LandChart() {
   };
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+      <Loading isLoading={isLandAllocationLoading || isLandUsedLoading} />
       <CustomPieChart
         header="Land Allocated"
         data={data}
         measurement={"100km"}
       />
       <CustomPieChart header="Land Used" data={data} measurement={"100km"} />
-      <CustomPieChart
+      {/* <CustomPieChart
         header="Land Allocated (Tags)"
         data={tagData}
         measurement={"100km"}
@@ -67,7 +84,7 @@ function LandChart() {
         header="Land Used (Tags)"
         data={tagData}
         measurement={"100km"}
-      />
+      /> */}
     </Stack>
   );
 }
