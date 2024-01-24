@@ -9,6 +9,11 @@ import {
   getIdealConsumptionExpectedData,
 } from "../../../functions/dashboard";
 import Loading from "../loading";
+import convert from "convert-units";
+
+const weightConverter = (unit, value) => {
+  return Math.round(convert(value).from("kg").to(unit));
+};
 
 function IdealQuantityDiet({ type_id, weight_unit }) {
   const { data: ideal_consumption_bar = [], isIdealConsumptionBarLoading } =
@@ -33,12 +38,16 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
     datasets: [
       {
         label: "Ideal Quantity To Be Consumed",
-        data: ideal_consumption_bar.map((_item) => _item.ideal_consumption),
+        data: ideal_consumption_bar.map((_item) =>
+          weightConverter(weight_unit, _item.ideal_consumption)
+        ),
         backgroundColor: backgroundColor[2],
       },
       {
         label: "Current Consumed Quantity",
-        data: ideal_consumption_bar.map((_item) => _item.total_consumed),
+        data: ideal_consumption_bar.map((_item) =>
+          weightConverter(weight_unit, _item.total_consumed)
+        ),
         backgroundColor: backgroundColor[1],
       },
     ],
@@ -51,8 +60,8 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
     datasets: [
       {
         label: "Ideal Quantity To Be Consumed",
-        data: ideal_consumption_expected.map(
-          (_item) => _item.ideal_consumption
+        data: ideal_consumption_expected.map((_item) =>
+          weightConverter(weight_unit, _item.ideal_consumption)
         ),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -65,7 +74,9 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
     datasets: [
       {
         label: "Currently Quantity Consumed",
-        data: ideal_consumption_expected.map((_item) => _item.total_consumed),
+        data: ideal_consumption_expected.map((_item) =>
+          weightConverter(weight_unit, _item.total_consumed)
+        ),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,

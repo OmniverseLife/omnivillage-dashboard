@@ -9,14 +9,13 @@ import {
   getBifurcatedLabelData,
 } from "../../../functions/dashboard";
 import Loading from "../loading";
-// import * as faker from "@faker-js/faker";
-const BifurcatedChart = ({
-  crop_id,
-  type_id,
-  land_unit,
-  weight_unit,
-  crops,
-}) => {
+import convert from "convert-units";
+
+const weightConverter = (unit, value) => {
+  return Math.round(convert(value).from("kg").to(unit));
+};
+
+const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   const { data: bifurcated_data_label, isBifurcatedDataLabelLoading } =
     useQuery({
       queryKey: ["bifurcated_data", type_id],
@@ -43,11 +42,23 @@ const BifurcatedChart = ({
           crops?.find((_crop) => _crop._id === crop_id)?.name
         } Information`,
         data: [
-          bifurcated_data_crop?.sold_to_neighbour,
-          bifurcated_data_crop?.self_consumed,
-          bifurcated_data_crop?.sold_to_market,
-          bifurcated_data_crop?.fed_to_livestock,
-          bifurcated_data_crop?.wastage,
+          weightConverter(
+            weight_unit,
+            bifurcated_data_crop?.sold_to_neighbour ?? 0
+          ),
+          weightConverter(
+            weight_unit,
+            bifurcated_data_crop?.self_consumed ?? 0
+          ),
+          weightConverter(
+            weight_unit,
+            bifurcated_data_crop?.sold_to_market ?? 0
+          ),
+          weightConverter(
+            weight_unit,
+            bifurcated_data_crop?.fed_to_livestock ?? 0
+          ),
+          weightConverter(weight_unit, bifurcated_data_crop?.wastage ?? 0),
         ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -60,7 +71,10 @@ const BifurcatedChart = ({
     datasets: [
       {
         label: "Quantity Produced",
-        data: bifurcated_data_label?.output.map((_item) => _item.output) || [],
+        data:
+          bifurcated_data_label?.output.map((_item) =>
+            weightConverter(weight_unit, _item.output)
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -111,8 +125,8 @@ const BifurcatedChart = ({
       {
         label: "Self Consumed",
         data:
-          bifurcated_data_label?.self_consumed.map(
-            (_item) => _item.self_consumed
+          bifurcated_data_label?.self_consumed.map((_item) =>
+            weightConverter(weight_unit, _item.self_consumed)
           ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -129,8 +143,8 @@ const BifurcatedChart = ({
       {
         label: "Sold To Neighbours",
         data:
-          bifurcated_data_label?.sold_to_neighbour.map(
-            (_item) => _item.sold_to_neighbour
+          bifurcated_data_label?.sold_to_neighbour.map((_item) =>
+            weightConverter(weight_unit, _item.sold_to_neighbour)
           ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -146,8 +160,8 @@ const BifurcatedChart = ({
       {
         label: "Sold To Market",
         data:
-          bifurcated_data_label?.sold_to_market.map(
-            (_item) => _item.sold_to_market
+          bifurcated_data_label?.sold_to_market.map((_item) =>
+            weightConverter(weight_unit, _item.sold_to_market)
           ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -163,8 +177,8 @@ const BifurcatedChart = ({
       {
         label: "Fed To Live Stock",
         data:
-          bifurcated_data_label?.fed_to_livestock.map(
-            (_item) => _item.fed_to_livestock
+          bifurcated_data_label?.fed_to_livestock.map((_item) =>
+            weightConverter(weight_unit, _item.fed_to_livestock)
           ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -179,7 +193,9 @@ const BifurcatedChart = ({
       {
         label: "Wastage",
         data:
-          bifurcated_data_label?.wastage.map((_item) => _item.wastage) || [],
+          bifurcated_data_label?.wastage.map((_item) =>
+            weightConverter(weight_unit, _item.wastage)
+          ) || [],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -439,6 +455,118 @@ const BifurcatedChart = ({
       },
     ],
   };
+
+  // Sums of each section
+
+  const single_crop_sum = Object.values(bifurcated_data_crop || {}).reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current),
+    0
+  );
+
+  const quantity_produced_sum = bifurcated_data_label?.output.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
+  const soil_health_stable_sum =
+    bifurcated_data_label?.soil_health_stable.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const soil_health_decreasing_yeild_sum =
+    bifurcated_data_label?.soil_health_decreasing_yeild.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const self_consumed_sum = bifurcated_data_label?.self_consumed.reduce(
+    (prev, current) =>
+      prev + weightConverter(weight_unit, current.self_consumed),
+    0
+  );
+
+  const sold_to_neighbour_sum = bifurcated_data_label?.sold_to_neighbour.reduce(
+    (prev, current) =>
+      prev + weightConverter(weight_unit, current.sold_to_neighbour),
+    0
+  );
+
+  const sold_to_market_sum = bifurcated_data_label?.sold_to_market.reduce(
+    (prev, current) =>
+      prev + weightConverter(weight_unit, current.sold_to_market),
+    0
+  );
+
+  const fed_to_livestock_sum = bifurcated_data_label?.fed_to_livestock.reduce(
+    (prev, current) =>
+      prev + weightConverter(weight_unit, current.fed_to_livestock),
+    0
+  );
+
+  const wastage_sum = bifurcated_data_label?.wastage.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.wastage),
+    0
+  );
+
+  const fertilizer_used_chemical_based_sum =
+    bifurcated_data_label?.fertilizer_used_chemical_based.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const fertilizer_used_organic_self_made_sum =
+    bifurcated_data_label?.fertilizer_used_organic_self_made.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const fertilizer_used_organic_purchased_sum =
+    bifurcated_data_label?.fertilizer_used_organic_purchased.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const fertilizer_used_none_sum =
+    bifurcated_data_label?.fertilizer_used_none.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const pesticide_used_chemical_based_sum =
+    bifurcated_data_label?.pesticide_used_chemical_based.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const pesticide_used_organic_self_made_sum =
+    bifurcated_data_label?.pesticide_used_organic_self_made.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const pesticide_used_organic_purchased_sum =
+    bifurcated_data_label?.pesticide_used_organic_purchased.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const pesticide_used_none_sum =
+    bifurcated_data_label?.pesticide_used_none.reduce(
+      (prev, current) => prev + current.count,
+      0
+    );
+
+  const income_sum = bifurcated_data_label?.income.reduce(
+    (prev, current) => prev + Math.round(current.income),
+    0
+  );
+
+  const expenditure_sum = bifurcated_data_label?.expenditure.reduce(
+    (prev, current) => prev + Math.round(current.expenditure),
+    0
+  );
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <Loading
@@ -450,64 +578,64 @@ const BifurcatedChart = ({
             ?.find((_crop) => _crop._id === crop_id)
             ?.name.toUpperCase()} Information`}
           data={singleCropInfo}
-          measurement={"200kg"}
+          measurement={`${single_crop_sum} ${weight_unit}`}
         />
       ) : (
         <>
           <CustomPieChart
-            header="Quantity Produced(Crops)"
+            header="Quantity Produced"
             data={cropData}
-            measurement={"200kg"}
+            measurement={`${quantity_produced_sum} ${weight_unit}`}
           />
-          <CustomPieChart
-            header="Land Allocated (Crops)"
+          {/* <CustomPieChart
+            header="Self Consumed"
             data={selfConsumed}
             measurement={"100km"}
-          />
+          /> */}
           <CustomPieChart
             header="Soil Health (Stable)"
             data={soilHealthStable}
-            measurement={"100Km"}
+            measurement={soil_health_stable_sum}
           />
           <CustomPieChart
             header="Soil Health (Decreasing Yeild)"
             data={soilHealthDecreasing}
-            measurement={"70Km"}
+            measurement={soil_health_decreasing_yeild_sum}
           />
           <CustomPieChart
             header="Self Consumed"
             data={selfConsumed}
-            measurement={"100kg"}
+            measurement={`${self_consumed_sum} ${weight_unit}`}
           />
           <CustomPieChart
             header="Sold To Neighbours"
             data={soldToNeighbours}
-            measurement={"100kg"}
+            measurement={`${sold_to_neighbour_sum} ${weight_unit}`}
           />
           <CustomPieChart
             header="Sold To Market"
             data={soldToMarket}
-            measurement={"100kg"}
+            measurement={`${sold_to_market_sum} ${weight_unit}`}
           />
           <CustomPieChart
             header="Fed To Live Stock"
             data={fedToLiveStock}
-            measurement={"100kg"}
+            measurement={`${fed_to_livestock_sum} ${weight_unit}`}
           />
           <CustomPieChart
             header="Wastage"
             data={wastage}
-            measurement={"100kg"}
+            measurement={`${wastage_sum} ${weight_unit}`}
           />
           <CustomPieChart
             header="Income By Crops"
             data={incomeByCrops}
-            measurement={"500USD"}
+            measurement={`${income_sum} USD`}
           />
           <CustomPieChart
             header="Expenditure By Crops"
             data={expenditureByCrops}
-            measurement={"200USD"}
+            measurement={`${expenditure_sum} USD`}
           />
           {/* <CustomPieChart
             header="Processing"
@@ -518,43 +646,43 @@ const BifurcatedChart = ({
           <CustomPieChart
             header="Fertilizer - Chemical Based"
             data={fertilizerChemicalBasedCrops}
-            measurement={"100kg"}
+            measurement={fertilizer_used_chemical_based_sum}
           />
           <CustomPieChart
             header="Fertilizer - Organic Purchased"
             data={fertilizerOrganicPurchasedCrops}
-            measurement={"100kg"}
+            measurement={fertilizer_used_organic_purchased_sum}
           />
           <CustomPieChart
             header="Fertilizer - Organic Self Made"
             data={fertilizerOrganicSelfMadeCrops}
-            measurement={"100kg"}
+            measurement={fertilizer_used_organic_self_made_sum}
           />
           <CustomPieChart
             header="Fertilizer - None"
             data={fertilizerNoneCrops}
-            measurement={"100kg"}
+            measurement={fertilizer_used_none_sum}
           />
           {/* <CustomBarChart header="Organic Pesticides" data={pesticideData} /> */}
           <CustomPieChart
             header="Pesticide - Chemical Based"
             data={pesticideChemicalBasedCrops}
-            measurement={"100kg"}
+            measurement={pesticide_used_chemical_based_sum}
           />
           <CustomPieChart
             header="Pesticide - Organic Purchased"
             data={pesticideOrganicPurchasedCrops}
-            measurement={"100kg"}
+            measurement={pesticide_used_organic_purchased_sum}
           />
           <CustomPieChart
             header="Pesticide - Organic Self Made"
             data={pesticideOrganicSelfMadeCrops}
-            measurement={"100kg"}
+            measurement={pesticide_used_organic_self_made_sum}
           />
           <CustomPieChart
             header="Pesticide - None"
             data={pesticideNoneCrops}
-            measurement={"100kg"}
+            measurement={pesticide_used_none_sum}
           />
         </>
       )}

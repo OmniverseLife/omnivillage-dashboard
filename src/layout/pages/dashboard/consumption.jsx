@@ -58,6 +58,7 @@ function Consumption() {
           <ConsumptionFromProduction
             type_id={selectedTag}
             crop_id={selectedCrop}
+            weight_unit={selectedWeight}
           />
         );
       case "self-grown":

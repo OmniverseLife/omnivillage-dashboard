@@ -6,6 +6,11 @@ import CustomBarChart from "../customBarChart/customBarChart";
 import { useQuery } from "@tanstack/react-query";
 import { getPurchasedFromMarketData } from "../../../functions/dashboard";
 import Loading from "../loading";
+import convert from "convert-units";
+
+const weightConverter = (unit, value) => {
+  return Math.round(convert(value).from("kg").to(unit));
+};
 
 function PurchasedOutside({ type_id, weight_unit }) {
   const { data: purchased_from_market = [], isLoading } = useQuery({
@@ -18,7 +23,9 @@ function PurchasedOutside({ type_id, weight_unit }) {
     datasets: [
       {
         label: "Purchased From Outside",
-        data: purchased_from_market.map((_item) => _item.output),
+        data: purchased_from_market.map((_item) =>
+          weightConverter(weight_unit, _item.output)
+        ),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,

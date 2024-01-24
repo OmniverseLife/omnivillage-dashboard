@@ -8,14 +8,19 @@ import {
   getLandUsedData,
 } from "../../../functions/dashboard";
 import Loading from "../loading";
+import convert from "convert-units";
+
+const landConverter = (unit, value) => {
+  return Math.round(convert(value).from("km2").to(unit));
+};
 
 function LandChart({ land_unit }) {
-  const { data: land_allocation, isLandAllocationLoading } = useQuery({
+  const { data: land_allocation = {}, isLandAllocationLoading } = useQuery({
     queryKey: ["land_allocation"],
     queryFn: getLandAllocationData,
   });
 
-  const { data: land_used, isLandUsedLoading } = useQuery({
+  const { data: land_used = {}, isLandUsedLoading } = useQuery({
     queryKey: ["land_used"],
     queryFn: getLandUsedData,
   });
@@ -26,11 +31,11 @@ function LandChart({ land_unit }) {
       {
         label: "Land Allocated",
         data: [
-          Math.round(land_allocation?.cultivation),
-          Math.round(land_allocation?.fishery),
-          Math.round(land_allocation?.poultry),
-          Math.round(land_allocation?.storage),
-          Math.round(land_allocation?.trees),
+          landConverter(land_unit, land_allocation?.cultivation ?? 0),
+          landConverter(land_unit, land_allocation?.fishery ?? 0),
+          landConverter(land_unit, land_allocation?.poultry ?? 0),
+          landConverter(land_unit, land_allocation?.storage ?? 0),
+          landConverter(land_unit, land_allocation?.trees ?? 0),
         ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -42,13 +47,13 @@ function LandChart({ land_unit }) {
     labels: ["Cultivation", "Fishery", "Poultry", "Storage", "trees"],
     datasets: [
       {
-        label: "Land Allocated",
+        label: "Land Used",
         data: [
-          Math.round(land_used?.cultivation),
-          Math.round(land_used?.fishery),
-          Math.round(land_used?.poultry),
-          Math.round(land_used?.storage),
-          Math.round(land_used?.trees),
+          landConverter(land_unit, land_used?.cultivation ?? 0),
+          landConverter(land_unit, land_used?.fishery ?? 0),
+          landConverter(land_unit, land_used?.poultry ?? 0),
+          landConverter(land_unit, land_used?.storage ?? 0),
+          landConverter(land_unit, land_used?.trees ?? 0),
         ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -56,29 +61,30 @@ function LandChart({ land_unit }) {
       },
     ],
   };
+
+  const land_allocated_sum = Object.values(land_allocation).reduce(
+    (prev, current) => prev + landConverter(land_unit, current),
+    0
+  );
+
+  const land_used_sum = Object.values(land_used).reduce(
+    (prev, current) => prev + landConverter(land_unit, current),
+    0
+  );
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <Loading isLoading={isLandAllocationLoading || isLandUsedLoading} />
       <CustomPieChart
         header="Land Allocated"
         data={data}
-        measurement={"100km"}
+        measurement={`${Math.round(land_allocated_sum)} ${land_unit}`}
       />
       <CustomPieChart
         header="Land Used"
         data={usedLand}
-        measurement={"100km"}
+        measurement={`${Math.round(land_used_sum)} ${land_unit}`}
       />
-      {/* <CustomPieChart
-        header="Land Allocated (Tags)"
-        data={tagData}
-        measurement={"100km"}
-      />
-      <CustomPieChart
-        header="Land Used (Tags)"
-        data={tagData}
-        measurement={"100km"}
-      /> */}
     </Stack>
   );
 }
