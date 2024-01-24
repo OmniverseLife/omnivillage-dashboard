@@ -9,6 +9,11 @@ import {
   getSelfGrownByTagsData,
 } from "../../../functions/dashboard";
 import Loading from "../loading";
+import convert from "convert-units";
+
+const weightConverter = (unit, value) => {
+  return Math.round(convert(value).from("kg").to(unit));
+};
 
 function SelfGrown({ type_id, weight_unit }) {
   const { data: self_grown = [], isSelfGrownLoading } = useQuery({
@@ -27,7 +32,9 @@ function SelfGrown({ type_id, weight_unit }) {
     datasets: [
       {
         label: "Self Grown",
-        data: self_grown.map((_item) => _item.output),
+        data: self_grown.map((_item) =>
+          weightConverter(weight_unit, _item.output)
+        ),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -41,7 +48,9 @@ function SelfGrown({ type_id, weight_unit }) {
     datasets: [
       {
         label: "Self Consumed",
-        data: self_consumed.map((_item) => _item.output),
+        data: self_consumed.map((_item) =>
+          weightConverter(weight_unit, _item.output)
+        ),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,

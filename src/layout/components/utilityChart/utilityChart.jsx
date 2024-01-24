@@ -13,82 +13,67 @@ function UtilityChart() {
     queryFn: getUtilizationData,
   });
 
-  const barTags = [
-    "Grains & Nuts",
-    "Vegetables",
-    "Herbs",
-    "Legumes",
-    "Fruits",
-    "Dairy",
-    "Meat",
-    "Spices & Condiments",
-    "DaiTea/Coffeery",
-    "Oils",
-    "Processed Food & Beverages",
-    "Alcohol/Tobacco",
-  ];
-
   const soilHealth = {
-    labels: barTags,
+    labels: data?.soil_health?.map((_item) => _item.label),
     datasets: [
       {
         label: "Soil Health (Stable)",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        data: data?.soil_health?.map((_item) => _item.value.stable),
         backgroundColor: backgroundColor[2],
       },
       {
         label: "Soil Health (Decreasing Yeild)",
-        data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
+        data: data?.soil_health?.map((_item) => _item.value.decreasing_yeild),
         backgroundColor: backgroundColor[1],
       },
     ],
   };
   const selfConsumed = {
-    labels: barTags,
+    labels: data?.self_consumed?.map((_item) => _item.label),
     datasets: [
       {
         label: "Self Consumed",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        data: data?.self_consumed?.map((_item) => _item.value),
         backgroundColor: backgroundColor[0],
       },
     ],
   };
   const soldToNeighbour = {
-    labels: barTags,
+    labels: data?.sold_to_neighbours?.map((_item) => _item.label),
     datasets: [
       {
         label: "Sold To Neighbour",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        data: data?.sold_to_neighbours?.map((_item) => _item.value),
         backgroundColor: backgroundColor[5],
       },
     ],
   };
   const soldToMarket = {
-    labels: barTags,
+    labels: data?.sold_to_market?.map((_item) => _item.label),
     datasets: [
       {
         label: "Sold To Market",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        data: data?.sold_to_market?.map((_item) => _item.value),
         backgroundColor: backgroundColor[3],
       },
     ],
   };
   const fedToLiveStock = {
-    labels: barTags,
+    labels: data?.fed_to_livestock?.map((_item) => _item.label),
     datasets: [
       {
-        label: "Fed To Live Stock",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        label: "Fed To Livestock",
+        data: data?.fed_to_livestock?.map((_item) => _item.value),
         backgroundColor: backgroundColor[2],
       },
     ],
   };
   const wastage = {
-    labels: barTags,
+    labels: data?.wastage?.map((_item) => _item.label),
     datasets: [
       {
         label: "Wastage",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+        data: data?.wastage?.map((_item) => _item.value),
         backgroundColor: backgroundColor[4],
       },
     ],

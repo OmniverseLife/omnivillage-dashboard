@@ -6,6 +6,12 @@ import CustomBarChart from "../customBarChart/customBarChart";
 import { useQuery } from "@tanstack/react-query";
 import { getPurchasedFromNeighboursData } from "../../../functions/dashboard";
 import Loading from "../loading";
+import convert from "convert-units";
+
+const weightConverter = (unit, value) => {
+  return Math.round(convert(value).from("kg").to(unit));
+};
+
 function PurchasedNeighbour({ type_id, weight_unit }) {
   const { data: purchased_from_neighbour = [], isLoading } = useQuery({
     queryKey: ["purchased from neighbour", type_id],
@@ -17,7 +23,9 @@ function PurchasedNeighbour({ type_id, weight_unit }) {
     datasets: [
       {
         label: "Purchased From Neighbours",
-        data: purchased_from_neighbour.map((_item) => _item.output),
+        data: purchased_from_neighbour.map((_item) =>
+          weightConverter(weight_unit, _item.output)
+        ),
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,

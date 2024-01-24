@@ -6,8 +6,13 @@ import CustomBarChart from "../customBarChart/customBarChart";
 import { useQuery } from "@tanstack/react-query";
 import { getConsumptionFromProductionData } from "../../../functions/dashboard";
 import Loading from "../loading";
+import convert from "convert-units";
 
-function ConsumptionFromProduction({ crop_id, type_id }) {
+const weightConverter = (unit, value) => {
+  return Math.round(convert(value).from("kg").to(unit));
+};
+
+function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
   const { data: consumptionFromProduction, isLoading } = useQuery({
     queryKey: ["consumption-from-production", crop_id],
     queryFn: () => getConsumptionFromProductionData(type_id, crop_id),
@@ -33,10 +38,22 @@ function ConsumptionFromProduction({ crop_id, type_id }) {
         data: isLoading
           ? [0, 0, 0, 0]
           : [
-              consumptionFromProduction?.self_grown,
-              consumptionFromProduction?.self_consumed,
-              consumptionFromProduction?.purchased_from_neighbours,
-              consumptionFromProduction?.purchased_from_market,
+              weightConverter(
+                weight_unit,
+                consumptionFromProduction?.self_grown
+              ),
+              weightConverter(
+                weight_unit,
+                consumptionFromProduction?.self_consumed
+              ),
+              weightConverter(
+                weight_unit,
+                consumptionFromProduction?.purchased_from_neighbours
+              ),
+              weightConverter(
+                weight_unit,
+                consumptionFromProduction?.purchased_from_market
+              ),
             ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,

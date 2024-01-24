@@ -17,7 +17,13 @@ function SellingChannel() {
     datasets: [
       {
         label: "Selling Channel",
-        data: [20, 20, 20, 20, 20],
+        data: [
+          data?.local_market,
+          data?.agent,
+          data?.ecommerce,
+          data?.export,
+          data?.none,
+        ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
         borderWidth: 1,
@@ -30,7 +36,10 @@ function SellingChannel() {
       <CustomPieChart
         header="Selling Channel"
         data={sellingChannel}
-        measurement="Total 100"
+        measurement={`Total ${Object.values(data || {}).reduce(
+          (prev, current) => prev + current,
+          0
+        )}`}
       />
     </Stack>
   );

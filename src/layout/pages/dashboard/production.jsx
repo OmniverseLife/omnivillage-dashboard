@@ -128,7 +128,7 @@ function Production() {
             </Select>
           </FormControl>
         )}
-        {selectedOption === "bifurcated" || selectedOption === "land-chart" ? (
+        {selectedOption === "land-chart" ? (
           <FormControl style={{ marginLeft: "auto" }}>
             <InputLabel id="demo-simple-select-label">Area</InputLabel>
             <Select
@@ -150,7 +150,8 @@ function Production() {
             </Select>
           </FormControl>
         ) : null}
-        {selectedOption === "bifurcated" ? (
+        {selectedOption === "bifurcated" ||
+        selectedOption === "storage-facility" ? (
           <FormControl style={{ marginLeft: "auto" }}>
             <InputLabel id="demo-simple-select-label">Weight</InputLabel>
             <Select
@@ -179,7 +180,6 @@ function Production() {
         <BifurcatedChart
           type_id={selectedTag}
           crop_id={selectedCrop}
-          land_unit={selectedArea}
           weight_unit={selectedWeight}
           crops={crops}
         />
@@ -188,7 +188,7 @@ function Production() {
       ) : selectedOption === "selling-channel" ? (
         <SellingChannel />
       ) : selectedOption === "storage-facility" ? (
-        <StorageFacility />
+        <StorageFacility weight_unit={selectedWeight} />
       ) : selectedOption === "utility" ? (
         <UtilityChart />
       ) : null}
