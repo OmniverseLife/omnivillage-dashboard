@@ -55,9 +55,9 @@ function Production() {
     enabled: Boolean(selectedTag),
   });
 
-  useEffect(() => {
-    setselectedTag(labels[0]?._id ?? "");
-  }, [labels]);
+  // useEffect(() => {
+  //   // setselectedTag(labels[0]?._id ?? "");
+  // }, [labels]);
 
   return (
     <Stack className="container">
@@ -75,7 +75,7 @@ function Production() {
             style={{ width: 300 }}
             label="Production Information"
             onChange={(e) => {
-              setselectedTag(labels[0]._id);
+              setselectedTag("");
               setselectedCrop("");
               setselectedOption(e.target.value);
             }}
@@ -89,17 +89,17 @@ function Production() {
           </Select>
         </FormControl>
         {selectedOption === "bifurcated" ? (
-          <FormControl>
+          <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
-              size="small"
+              label="Tags"
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={selectedTag}
               style={{ width: 300 }}
-              label="Tags"
               onChange={(e) => setselectedTag(e.target.value)}
             >
+              <MenuItem value="">Select</MenuItem>
               {labels.map((_label) => (
                 <MenuItem value={_label._id} key={_label._id}>
                   {_label.name}
@@ -176,7 +176,8 @@ function Production() {
       </Stack>
       {selectedOption === "land-chart" ? (
         <LandChart land_unit={selectedArea} />
-      ) : selectedOption === "bifurcated" ? (
+      ) : // <></>
+      selectedOption === "bifurcated" ? (
         <BifurcatedChart
           type_id={selectedTag}
           crop_id={selectedCrop}

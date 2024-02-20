@@ -16,13 +16,20 @@ const weightConverter = (unit, value) => {
 };
 
 const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
-  const { data: bifurcated_data_label, isBifurcatedDataLabelLoading } =
-    useQuery({
-      queryKey: ["bifurcated_data", type_id],
-      queryFn: () => getBifurcatedLabelData(type_id),
-    });
+  const {
+    data: bifurcated_data_label,
+    isLoading: isBifurcatedDataLabelLoading,
+    isFetching: isBifurcatedDataLabelFetching,
+  } = useQuery({
+    queryKey: ["bifurcated_data", type_id],
+    queryFn: () => getBifurcatedLabelData(type_id),
+  });
 
-  const { data: bifurcated_data_crop, isBifurcatedDataCropLoading } = useQuery({
+  const {
+    data: bifurcated_data_crop,
+    isLoading: isBifurcatedDataCropLoading,
+    isFetching: isBifurcatedDataCropFetching,
+  } = useQuery({
     queryKey: ["bifurcated_data_crop", crop_id],
     queryFn: () => getBifurcatedCropData(crop_id),
     enabled: Boolean(crop_id),
@@ -67,7 +74,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     ],
   };
   const cropData = {
-    labels: bifurcated_data_label?.output.map((_item) => _item.crop_name) || [],
+    labels: bifurcated_data_label?.output.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Quantity Produced",
@@ -81,46 +88,45 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
       },
     ],
   };
-  const soilHealthStable = {
-    labels:
-      bifurcated_data_label?.soil_health_stable.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Soil Health (Stable)",
-        data:
-          bifurcated_data_label?.soil_health_stable.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const soilHealthDecreasing = {
-    labels:
-      bifurcated_data_label?.soil_health_decreasing_yeild.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Soil Health (Decreasing Yeild)",
-        data:
-          bifurcated_data_label?.soil_health_decreasing_yeild.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const soilHealthStable = {
+  //   labels:
+  //     bifurcated_data_label?.soil_health_stable.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Soil Health (Stable)",
+  //       data:
+  //         bifurcated_data_label?.soil_health_stable.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const soilHealthDecreasing = {
+  //   labels:
+  //     bifurcated_data_label?.soil_health_decreasing_yeild.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Soil Health (Decreasing Yeild)",
+  //       data:
+  //         bifurcated_data_label?.soil_health_decreasing_yeild.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
   const selfConsumed = {
     labels:
-      bifurcated_data_label?.self_consumed.map((_item) => _item.crop_name) ||
-      [],
+      bifurcated_data_label?.self_consumed.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Self Consumed",
@@ -136,9 +142,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   };
   const soldToNeighbours = {
     labels:
-      bifurcated_data_label?.sold_to_neighbour.map(
-        (_item) => _item.crop_name
-      ) || [],
+      bifurcated_data_label?.sold_to_neighbour.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Sold To Neighbours",
@@ -154,8 +158,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   };
   const soldToMarket = {
     labels:
-      bifurcated_data_label?.sold_to_market.map((_item) => _item.crop_name) ||
-      [],
+      bifurcated_data_label?.sold_to_market.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Sold To Market",
@@ -171,8 +174,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   };
   const fedToLiveStock = {
     labels:
-      bifurcated_data_label?.fed_to_livestock.map((_item) => _item.crop_name) ||
-      [],
+      bifurcated_data_label?.fed_to_livestock.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Fed To Live Stock",
@@ -187,8 +189,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     ],
   };
   const wastage = {
-    labels:
-      bifurcated_data_label?.wastage.map((_item) => _item.crop_name) || [],
+    labels: bifurcated_data_label?.wastage.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Wastage",
@@ -203,7 +204,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     ],
   };
   // const processing = {
-  //   labels: bifurcated_data_label?.wastage.map((_item) => _item.crop_name) ||
+  //   labels: bifurcated_data_label?.wastage.map((_item) => _item.name) ||
   //   [],
   //   datasets: [
   //     {
@@ -232,21 +233,21 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     "Alcohol/Tobacco",
   ];
 
-  const fertilizerData = {
-    labels: Organiclabels,
-    datasets: [
-      {
-        label: "Fertilizer A",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
-        backgroundColor: backgroundColor[2],
-      },
-      {
-        label: "Fertilizer B",
-        data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
-        backgroundColor: backgroundColor[1],
-      },
-    ],
-  };
+  // const fertilizerData = {
+  //   labels: Organiclabels,
+  //   datasets: [
+  //     {
+  //       label: "Fertilizer A",
+  //       data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+  //       backgroundColor: backgroundColor[2],
+  //     },
+  //     {
+  //       label: "Fertilizer B",
+  //       data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
+  //       backgroundColor: backgroundColor[1],
+  //     },
+  //   ],
+  // };
   const OrganicPesticides = [
     "Grains & Nuts",
     "Vegetables",
@@ -262,170 +263,170 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     "Alcohol/Tobacco",
   ];
 
-  const pesticideData = {
-    labels: OrganicPesticides,
-    datasets: [
-      {
-        label: "Pesticide A",
-        data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
-        backgroundColor: backgroundColor[2],
-      },
-      {
-        label: "Pesticide B",
-        data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
-        backgroundColor: backgroundColor[1],
-      },
-    ],
-  };
+  // const pesticideData = {
+  //   labels: OrganicPesticides,
+  //   datasets: [
+  //     {
+  //       label: "Pesticide A",
+  //       data: [40, 80, 60, 30, 20, 50, 70, 90, 35, 25, 20, 65],
+  //       backgroundColor: backgroundColor[2],
+  //     },
+  //     {
+  //       label: "Pesticide B",
+  //       data: [20, 60, 90, 30, 70, 10, 20, 40, 35, 75, 20, 35],
+  //       backgroundColor: backgroundColor[1],
+  //     },
+  //   ],
+  // };
 
-  const fertilizerChemicalBasedCrops = {
-    labels:
-      bifurcated_data_label?.fertilizer_used_chemical_based.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Chemical Based",
-        data:
-          bifurcated_data_label?.fertilizer_used_chemical_based.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const fertilizerOrganicSelfMadeCrops = {
-    labels:
-      bifurcated_data_label?.fertilizer_used_organic_self_made.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Organic Self Made",
-        data:
-          bifurcated_data_label?.fertilizer_used_organic_self_made.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const fertilizerOrganicPurchasedCrops = {
-    labels:
-      bifurcated_data_label?.fertilizer_used_organic_purchased.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Organic Self Made",
-        data:
-          bifurcated_data_label?.fertilizer_used_organic_purchased.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const fertilizerNoneCrops = {
-    labels:
-      bifurcated_data_label?.fertilizer_used_none.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "None",
-        data:
-          bifurcated_data_label?.fertilizer_used_none.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const fertilizerChemicalBasedCrops = {
+  //   labels:
+  //     bifurcated_data_label?.fertilizer_used_chemical_based.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Chemical Based",
+  //       data:
+  //         bifurcated_data_label?.fertilizer_used_chemical_based.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const fertilizerOrganicSelfMadeCrops = {
+  //   labels:
+  //     bifurcated_data_label?.fertilizer_used_organic_self_made.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Organic Self Made",
+  //       data:
+  //         bifurcated_data_label?.fertilizer_used_organic_self_made.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const fertilizerOrganicPurchasedCrops = {
+  //   labels:
+  //     bifurcated_data_label?.fertilizer_used_organic_purchased.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Organic Self Made",
+  //       data:
+  //         bifurcated_data_label?.fertilizer_used_organic_purchased.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const fertilizerNoneCrops = {
+  //   labels:
+  //     bifurcated_data_label?.fertilizer_used_none.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "None",
+  //       data:
+  //         bifurcated_data_label?.fertilizer_used_none.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
 
-  const pesticideChemicalBasedCrops = {
-    labels:
-      bifurcated_data_label?.pesticide_used_chemical_based.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Chemical Based",
-        data:
-          bifurcated_data_label?.pesticide_used_chemical_based.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const pesticideOrganicSelfMadeCrops = {
-    labels:
-      bifurcated_data_label?.pesticide_used_organic_self_made.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Organic Self Made",
-        data:
-          bifurcated_data_label?.pesticide_used_organic_self_made.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const pesticideOrganicPurchasedCrops = {
-    labels:
-      bifurcated_data_label?.pesticide_used_organic_purchased.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "Organic Self Made",
-        data:
-          bifurcated_data_label?.pesticide_used_organic_purchased.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const pesticideNoneCrops = {
-    labels:
-      bifurcated_data_label?.pesticide_used_none.map(
-        (_item) => _item.crop_name
-      ) || [],
-    datasets: [
-      {
-        label: "None",
-        data:
-          bifurcated_data_label?.pesticide_used_none.map(
-            (_item) => _item.count
-          ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const pesticideChemicalBasedCrops = {
+  //   labels:
+  //     bifurcated_data_label?.pesticide_used_chemical_based.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Chemical Based",
+  //       data:
+  //         bifurcated_data_label?.pesticide_used_chemical_based.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const pesticideOrganicSelfMadeCrops = {
+  //   labels:
+  //     bifurcated_data_label?.pesticide_used_organic_self_made.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Organic Self Made",
+  //       data:
+  //         bifurcated_data_label?.pesticide_used_organic_self_made.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const pesticideOrganicPurchasedCrops = {
+  //   labels:
+  //     bifurcated_data_label?.pesticide_used_organic_purchased.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "Organic Self Made",
+  //       data:
+  //         bifurcated_data_label?.pesticide_used_organic_purchased.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const pesticideNoneCrops = {
+  //   labels:
+  //     bifurcated_data_label?.pesticide_used_none.map(
+  //       (_item) => _item.name
+  //     ) || [],
+  //   datasets: [
+  //     {
+  //       label: "None",
+  //       data:
+  //         bifurcated_data_label?.pesticide_used_none.map(
+  //           (_item) => _item.count
+  //         ) || [],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
 
   const incomeByCrops = {
-    labels: bifurcated_data_label?.income.map((_item) => _item.crop_name) || [],
+    labels: bifurcated_data_label?.income.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Income Generated",
@@ -440,8 +441,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     ],
   };
   const expenditureByCrops = {
-    labels:
-      bifurcated_data_label?.expenditure.map((_item) => _item.crop_name) || [],
+    labels: bifurcated_data_label?.expenditure.map((_item) => _item.name) || [],
     datasets: [
       {
         label: "Expenditure",
@@ -468,17 +468,17 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     0
   );
 
-  const soil_health_stable_sum =
-    bifurcated_data_label?.soil_health_stable.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const soil_health_stable_sum =
+  //   bifurcated_data_label?.soil_health_stable.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const soil_health_decreasing_yeild_sum =
-    bifurcated_data_label?.soil_health_decreasing_yeild.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const soil_health_decreasing_yeild_sum =
+  //   bifurcated_data_label?.soil_health_decreasing_yeild.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
   const self_consumed_sum = bifurcated_data_label?.self_consumed.reduce(
     (prev, current) =>
@@ -509,53 +509,53 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     0
   );
 
-  const fertilizer_used_chemical_based_sum =
-    bifurcated_data_label?.fertilizer_used_chemical_based.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const fertilizer_used_chemical_based_sum =
+  //   bifurcated_data_label?.fertilizer_used_chemical_based.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const fertilizer_used_organic_self_made_sum =
-    bifurcated_data_label?.fertilizer_used_organic_self_made.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const fertilizer_used_organic_self_made_sum =
+  //   bifurcated_data_label?.fertilizer_used_organic_self_made.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const fertilizer_used_organic_purchased_sum =
-    bifurcated_data_label?.fertilizer_used_organic_purchased.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const fertilizer_used_organic_purchased_sum =
+  //   bifurcated_data_label?.fertilizer_used_organic_purchased.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const fertilizer_used_none_sum =
-    bifurcated_data_label?.fertilizer_used_none.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const fertilizer_used_none_sum =
+  //   bifurcated_data_label?.fertilizer_used_none.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const pesticide_used_chemical_based_sum =
-    bifurcated_data_label?.pesticide_used_chemical_based.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const pesticide_used_chemical_based_sum =
+  //   bifurcated_data_label?.pesticide_used_chemical_based.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const pesticide_used_organic_self_made_sum =
-    bifurcated_data_label?.pesticide_used_organic_self_made.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const pesticide_used_organic_self_made_sum =
+  //   bifurcated_data_label?.pesticide_used_organic_self_made.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const pesticide_used_organic_purchased_sum =
-    bifurcated_data_label?.pesticide_used_organic_purchased.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const pesticide_used_organic_purchased_sum =
+  //   bifurcated_data_label?.pesticide_used_organic_purchased.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
-  const pesticide_used_none_sum =
-    bifurcated_data_label?.pesticide_used_none.reduce(
-      (prev, current) => prev + current.count,
-      0
-    );
+  // const pesticide_used_none_sum =
+  //   bifurcated_data_label?.pesticide_used_none.reduce(
+  //     (prev, current) => prev + current.count,
+  //     0
+  //   );
 
   const income_sum = bifurcated_data_label?.income.reduce(
     (prev, current) => prev + Math.round(current.income),
@@ -568,9 +568,19 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   );
 
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+    <Stack
+      direction={"row"}
+      justifyContent={"space-between"}
+      flexWrap={"wrap"}
+      rowGap={5}
+    >
       <Loading
-        isLoading={isBifurcatedDataCropLoading || isBifurcatedDataLabelLoading}
+        isLoading={
+          isBifurcatedDataCropLoading ||
+          isBifurcatedDataLabelLoading ||
+          isBifurcatedDataLabelFetching ||
+          isBifurcatedDataCropFetching
+        }
       />
       {crop_id ? (
         <CustomPieChart
@@ -592,7 +602,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
             data={selfConsumed}
             measurement={"100km"}
           /> */}
-          <CustomPieChart
+          {/*<CustomPieChart
             header="Soil Health (Stable)"
             data={soilHealthStable}
             measurement={soil_health_stable_sum}
@@ -601,7 +611,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
             header="Soil Health (Decreasing Yeild)"
             data={soilHealthDecreasing}
             measurement={soil_health_decreasing_yeild_sum}
-          />
+        />*/}
           <CustomPieChart
             header="Self Consumed"
             data={selfConsumed}
@@ -643,7 +653,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
             measurement={"Count 100"}
           /> */}
           {/* <CustomBarChart header="Organic Fertilizer" data={fertilizerData} /> */}
-          <CustomPieChart
+          {/* <CustomPieChart
             header="Fertilizer - Chemical Based"
             data={fertilizerChemicalBasedCrops}
             measurement={fertilizer_used_chemical_based_sum}
@@ -663,7 +673,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
             data={fertilizerNoneCrops}
             measurement={fertilizer_used_none_sum}
           />
-          {/* <CustomBarChart header="Organic Pesticides" data={pesticideData} /> */}
+          {/* <CustomBarChart header="Organic Pesticides" data={pesticideData} /> 
           <CustomPieChart
             header="Pesticide - Chemical Based"
             data={pesticideChemicalBasedCrops}
@@ -683,7 +693,7 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
             header="Pesticide - None"
             data={pesticideNoneCrops}
             measurement={pesticide_used_none_sum}
-          />
+          /> */}
         </>
       )}
     </Stack>

@@ -159,7 +159,7 @@ text {
   font-size: 14px;
 }
 .App .pieChartContainer {
-  margin: 40px auto;
+  margin: 0px auto;
 
   width: 48%;
   font-family: inherit;

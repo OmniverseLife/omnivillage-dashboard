@@ -12,7 +12,7 @@ const weightConverter = (unit, value) => {
 };
 
 function StorageFacility({ weight_unit }) {
-  const { data, isLoading } = useQuery({
+  const { data = {}, isLoading } = useQuery({
     queryKey: ["storage_data"],
     queryFn: getStorageData,
   });
@@ -85,28 +85,33 @@ function StorageFacility({ weight_unit }) {
 
   // Sum
 
-  const grains_sum = Object.values(data?.grains).reduce(
+  const grains_sum = Object.values(data?.grain || {}).reduce(
     (prev, current) => prev + weightConverter(weight_unit, current),
     0
   );
 
-  const poultry_sum = Object.values(data?.poultry).reduce(
+  const poultry_sum = Object.values(data?.poultry || {}).reduce(
     (prev, current) => prev + weightConverter(weight_unit, current),
     0
   );
 
-  const meat_sum = Object.values(data?.meat).reduce(
+  const meat_sum = Object.values(data?.meat || {}).reduce(
     (prev, current) => prev + weightConverter(weight_unit, current),
     0
   );
 
-  const fruits_sum = Object.values(data?.fruits).reduce(
+  const fruits_sum = Object.values(data?.fruits || {}).reduce(
     (prev, current) => prev + weightConverter(weight_unit, current),
     0
   );
 
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+    <Stack
+      direction={"row"}
+      justifyContent={"space-between"}
+      flexWrap={"wrap"}
+      rowGap={5}
+    >
       <Loading isLoading={isLoading} />
       <CustomPieChart
         header="Storage Facility Grains"

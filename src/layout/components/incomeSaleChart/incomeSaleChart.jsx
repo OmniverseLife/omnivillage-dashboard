@@ -20,12 +20,12 @@ function IncomeSaleChart() {
     datasets: [
       {
         label: "Income",
-        data: income_expenditure.map((_item) => _item.income),
+        data: income_expenditure.map((_item) => Math.round(_item.income)),
         backgroundColor: backgroundColor[2],
       },
       {
         label: "Expenditure",
-        data: income_expenditure.map((_item) => _item.expenditure),
+        data: income_expenditure.map((_item) => Math.round(_item.expenditure)),
         backgroundColor: backgroundColor[1],
       },
     ],

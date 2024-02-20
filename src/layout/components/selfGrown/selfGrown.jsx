@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
@@ -27,7 +27,7 @@ function SelfGrown({ type_id, weight_unit }) {
 
   const selfGrownData = {
     labels: self_grown
-      .map((_item) => _item.crop_name)
+      .map((_item) => _item.name)
       .sort((a, b) => a.localeCompare(b)),
     datasets: [
       {
@@ -43,7 +43,7 @@ function SelfGrown({ type_id, weight_unit }) {
   };
   const selfConsumedData = {
     labels: self_consumed
-      .map((_item) => _item.crop_name)
+      .map((_item) => _item.name)
       .sort((a, b) => a.localeCompare(b)),
     datasets: [
       {
@@ -58,11 +58,18 @@ function SelfGrown({ type_id, weight_unit }) {
     ],
   };
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+    // <Box width={"100%"}>
+    <Stack
+      direction={"row"}
+      justifyContent={"space-between"}
+      flexWrap={"wrap"}
+      width={"100%"}
+    >
       <Loading isLoading={isSelfConsumedLoading || isSelfGrownLoading} />
-      <CustomPieChart header="Self Grown" data={selfGrownData} />
-      <CustomPieChart header="Self Consumed" data={selfConsumedData} />
+      <CustomBarChart header="Self Grown" data={selfGrownData} />
+      <CustomBarChart header="Self Consumed" data={selfConsumedData} />
     </Stack>
+    // </Box>
   );
 }
 

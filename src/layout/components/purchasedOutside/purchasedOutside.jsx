@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
@@ -19,7 +19,7 @@ function PurchasedOutside({ type_id, weight_unit }) {
   });
 
   const data = {
-    labels: purchased_from_market.map((_item) => _item.crop_name),
+    labels: purchased_from_market.map((_item) => _item.name),
     datasets: [
       {
         label: "Purchased From Outside",
@@ -33,10 +33,14 @@ function PurchasedOutside({ type_id, weight_unit }) {
     ],
   };
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+    <Box width={"100%"}>
       <Loading isLoading={isLoading} />
-      <CustomPieChart header="Purchased From Outside" data={data} />
-    </Stack>
+      <CustomBarChart
+        header="Purchased From Outside"
+        data={data}
+        style={{ width: "100%" }}
+      />
+    </Box>
   );
 }
 

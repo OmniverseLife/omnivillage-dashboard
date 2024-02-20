@@ -22,14 +22,14 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
       queryFn: getIdealConsumptionByLabelData,
     });
 
-  const {
-    data: ideal_consumption_expected = [],
-    isIdealConsumptionCropLoading,
-    isFetching,
-  } = useQuery({
-    queryKey: ["ideal_consumption_expected", type_id],
-    queryFn: () => getIdealConsumptionExpectedData(type_id),
-  });
+  // const {
+  //   data: ideal_consumption_expected = [],
+  //   isIdealConsumptionCropLoading,
+  //   isFetching,
+  // } = useQuery({
+  //   queryKey: ["ideal_consumption_expected", type_id],
+  //   queryFn: () => getIdealConsumptionExpectedData(type_id),
+  // });
 
   const tags = ideal_consumption_bar.map((_item) => _item.label_name);
 
@@ -53,58 +53,65 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
     ],
   };
 
-  const labels = ideal_consumption_expected.map((_item) => _item.crop_name);
+  // const labels = ideal_consumption_expected.map((_item) => _item.crop_name);
 
-  const quantityToBeConsumed = {
-    labels: labels,
-    datasets: [
-      {
-        label: "Ideal Quantity To Be Consumed",
-        data: ideal_consumption_expected.map((_item) =>
-          weightConverter(weight_unit, _item.ideal_consumption)
-        ),
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const currentlyQuantityConsumed = {
-    labels: labels,
-    datasets: [
-      {
-        label: "Currently Quantity Consumed",
-        data: ideal_consumption_expected.map((_item) =>
-          weightConverter(weight_unit, _item.total_consumed)
-        ),
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const quantityToBeConsumed = {
+  //   labels: labels,
+  //   datasets: [
+  //     {
+  //       label: "Ideal Quantity To Be Consumed",
+  //       data: ideal_consumption_expected.map((_item) =>
+  //         weightConverter(weight_unit, _item.ideal_consumption)
+  //       ),
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  // const currentlyQuantityConsumed = {
+  //   labels: labels,
+  //   datasets: [
+  //     {
+  //       label: "Currently Quantity Consumed",
+  //       data: ideal_consumption_expected.map((_item) =>
+  //         weightConverter(weight_unit, _item.total_consumed)
+  //       ),
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
 
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+    <Stack
+      direction={"row"}
+      justifyContent={"space-between"}
+      flexWrap={"wrap"}
+      rowGap={5}
+      width={"100%"}
+    >
       <Loading
         isLoading={
-          isIdealConsumptionBarLoading ||
-          isIdealConsumptionCropLoading ||
-          isFetching
+          isIdealConsumptionBarLoading
+          // isIdealConsumptionCropLoading ||
+          // isFetching
         }
       />
       <CustomBarChart
         header="Ideal Quantity Consumption (Tags)"
         data={tagsData}
+        // style={{ width: "100%" }}
       />
-      <CustomPieChart
+      {/* <CustomPieChart
         header="Ideal Quantity To Be Consumed"
         data={quantityToBeConsumed}
       />
       <CustomPieChart
         header="Current Consumed Quantity"
         data={currentlyQuantityConsumed}
-      />
+      /> */}
     </Stack>
   );
 }

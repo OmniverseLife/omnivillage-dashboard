@@ -7,6 +7,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getConsumptionFromProductionData } from "../../../functions/dashboard";
 import Loading from "../loading";
 import convert from "convert-units";
+import SelfGrown from "../selfGrown/selfGrown";
+import PurchasedNeighbour from "../purchasedNeighbour/purchasedNeighbour";
+import PurchasedOutside from "../purchasedOutside/purchasedOutside";
+import IdealQuantityDiet from "../idealQuantityDiet/idealQuantityDiet";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
@@ -63,9 +67,23 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
   };
 
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+    <Stack
+      direction={"row"}
+      justifyContent={"center"}
+      flexWrap={"wrap"}
+      gap={"20px"}
+    >
       <Loading isLoading={isLoading} />
-      <CustomPieChart header="Consumption From Production" data={data} />
+      {crop_id ? (
+        <CustomPieChart header="Individual Crop Consumption" data={data} />
+      ) : (
+        <>
+          <SelfGrown type_id={type_id} weight_unit={weight_unit} />
+          <PurchasedNeighbour type_id={type_id} weight_unit={weight_unit} />
+          <PurchasedOutside type_id={type_id} weight_unit={weight_unit} />
+          <IdealQuantityDiet type_id={type_id} weight_unit={weight_unit} />
+        </>
+      )}
     </Stack>
   );
 }

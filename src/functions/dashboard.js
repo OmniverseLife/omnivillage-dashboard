@@ -3,14 +3,24 @@ import axiosInstance from "../axios/axiosInstance";
 
 export const getLandAllocationData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.production.land_allocation_category_data
+    endpoints.dashboard.production.land_allocation_category_data,
+    {
+      params: {
+        village: "kolkata",
+      },
+    }
   );
   return res?.data;
 };
 
 export const getLandUsedData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.production.land_used_category_data
+    endpoints.dashboard.production.land_used_category_data,
+    {
+      params: {
+        village: "kolkata",
+      },
+    }
   );
   return res?.data;
 };
@@ -21,6 +31,7 @@ export const getBifurcatedLabelData = async (type_id) => {
     {
       params: {
         type_id,
+        village: "kolkata",
       },
     }
   );
@@ -31,7 +42,7 @@ export const getBifurcatedCropData = async (crop_id) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.bifurcated_chart_crop,
     {
-      params: { crop_id },
+      params: { crop_id, village: "kolkata" },
     }
   );
   return res?.data;
@@ -39,28 +50,48 @@ export const getBifurcatedCropData = async (crop_id) => {
 
 export const getIncomeExpenditureData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.production.income_expenditure
+    endpoints.dashboard.production.income_expenditure,
+    {
+      params: {
+        village: "kolkata",
+      },
+    }
   );
   return res?.data;
 };
 
 export const getSellingChannelData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.production.selling_channel_data
+    endpoints.dashboard.production.selling_channel_data,
+    {
+      params: {
+        village: "kolkata",
+      },
+    }
   );
   return res?.data;
 };
 
 export const getStorageData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.production.storage_data
+    endpoints.dashboard.production.storage_data,
+    {
+      params: {
+        village: "kolkata",
+      },
+    }
   );
   return res?.data;
 };
 
 export const getUtilizationData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.production.utilization_chart
+    endpoints.dashboard.production.utilization_chart,
+    {
+      params: {
+        village: "kolkata",
+      },
+    }
   );
   return res?.data;
 };
@@ -72,6 +103,7 @@ export const getConsumptionFromProductionData = async (type_id, crop_id) => {
       params: {
         type_id,
         crop_id,
+        village: "kolkata",
       },
     }
   );
@@ -84,6 +116,7 @@ export const getSelfGrownByTagsData = async (type_id) => {
     {
       params: {
         type_id,
+        village: "kolkata",
       },
     }
   );
@@ -96,6 +129,7 @@ export const getSelfConsumedData = async (type_id) => {
     {
       params: {
         type_id,
+        village: "kolkata",
       },
     }
   );
@@ -108,6 +142,7 @@ export const getPurchasedFromNeighboursData = async (type_id) => {
     {
       params: {
         type_id,
+        village: "kolkata",
       },
     }
   );
@@ -120,6 +155,7 @@ export const getPurchasedFromMarketData = async (type_id) => {
     {
       params: {
         type_id,
+        village: "kolkata",
       },
     }
   );
@@ -128,7 +164,12 @@ export const getPurchasedFromMarketData = async (type_id) => {
 
 export const getIdealConsumptionByLabelData = async () => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.consumption.ideal_consumption_by_label
+    endpoints.dashboard.consumption.ideal_consumption_by_label,
+    {
+      params: {
+        village: "kolkata",
+      },
+    }
   );
   return res?.data;
 };

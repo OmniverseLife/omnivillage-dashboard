@@ -43,13 +43,13 @@ function Consumption() {
       Boolean(selectedTag) && selectedOption === "consumption-production",
   });
 
-  useEffect(() => {
-    setselectedTag(labels[0]?._id ?? "");
-  }, [labels]);
+  // useEffect(() => {
+  //   setselectedTag(labels[0]?._id ?? "");
+  // }, [labels]);
 
-  useEffect(() => {
-    setselectedCrop(crops[0]?._id ?? "");
-  }, [crops]);
+  // useEffect(() => {
+  //   setselectedCrop(crops[0]?._id ?? "");
+  // }, [crops]);
 
   const renderItems = () => {
     switch (selectedOption) {
@@ -91,7 +91,7 @@ function Consumption() {
     <Stack className="container">
       <Loading isLoading={isLoading || isCropsLoading || isFetching} />
       <Stack direction={"row"} spacing={3} marginBottom={3}>
-        <FormControl size="small">
+        {/* <FormControl size="small">
           <InputLabel id="demo-simple-select-label">
             Consumption Information
           </InputLabel>
@@ -102,8 +102,8 @@ function Consumption() {
             style={{ width: 300 }}
             label="Production Information"
             onChange={(e) => {
-              setselectedTag(labels[0]._id);
-              setselectedCrop(crops[0]._id);
+              // setselectedTag(labels[0]._id);
+              // setselectedCrop(crops[0]._id);
               setselectedOption(e.target.value);
             }}
           >
@@ -119,7 +119,7 @@ function Consumption() {
             </MenuItem>
             <MenuItem value="ideal-diet">Ideal Quantity Healthy Diet</MenuItem>
           </Select>
-        </FormControl>
+        </FormControl> */}
         <FormControl size="small">
           <InputLabel id="demo-simple-select-label">Tags</InputLabel>
           <Select
@@ -130,6 +130,7 @@ function Consumption() {
             label="Production Information"
             onChange={(e) => setselectedTag(e.target.value)}
           >
+            <MenuItem value={""}>Select</MenuItem>
             {labels.map((_label) => {
               return (
                 <MenuItem value={_label._id} key={_label._id}>
@@ -150,6 +151,7 @@ function Consumption() {
               label="Production Information"
               onChange={(e) => setselectedCrop(e.target.value)}
             >
+              <MenuItem value={""}>Select</MenuItem>
               {crops.map((_crop) => {
                 return (
                   <MenuItem value={_crop._id} key={_crop._id}>

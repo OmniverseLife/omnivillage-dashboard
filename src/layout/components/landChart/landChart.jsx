@@ -25,17 +25,19 @@ function LandChart({ land_unit }) {
     queryFn: getLandUsedData,
   });
 
+  // , "Fishery", "Poultry", "Storage", "trees"
+
   const data = {
-    labels: ["Cultivation", "Fishery", "Poultry", "Storage", "trees"],
+    labels: ["Cultivation"],
     datasets: [
       {
         label: "Land Allocated",
         data: [
           landConverter(land_unit, land_allocation?.cultivation ?? 0),
-          landConverter(land_unit, land_allocation?.fishery ?? 0),
-          landConverter(land_unit, land_allocation?.poultry ?? 0),
-          landConverter(land_unit, land_allocation?.storage ?? 0),
-          landConverter(land_unit, land_allocation?.trees ?? 0),
+          // landConverter(land_unit, land_allocation?.fishery ?? 0),
+          // landConverter(land_unit, land_allocation?.poultry ?? 0),
+          // landConverter(land_unit, land_allocation?.storage ?? 0),
+          // landConverter(land_unit, land_allocation?.trees ?? 0),
         ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -43,17 +45,18 @@ function LandChart({ land_unit }) {
       },
     ],
   };
+  // , "Fishery", "Poultry", "Storage", "trees"
   const usedLand = {
-    labels: ["Cultivation", "Fishery", "Poultry", "Storage", "trees"],
+    labels: ["Cultivation"],
     datasets: [
       {
         label: "Land Used",
         data: [
           landConverter(land_unit, land_used?.cultivation ?? 0),
-          landConverter(land_unit, land_used?.fishery ?? 0),
-          landConverter(land_unit, land_used?.poultry ?? 0),
-          landConverter(land_unit, land_used?.storage ?? 0),
-          landConverter(land_unit, land_used?.trees ?? 0),
+          // landConverter(land_unit, land_used?.fishery ?? 0),
+          // landConverter(land_unit, land_used?.poultry ?? 0),
+          // landConverter(land_unit, land_used?.storage ?? 0),
+          // landConverter(land_unit, land_used?.trees ?? 0),
         ],
         backgroundColor: backgroundColor,
         borderColor: borderColor,
@@ -73,7 +76,12 @@ function LandChart({ land_unit }) {
   );
 
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
+    <Stack
+      direction={"row"}
+      justifyContent={"space-between"}
+      flexWrap={"wrap"}
+      rowGap={10}
+    >
       <Loading isLoading={isLandAllocationLoading || isLandUsedLoading} />
       <CustomPieChart
         header="Land Allocated"
