@@ -10,19 +10,22 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
 const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
+  const [searchParams] = useSearchParams();
+
   const {
     data: bifurcated_data_label,
     isLoading: isBifurcatedDataLabelLoading,
     isFetching: isBifurcatedDataLabelFetching,
   } = useQuery({
     queryKey: ["bifurcated_data", type_id],
-    queryFn: () => getBifurcatedLabelData(type_id),
+    queryFn: () => getBifurcatedLabelData(type_id, searchParams.get("village")),
   });
 
   const {
@@ -31,63 +34,89 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
     isFetching: isBifurcatedDataCropFetching,
   } = useQuery({
     queryKey: ["bifurcated_data_crop", crop_id],
-    queryFn: () => getBifurcatedCropData(crop_id),
+    queryFn: () => getBifurcatedCropData(crop_id, searchParams.get("village")),
     enabled: Boolean(crop_id),
   });
 
-  const singleCropInfo = {
-    labels: [
-      "Sold To Neighbour",
-      "Self Consumed",
-      "Sold To Market",
-      "Fed To Livestock",
-      "Wastage",
-    ],
-    datasets: [
+  const singleCropInfo = [
+    {
+      name: "Sold To Neighbour",
+      y: weightConverter(
+        weight_unit,
+        bifurcated_data_crop?.sold_to_neighbour ?? 0
+      ),
+    },
+    {
+      name: "Self Consumed",
+      y: weightConverter(weight_unit, bifurcated_data_crop?.self_consumed ?? 0),
+    },
+    {
+      name: "Sold To Market",
+      y: weightConverter(
+        weight_unit,
+        bifurcated_data_crop?.sold_to_market ?? 0
+      ),
+    },
+
+    {
+      name: "Fed To Livestock",
+      y: weightConverter(
+        weight_unit,
+        bifurcated_data_crop?.fed_to_livestock ?? 0
+      ),
+    },
+    {
+      name: "Wastage",
+      y: weightConverter(weight_unit, bifurcated_data_crop?.wastage ?? 0),
+    },
+  ];
+
+  const singleCropIncomeInfo = {
+    xAxis: ["Income", "Expenditure"],
+    dataset: [
       {
-        label: `${
-          crops?.find((_crop) => _crop._id === crop_id)?.name
-        } Information`,
-        data: [
-          weightConverter(
-            weight_unit,
-            bifurcated_data_crop?.sold_to_neighbour ?? 0
-          ),
-          weightConverter(
-            weight_unit,
-            bifurcated_data_crop?.self_consumed ?? 0
-          ),
-          weightConverter(
-            weight_unit,
-            bifurcated_data_crop?.sold_to_market ?? 0
-          ),
-          weightConverter(
-            weight_unit,
-            bifurcated_data_crop?.fed_to_livestock ?? 0
-          ),
-          weightConverter(weight_unit, bifurcated_data_crop?.wastage ?? 0),
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
+        name: crops?.find((_crop) => _crop._id === crop_id)?.name.toUpperCase(),
+        data: [bifurcated_data_crop?.income, bifurcated_data_crop?.expenditure],
       },
     ],
   };
+
+  // const soilHealth = {
+  //   labels: data?.soil_health?.map((_item) => _item.label),
+  //   datasets: [
+  //     {
+  //       label: "Soil Health (Stable)",
+  //       data: data?.soil_health?.map((_item) => _item.value.stable),
+  //       backgroundColor: backgroundColor[2],
+  //     },
+  //     {
+  //       label: "Soil Health (Decreasing Yeild)",
+  //       data: data?.soil_health?.map((_item) => _item.value.decreasing_yeild),
+  //       backgroundColor: backgroundColor[1],
+  //     },
+  //   ],
+  // };
+
   const cropData = {
-    labels: bifurcated_data_label?.output.map((_item) => _item.name) || [],
-    datasets: [
+    xAxis: bifurcated_data_label?.output.map((_item) => _item.name) || [],
+    dataset: [
       {
-        label: "Quantity Produced",
+        name: "Quantity Produced",
         data:
           bifurcated_data_label?.output.map((_item) =>
             weightConverter(weight_unit, _item.output)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
+
+  // const usedLand = [
+  //   {
+  //     name: "Cultivation",
+  //     y: landConverter(land_unit, land_used?.cultivation ?? 0),
+  //   },
+  // ];
+
   // const soilHealthStable = {
   //   labels:
   //     bifurcated_data_label?.soil_health_stable.map(
@@ -125,81 +154,66 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   //   ],
   // };
   const selfConsumed = {
-    labels:
+    xAxis:
       bifurcated_data_label?.self_consumed.map((_item) => _item.name) || [],
-    datasets: [
+    dataset: [
       {
         label: "Self Consumed",
         data:
           bifurcated_data_label?.self_consumed.map((_item) =>
             weightConverter(weight_unit, _item.self_consumed)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
   const soldToNeighbours = {
-    labels:
+    xAxis:
       bifurcated_data_label?.sold_to_neighbour.map((_item) => _item.name) || [],
-    datasets: [
+    dataset: [
       {
         label: "Sold To Neighbours",
         data:
           bifurcated_data_label?.sold_to_neighbour.map((_item) =>
             weightConverter(weight_unit, _item.sold_to_neighbour)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
   const soldToMarket = {
-    labels:
+    xAxis:
       bifurcated_data_label?.sold_to_market.map((_item) => _item.name) || [],
-    datasets: [
+    dataset: [
       {
         label: "Sold To Market",
         data:
           bifurcated_data_label?.sold_to_market.map((_item) =>
             weightConverter(weight_unit, _item.sold_to_market)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
   const fedToLiveStock = {
-    labels:
+    xAxis:
       bifurcated_data_label?.fed_to_livestock.map((_item) => _item.name) || [],
-    datasets: [
+    dataset: [
       {
         label: "Fed To Live Stock",
         data:
           bifurcated_data_label?.fed_to_livestock.map((_item) =>
             weightConverter(weight_unit, _item.fed_to_livestock)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
   const wastage = {
-    labels: bifurcated_data_label?.wastage.map((_item) => _item.name) || [],
-    datasets: [
+    xAxis: bifurcated_data_label?.wastage.map((_item) => _item.name) || [],
+    dataset: [
       {
         label: "Wastage",
         data:
           bifurcated_data_label?.wastage.map((_item) =>
             weightConverter(weight_unit, _item.wastage)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
@@ -426,32 +440,26 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   // };
 
   const incomeByCrops = {
-    labels: bifurcated_data_label?.income.map((_item) => _item.name) || [],
-    datasets: [
+    xAxis: bifurcated_data_label?.income.map((_item) => _item.name) || [],
+    dataset: [
       {
         label: "Income Generated",
         data:
           bifurcated_data_label?.income.map((_item) =>
             Math.round(_item.income)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
   const expenditureByCrops = {
-    labels: bifurcated_data_label?.expenditure.map((_item) => _item.name) || [],
-    datasets: [
+    xAxis: bifurcated_data_label?.expenditure.map((_item) => _item.name) || [],
+    dataset: [
       {
         label: "Expenditure",
         data:
           bifurcated_data_label?.expenditure.map((_item) =>
             Math.round(_item.expenditure)
           ) || [],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
@@ -459,7 +467,11 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
   // Sums of each section
 
   const single_crop_sum = Object.values(bifurcated_data_crop || {}).reduce(
-    (prev, current) => prev + weightConverter(weight_unit, current),
+    (prev, current) => {
+      if (typeof current === "number")
+        return prev + weightConverter(weight_unit, current);
+      return prev;
+    },
     0
   );
 
@@ -583,16 +595,65 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
         }
       />
       {crop_id ? (
-        <CustomPieChart
-          header={`${crops
-            ?.find((_crop) => _crop._id === crop_id)
-            ?.name.toUpperCase()} Information`}
-          data={singleCropInfo}
-          measurement={`${single_crop_sum} ${weight_unit}`}
-        />
-      ) : (
         <>
           <CustomPieChart
+            header={`${crops
+              ?.find((_crop) => _crop._id === crop_id)
+              ?.name.toUpperCase()} Information`}
+            data={singleCropInfo}
+            measurement={`${single_crop_sum} ${weight_unit}`}
+          />
+          <div
+            style={{
+              width: "48%",
+              fontFamily: "inherit",
+              borderRadius: "10px",
+              display: "flex",
+              flexDirection: "column",
+              border: "1px solid #4b465c1f",
+              padding: "15px 30px",
+              alignItems: "center",
+            }}
+          >
+            <h3>Important Information</h3>
+            <div style={{ width: "100%", marginTop: 40 }}>
+              <p style={{ marginBottom: 20 }}>
+                <strong
+                  style={{
+                    fontWeight: "500",
+                    marginRight: 10,
+                  }}
+                >
+                  Area Allocated:
+                </strong>{" "}
+                {bifurcated_data_crop?.area_allocated || "-"} km<sup>2</sup>
+              </p>
+              <p>
+                <strong style={{ fontWeight: "500", marginRight: 10 }}>
+                  Average Number
+                  <br />
+                  (Planted/Hunted/Domesticated):
+                </strong>{" "}
+                {bifurcated_data_crop?.avg_number || "-"}
+              </p>
+              {/* <p>
+                <strong>Expenditure Incurred:</strong>{" "}
+                {bifurcated_data_crop?.expenditure || "-"}
+              </p>
+              <p>
+                <strong>Income From Sale:</strong>{" "}
+                {bifurcated_data_crop?.income || "-"}
+              </p> */}
+            </div>
+          </div>
+          <CustomBarChart
+            header="Income & Expenditure"
+            data={singleCropIncomeInfo}
+          />
+        </>
+      ) : (
+        <>
+          <CustomBarChart
             header="Quantity Produced"
             data={cropData}
             measurement={`${quantity_produced_sum} ${weight_unit}`}
@@ -612,37 +673,37 @@ const BifurcatedChart = ({ crop_id, type_id, weight_unit, crops }) => {
             data={soilHealthDecreasing}
             measurement={soil_health_decreasing_yeild_sum}
         />*/}
-          <CustomPieChart
+          <CustomBarChart
             header="Self Consumed"
             data={selfConsumed}
             measurement={`${self_consumed_sum} ${weight_unit}`}
           />
-          <CustomPieChart
+          <CustomBarChart
             header="Sold To Neighbours"
             data={soldToNeighbours}
             measurement={`${sold_to_neighbour_sum} ${weight_unit}`}
           />
-          <CustomPieChart
+          <CustomBarChart
             header="Sold To Market"
             data={soldToMarket}
             measurement={`${sold_to_market_sum} ${weight_unit}`}
           />
-          <CustomPieChart
+          <CustomBarChart
             header="Fed To Live Stock"
             data={fedToLiveStock}
             measurement={`${fed_to_livestock_sum} ${weight_unit}`}
           />
-          <CustomPieChart
+          <CustomBarChart
             header="Wastage"
             data={wastage}
             measurement={`${wastage_sum} ${weight_unit}`}
           />
-          <CustomPieChart
+          <CustomBarChart
             header="Income By Crops"
             data={incomeByCrops}
             measurement={`${income_sum} USD`}
           />
-          <CustomPieChart
+          <CustomBarChart
             header="Expenditure By Crops"
             data={expenditureByCrops}
             measurement={`${expenditure_sum} USD`}

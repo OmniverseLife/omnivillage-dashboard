@@ -6,11 +6,14 @@ import CustomBarChart from "../customBarChart/customBarChart";
 import { useQuery } from "@tanstack/react-query";
 import { getUtilizationData } from "../../../functions/dashboard";
 import Loading from "../loading";
+import { useSearchParams } from "react-router-dom";
 
 function UtilityChart() {
+  const [searchParams] = useSearchParams();
+
   const { data, isLoading } = useQuery({
     queryKey: ["utilization_data"],
-    queryFn: getUtilizationData,
+    queryFn: () => getUtilizationData(searchParams.get("village")),
   });
 
   const soilHealth = {

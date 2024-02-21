@@ -6,15 +6,18 @@ import { getStorageData } from "../../../functions/dashboard";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "../loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
 function StorageFacility({ weight_unit }) {
+  const [searchParams] = useSearchParams();
+
   const { data = {}, isLoading } = useQuery({
     queryKey: ["storage_data"],
-    queryFn: getStorageData,
+    queryFn: () => getStorageData(searchParams.get("village")),
   });
 
   const grains = {

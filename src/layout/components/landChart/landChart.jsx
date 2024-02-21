@@ -9,61 +9,78 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 const landConverter = (unit, value) => {
   return Math.round(convert(value).from("km2").to(unit));
 };
 
 function LandChart({ land_unit }) {
+  const [searchParams] = useSearchParams();
+
   const { data: land_allocation = {}, isLandAllocationLoading } = useQuery({
     queryKey: ["land_allocation"],
-    queryFn: getLandAllocationData,
+    queryFn: () => getLandAllocationData(searchParams.get("village")),
   });
 
   const { data: land_used = {}, isLandUsedLoading } = useQuery({
     queryKey: ["land_used"],
-    queryFn: getLandUsedData,
+    queryFn: () => getLandUsedData(searchParams.get("village")),
   });
 
   // , "Fishery", "Poultry", "Storage", "trees"
 
-  const data = {
-    labels: ["Cultivation"],
-    datasets: [
-      {
-        label: "Land Allocated",
-        data: [
-          landConverter(land_unit, land_allocation?.cultivation ?? 0),
-          // landConverter(land_unit, land_allocation?.fishery ?? 0),
-          // landConverter(land_unit, land_allocation?.poultry ?? 0),
-          // landConverter(land_unit, land_allocation?.storage ?? 0),
-          // landConverter(land_unit, land_allocation?.trees ?? 0),
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const data = {
+  //   labels: ["Cultivation"],
+  //   datasets: [
+  //     {
+  //       label: "Land Allocated",
+  //       data: [
+  //         landConverter(land_unit, land_allocation?.cultivation ?? 0),
+  //         // landConverter(land_unit, land_allocation?.fishery ?? 0),
+  //         // landConverter(land_unit, land_allocation?.poultry ?? 0),
+  //         // landConverter(land_unit, land_allocation?.storage ?? 0),
+  //         // landConverter(land_unit, land_allocation?.trees ?? 0),
+  //       ],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+  const data = [
+    {
+      name: "Cultivation",
+      y: landConverter(land_unit, land_allocation?.cultivation ?? 0),
+    },
+  ];
+
   // , "Fishery", "Poultry", "Storage", "trees"
-  const usedLand = {
-    labels: ["Cultivation"],
-    datasets: [
-      {
-        label: "Land Used",
-        data: [
-          landConverter(land_unit, land_used?.cultivation ?? 0),
-          // landConverter(land_unit, land_used?.fishery ?? 0),
-          // landConverter(land_unit, land_used?.poultry ?? 0),
-          // landConverter(land_unit, land_used?.storage ?? 0),
-          // landConverter(land_unit, land_used?.trees ?? 0),
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const usedLand = {
+  //   labels: ["Cultivation"],
+  //   datasets: [
+  //     {
+  //       label: "Land Used",
+  //       data: [
+  //         landConverter(land_unit, land_used?.cultivation ?? 0),
+  //         // landConverter(land_unit, land_used?.fishery ?? 0),
+  //         // landConverter(land_unit, land_used?.poultry ?? 0),
+  //         // landConverter(land_unit, land_used?.storage ?? 0),
+  //         // landConverter(land_unit, land_used?.trees ?? 0),
+  //       ],
+  //       backgroundColor: backgroundColor,
+  //       borderColor: borderColor,
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+
+  const usedLand = [
+    {
+      name: "Cultivation",
+      y: landConverter(land_unit, land_used?.cultivation ?? 0),
+    },
+  ];
 
   const land_allocated_sum = Object.values(land_allocation).reduce(
     (prev, current) => prev + landConverter(land_unit, current),

@@ -6,11 +6,14 @@ import CustomPieChart from "../customPieChart/customPieChart";
 import { useQuery } from "@tanstack/react-query";
 import { getIncomeExpenditureData } from "../../../functions/dashboard";
 import Loading from "../loading";
+import { useSearchParams } from "react-router-dom";
 
 function IncomeSaleChart() {
+  const [searchParams] = useSearchParams();
+
   const { data: income_expenditure = [], isLoading } = useQuery({
     queryKey: ["income_expenditure"],
-    queryFn: getIncomeExpenditureData,
+    queryFn: () => getIncomeExpenditureData(searchParams.get("village")),
   });
 
   const incomeByLabels = income_expenditure.map((_item) => _item.label);

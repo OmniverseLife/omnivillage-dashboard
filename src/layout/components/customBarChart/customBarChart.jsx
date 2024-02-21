@@ -11,6 +11,8 @@ import {
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { customDatalabels } from "../customPieChart/customPieChart";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
 // ChartJS.unregister(customDatalabels);
 
 ChartJS.register(
@@ -57,11 +59,60 @@ const options = {
   },
 };
 
-function CustomBarChart({ header, data }) {
+function CustomBarChart({ header, data, measurement }) {
+  // console.log(data.dataset);
+  const options1 = {
+    chart: {
+      type: "column",
+      // spacingBottom: 0,
+    },
+    title: {
+      text: header,
+      align: "left",
+      // margin: 120,
+    },
+    xAxis: {
+      categories: data.xAxis,
+      crosshair: true,
+      accessibility: {
+        description: "Countries",
+      },
+    },
+    yAxis: [{ min: 0 }],
+    plotOptions: {
+      column: {
+        pointPadding: 0.2,
+        borderWidth: 0,
+      },
+      series: {
+        minPointLength: 10,
+      },
+    },
+    series: data.dataset,
+    legend: {
+      enabled: false,
+    },
+  };
+
   return (
-    <div style={{ width: "100%" }}>
-      <h3>{header}</h3>
-      <Bar options={options} data={data} plugins={[ChartDataLabels]} />
+    <div
+      style={{
+        width: "48%",
+        fontFamily: "inherit",
+        borderRadius: "10px",
+        display: "flex",
+        flexDirection: "column",
+        border: "1px solid #4b465c1f",
+        padding: "15px 5px",
+        alignItems: "center",
+      }}
+    >
+      {/* <h3>{header}</h3> */}
+      <p style={{ color: "#888", alignSelf: "flex-end" }}>{measurement}</p>
+      {/* <Bar options={options} data={data} plugins={[ChartDataLabels]} /> */}
+      <div style={{ width: "100%", marginTop: "auto" }}>
+        <HighchartsReact highcharts={Highcharts} options={options1} />
+      </div>
     </div>
   );
 }

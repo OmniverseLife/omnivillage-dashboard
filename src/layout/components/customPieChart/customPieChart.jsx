@@ -3,6 +3,8 @@ import React from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
 
 export const customDatalabels = {
   id: "customDatalabels",
@@ -94,9 +96,60 @@ function CustomPieChart({ header, data, measurement, style }) {
       // },
     },
   };
+
+  const options1 = {
+    chart: {
+      type: "pie",
+    },
+    title: {
+      text: header,
+      align: "left",
+    },
+    plotOptions: {
+      series: {
+        allowPointSelect: true,
+        cursor: "pointer",
+        // dataLabels: [
+        //   {
+        //     enabled: true,
+        //     distance: 20,
+        //   },
+        //   {
+        //     enabled: true,
+        //     distance: -40,
+        //     format: "{point.percentage:.1f}%",
+        //     style: {
+        //       fontSize: "1.2em",
+        //       textOutline: "none",
+        //       opacity: 0.7,
+        //     },
+        //     // filter: {
+        //     //     operator: '>',
+        //     //     property: 'percentage',
+        //     //     value: 10
+        //     // }
+        //   },
+        // ],
+      },
+      pie: {
+        size: "100%",
+        // dataLabels: {
+        //     enabled: false
+        // }
+      },
+    },
+    series: [
+      {
+        name: "data",
+        colorByPoint: true,
+        data: data,
+      },
+    ],
+  };
+
   return (
     <div className="pieChartContainer" style={style}>
-      <h3
+      {/* <h3
         style={{
           marginBottom: 20,
           alignSelf: "flex-start",
@@ -104,15 +157,18 @@ function CustomPieChart({ header, data, measurement, style }) {
           justifyContent: "space-between",
           width: "100%",
         }}
-      >
-        {header} <p style={{ color: "#888" }}>{measurement}</p>
-      </h3>
-      <Pie
+      > */}
+      <p style={{ color: "#888", alignSelf: "flex-end" }}>{measurement}</p>
+      {/* </h3> */}
+      {/* <Pie
         options={options}
         data={data}
         className="pieChart"
         plugins={[customDatalabels]}
-      />
+      /> */}
+      <div style={{ width: "100%" }}>
+        <HighchartsReact highcharts={Highcharts} options={options1} />
+      </div>
     </div>
   );
 }

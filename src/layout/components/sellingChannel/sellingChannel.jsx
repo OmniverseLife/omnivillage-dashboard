@@ -5,11 +5,14 @@ import { Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { getSellingChannelData } from "../../../functions/dashboard";
 import Loading from "../loading";
+import { useSearchParams } from "react-router-dom";
 
 function SellingChannel() {
+  const [searchParams] = useSearchParams();
+
   const { data, isLoading } = useQuery({
     queryKey: ["selling_channel"],
-    queryFn: getSellingChannelData,
+    queryFn: () => getSellingChannelData(searchParams.get("village")),
   });
 
   const sellingChannel = {

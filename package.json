@@ -22,6 +22,8 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-piechart-outlabels": "0.1.4",
     "convert-units": "^2.3.4",
+    "highcharts": "^11.3.0",
+    "highcharts-react-official": "^3.2.1",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

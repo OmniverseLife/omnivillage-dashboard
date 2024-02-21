@@ -134,4 +134,7 @@ export const endpoints = {
     },
     food_balance: "/dashboard/food-balance",
   },
+  others: {
+    villages: "/villages",
+  },
 };

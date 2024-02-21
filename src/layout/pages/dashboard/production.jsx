@@ -19,6 +19,7 @@ import { fetchLabels } from "../../../functions/others";
 import { fetchTagWiseCrops } from "../../../functions/consumption";
 import Loading from "../../components/loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 export const backgroundColor = [
   "rgba(255, 99, 132, 0.35)",
@@ -38,9 +39,7 @@ export const borderColor = [
 ];
 
 function Production() {
-  const [selectedOption, setselectedOption] = useState("land-chart");
-  const [selectedTag, setselectedTag] = useState("");
-  const [selectedCrop, setselectedCrop] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedWeight, setselectedWeight] = useState("kg");
   const [selectedArea, setselectedArea] = useState("km2");
 
@@ -50,14 +49,17 @@ function Production() {
   });
 
   const { data: crops = [], isCropsLoading } = useQuery({
-    queryKey: ["crops", selectedTag],
-    queryFn: () => fetchTagWiseCrops(selectedTag),
-    enabled: Boolean(selectedTag),
+    queryKey: ["crops", searchParams.get("label")],
+    queryFn: () => fetchTagWiseCrops(searchParams.get("label")),
+    enabled: Boolean(searchParams.get("label")),
   });
 
-  // useEffect(() => {
-  //   // setselectedTag(labels[0]?._id ?? "");
-  // }, [labels]);
+  useEffect(() => {
+    if (!searchParams.get("option")) {
+      searchParams.set("option", "land-use");
+      setSearchParams(searchParams);
+    }
+  }, []);
 
   return (
     <Stack className="container">
@@ -71,33 +73,37 @@ function Production() {
             size="small"
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={selectedOption}
+            value={searchParams.get("option")}
             style={{ width: 300 }}
             label="Production Information"
             onChange={(e) => {
-              setselectedTag("");
-              setselectedCrop("");
-              setselectedOption(e.target.value);
+              searchParams.set("label", "");
+              searchParams.set("crop", "");
+              searchParams.set("option", e.target.value);
+              setSearchParams(searchParams);
             }}
           >
-            <MenuItem value="land-chart">Land Chart</MenuItem>
-            <MenuItem value="bifurcated">Bifurcated Chart By Tags</MenuItem>
-            <MenuItem value="utility">Utilisation Chart</MenuItem>
-            <MenuItem value="income-chart">Income & Expenditure Chart</MenuItem>
+            <MenuItem value="land-use">Land Use</MenuItem>
+            <MenuItem value="output-utilisation">Output & Utilisation</MenuItem>
+            <MenuItem value="soil-health">Soil Health</MenuItem>
             <MenuItem value="selling-channel">Selling Channel</MenuItem>
             <MenuItem value="storage-facility">Storage Facility</MenuItem>
           </Select>
         </FormControl>
-        {selectedOption === "bifurcated" ? (
+        {searchParams.get("option") === "output-utilisation" ? (
           <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
               label="Tags"
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={selectedTag}
+              value={searchParams.get("label")}
               style={{ width: 300 }}
-              onChange={(e) => setselectedTag(e.target.value)}
+              onChange={(e) => {
+                searchParams.set("crop", "");
+                searchParams.set("label", e.target.value);
+                setSearchParams(searchParams);
+              }}
             >
               <MenuItem value="">Select</MenuItem>
               {labels.map((_label) => (
@@ -108,16 +114,19 @@ function Production() {
             </Select>
           </FormControl>
         ) : null}
-        {selectedOption === "bifurcated" && (
+        {searchParams.get("option") === "output-utilisation" && (
           <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Crops</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={selectedCrop}
+              value={searchParams.get("crop")}
               style={{ width: 200 }}
               label="Crops"
-              onChange={(e) => setselectedCrop(e.target.value)}
+              onChange={(e) => {
+                searchParams.set("crop", e.target.value);
+                setSearchParams(searchParams);
+              }}
             >
               <MenuItem value="">Select</MenuItem>
               {crops.map((_crop) => (
@@ -128,7 +137,7 @@ function Production() {
             </Select>
           </FormControl>
         )}
-        {selectedOption === "land-chart" ? (
+        {searchParams.get("option") === "land-use" ? (
           <FormControl style={{ marginLeft: "auto" }}>
             <InputLabel id="demo-simple-select-label">Area</InputLabel>
             <Select
@@ -150,8 +159,8 @@ function Production() {
             </Select>
           </FormControl>
         ) : null}
-        {selectedOption === "bifurcated" ||
-        selectedOption === "storage-facility" ? (
+        {searchParams.get("option") === "output-utilisation" ||
+        searchParams.get("option") === "storage-facility" ? (
           <FormControl style={{ marginLeft: "auto" }}>
             <InputLabel id="demo-simple-select-label">Weight</InputLabel>
             <Select
@@ -174,24 +183,22 @@ function Production() {
           </FormControl>
         ) : null}
       </Stack>
-      {selectedOption === "land-chart" ? (
+      {searchParams.get("option") === "land-use" ? (
         <LandChart land_unit={selectedArea} />
       ) : // <></>
-      selectedOption === "bifurcated" ? (
+      searchParams.get("option") === "output-utilisation" ? (
         <BifurcatedChart
-          type_id={selectedTag}
-          crop_id={selectedCrop}
+          type_id={searchParams.get("label")}
+          crop_id={searchParams.get("crop")}
           weight_unit={selectedWeight}
           crops={crops}
         />
-      ) : selectedOption === "income-chart" ? (
+      ) : searchParams.get("option") === "income-chart" ? (
         <IncomeSaleChart />
-      ) : selectedOption === "selling-channel" ? (
+      ) : searchParams.get("option") === "selling-channel" ? (
         <SellingChannel />
-      ) : selectedOption === "storage-facility" ? (
+      ) : searchParams.get("option") === "storage-facility" ? (
         <StorageFacility weight_unit={selectedWeight} />
-      ) : selectedOption === "utility" ? (
-        <UtilityChart />
       ) : null}
     </Stack>
   );

@@ -1,180 +1,184 @@
 import { endpoints } from "../axios/endpoints";
 import axiosInstance from "../axios/axiosInstance";
 
-export const getLandAllocationData = async () => {
+export const getLandAllocationData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.land_allocation_category_data,
     {
       params: {
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getLandUsedData = async () => {
+export const getLandUsedData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.land_used_category_data,
     {
       params: {
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getBifurcatedLabelData = async (type_id) => {
+export const getBifurcatedLabelData = async (type_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.bifurcated_chart_label,
     {
       params: {
         type_id,
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getBifurcatedCropData = async (crop_id) => {
+export const getBifurcatedCropData = async (crop_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.bifurcated_chart_crop,
     {
-      params: { crop_id, village: "kolkata" },
+      params: { crop_id, village },
     }
   );
   return res?.data;
 };
 
-export const getIncomeExpenditureData = async () => {
+export const getIncomeExpenditureData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.income_expenditure,
     {
       params: {
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getSellingChannelData = async () => {
+export const getSellingChannelData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.selling_channel_data,
     {
       params: {
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getStorageData = async () => {
+export const getStorageData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.storage_data,
     {
       params: {
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getUtilizationData = async () => {
+export const getUtilizationData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.utilization_chart,
     {
       params: {
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getConsumptionFromProductionData = async (type_id, crop_id) => {
+export const getConsumptionFromProductionData = async (
+  type_id,
+  crop_id,
+  village
+) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.consumption.consumption_from_production,
     {
       params: {
         type_id,
         crop_id,
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getSelfGrownByTagsData = async (type_id) => {
+export const getSelfGrownByTagsData = async (type_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.consumption.self_grown_by_tag,
     {
       params: {
         type_id,
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getSelfConsumedData = async (type_id) => {
+export const getSelfConsumedData = async (type_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.consumption.self_consumed_data,
     {
       params: {
         type_id,
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getPurchasedFromNeighboursData = async (type_id) => {
+export const getPurchasedFromNeighboursData = async (type_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.consumption.purchased_from_neighbours_consumed,
     {
       params: {
         type_id,
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getPurchasedFromMarketData = async (type_id) => {
+export const getPurchasedFromMarketData = async (type_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.consumption.purchased_from_market_consumed,
     {
       params: {
         type_id,
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getIdealConsumptionByLabelData = async () => {
+export const getIdealConsumptionByLabelData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.consumption.ideal_consumption_by_label,
     {
       params: {
-        village: "kolkata",
+        village,
       },
     }
   );
   return res?.data;
 };
 
-export const getIdealConsumptionExpectedData = async (type_id) => {
+export const getIdealConsumptionExpectedData = async (type_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.consumption.ideal_consumption_expected,
     {
@@ -186,7 +190,7 @@ export const getIdealConsumptionExpectedData = async (type_id) => {
   return res?.data;
 };
 
-export const fetchFoodBalance = async (tag) => {
+export const fetchFoodBalance = async (tag, village) => {
   const res = await axiosInstance.get(endpoints.dashboard.food_balance, {
     params: {
       type_id: tag,
