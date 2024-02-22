@@ -59,7 +59,7 @@ const options = {
   },
 };
 
-function CustomBarChart({ header, data, measurement }) {
+function CustomBarChart({ header, data, measurement, helper_text }) {
   // console.log(data.dataset);
   const options1 = {
     chart: {
@@ -113,6 +113,9 @@ function CustomBarChart({ header, data, measurement }) {
       <div style={{ width: "100%", marginTop: "auto" }}>
         <HighchartsReact highcharts={Highcharts} options={options1} />
       </div>
+      <span style={{ fontSize: "12px", color: "#777" }}>
+        &#9432; {helper_text}
+      </span>
     </div>
   );
 }

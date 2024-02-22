@@ -120,6 +120,9 @@ export const endpoints = {
       income_expenditure: "/dashboard/income_expenditure",
       selling_channel_data: "/dashboard/selling_channel_data",
       storage_data: "/dashboard/storage_data",
+      other_informations:
+        "/dashboard/other_information_tree_fish_poultry_charts",
+      processing_method: "/dashboard/processing_method",
     },
     consumption: {
       consumption_from_production: "/dashboard/consumption_from_production",

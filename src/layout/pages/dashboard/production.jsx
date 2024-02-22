@@ -13,7 +13,6 @@ import IncomeSaleChart from "../../components/incomeSaleChart/incomeSaleChart";
 import LandChart from "../../components/landChart/landChart";
 import SellingChannel from "../../components/sellingChannel/sellingChannel";
 import StorageFacility from "../../components/storageFacility/storageFacility";
-import UtilityChart from "../../components/utilityChart/utilityChart";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLabels } from "../../../functions/others";
 import { fetchTagWiseCrops } from "../../../functions/consumption";
@@ -124,16 +123,20 @@ function Production() {
               style={{ width: 200 }}
               label="Crops"
               onChange={(e) => {
+                console.log(e.target.value);
                 searchParams.set("crop", e.target.value);
                 setSearchParams(searchParams);
               }}
             >
               <MenuItem value="">Select</MenuItem>
-              {crops.map((_crop) => (
-                <MenuItem value={_crop._id} key={_crop._id}>
-                  {_crop.name}
-                </MenuItem>
-              ))}
+              {crops.map((_crop) => {
+                console.log(_crop._id, _crop.name);
+                return (
+                  <MenuItem value={_crop._id} key={_crop._id}>
+                    {_crop.name}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         )}
@@ -187,12 +190,7 @@ function Production() {
         <LandChart land_unit={selectedArea} />
       ) : // <></>
       searchParams.get("option") === "output-utilisation" ? (
-        <BifurcatedChart
-          type_id={searchParams.get("label")}
-          crop_id={searchParams.get("crop")}
-          weight_unit={selectedWeight}
-          crops={crops}
-        />
+        <BifurcatedChart weight_unit={selectedWeight} crops={crops} />
       ) : searchParams.get("option") === "income-chart" ? (
         <IncomeSaleChart />
       ) : searchParams.get("option") === "selling-channel" ? (
