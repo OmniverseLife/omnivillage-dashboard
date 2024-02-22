@@ -12,13 +12,15 @@ import DoneIcon from "@mui/icons-material/Done";
 import Loading from "../loading";
 import { useQuery } from "@tanstack/react-query";
 import { fetchFoodBalance } from "../../../functions/dashboard";
+import { useSearchParams } from "react-router-dom";
 
 function DeficitCrops({ parentLoading, tag }) {
   const [rows, setRows] = useState([]);
+  const [searchParams] = useSearchParams();
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["food_balance", tag],
-    queryFn: () => fetchFoodBalance(tag),
+    queryFn: () => fetchFoodBalance(tag, searchParams.get("village")),
     initialData: [],
   });
 

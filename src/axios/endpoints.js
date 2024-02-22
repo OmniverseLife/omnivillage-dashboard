@@ -136,6 +136,7 @@ export const endpoints = {
       ideal_consumption_expected: "/dashboard/ideal_consumption_expected",
     },
     food_balance: "/dashboard/food-balance",
+    deficiet_chart: "/dashboard/deficiet_chart",
   },
   others: {
     villages: "/villages",

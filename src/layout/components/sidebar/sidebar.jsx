@@ -41,7 +41,7 @@ export default function Sidebar() {
       {dashboardMenu && (
         <div className="menu">
           <Link
-            to="/dashboard/production"
+            to="/dashboard/production?option=land-use&village=kolkata"
             className={paths.includes("production") ? "link active" : "link"}
           >
             Production
@@ -53,7 +53,7 @@ export default function Sidebar() {
             Consumption
           </Link>
           <Link
-            to="/dashboard/food-balance"
+            to="/dashboard/food-balance?village=kolkata"
             className={paths.includes("food-balance") ? "link active" : "link"}
           >
             Food Balance

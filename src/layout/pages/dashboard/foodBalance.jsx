@@ -23,7 +23,7 @@ function FoodBalance() {
 
   useEffect(() => {
     if (!isLoading) {
-      setselectedOption(labels[0]._id);
+      setselectedTag(labels[0]._id);
     }
   }, [isLoading, labels]);
 
@@ -31,28 +31,51 @@ function FoodBalance() {
     <Stack className="container">
       <Stack direction={"row"} spacing={3} marginBottom={3}>
         <FormControl size="small">
-          <InputLabel id="demo-simple-select-label">Tags</InputLabel>
+          <InputLabel id="demo-simple-select-label">Section</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             value={selectedOption}
             style={{ width: 300, textTransform: "capitalize" }}
-            label="Tags"
+            label="Section"
             onChange={(e) => setselectedOption(e.target.value)}
           >
-            {labels.map((_label) => {
-              return (
-                <MenuItem
-                  value={_label._id}
-                  key={_label._id}
-                  sx={{ textTransform: "capitalize" }}
-                >
-                  {_label.name}
-                </MenuItem>
-              );
-            })}
+            <MenuItem value={"analytics"} sx={{ textTransform: "capitalize" }}>
+              Analytics
+            </MenuItem>
+            <MenuItem
+              value={"food_balance"}
+              sx={{ textTransform: "capitalize" }}
+            >
+              Food balance
+            </MenuItem>
           </Select>
         </FormControl>
+        {selectedOption === "food_balance" && (
+          <FormControl size="small">
+            <InputLabel id="demo-simple-select-label">Tags</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectedTag}
+              style={{ width: 300, textTransform: "capitalize" }}
+              label="Tags"
+              onChange={(e) => setselectedTag(e.target.value)}
+            >
+              {labels.map((_label) => {
+                return (
+                  <MenuItem
+                    value={_label._id}
+                    key={_label._id}
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    {_label.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        )}
         {/* {selectedOption === "analytics" && (
           <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
@@ -82,12 +105,12 @@ function FoodBalance() {
           </FormControl>
         )} */}
       </Stack>
-      {/* {selectedOption === "analytics" ? (
+      {selectedOption === "analytics" ? (
         <FoodBalanceAnalytics />
-      ) : selectedOption === "deficit" ? (
-        <DeficitCrops />
-        ) : null} */}
-      <DeficitCrops parentLoading={isLoading} tag={selectedOption} />
+      ) : selectedOption === "food_balance" ? (
+        <DeficitCrops parentLoading={isLoading} tag={selectedTag} />
+      ) : null}
+      {/* <DeficitCrops /> */}
     </Stack>
   );
 }

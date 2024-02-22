@@ -204,10 +204,20 @@ export const getIdealConsumptionExpectedData = async (type_id, village) => {
   return res?.data;
 };
 
+export const fetchDeficietChart = async (village) => {
+  const res = await axiosInstance.get(endpoints.dashboard.deficiet_chart, {
+    params: {
+      village,
+    },
+  });
+  return res?.data;
+};
+
 export const fetchFoodBalance = async (tag, village) => {
   const res = await axiosInstance.get(endpoints.dashboard.food_balance, {
     params: {
       type_id: tag,
+      village,
     },
   });
   return res?.data;
