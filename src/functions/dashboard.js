@@ -84,11 +84,25 @@ export const getStorageData = async (village) => {
   return res?.data;
 };
 
-export const getUtilizationData = async (village) => {
+export const getProcessingMethod = async (crop_id, village) => {
   const res = await axiosInstance.get(
-    endpoints.dashboard.production.utilization_chart,
+    endpoints.dashboard.production.processing_method,
     {
       params: {
+        crop_id,
+        village,
+      },
+    }
+  );
+  return res?.data;
+};
+
+export const getOtherInformations = async (crop_id, village) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production.other_informations,
+    {
+      params: {
+        crop_id,
         village,
       },
     }
