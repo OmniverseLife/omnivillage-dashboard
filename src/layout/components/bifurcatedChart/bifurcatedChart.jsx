@@ -30,7 +30,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     isLoading: isBifurcatedDataLabelLoading,
     isFetching: isBifurcatedDataLabelFetching,
   } = useQuery({
-    queryKey: ["bifurcated_data", type_id],
+    queryKey: ["bifurcated_data", type_id, searchParams.get("village")],
     queryFn: () => getBifurcatedLabelData(type_id, searchParams.get("village")),
   });
 
@@ -39,7 +39,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     isLoading: isBifurcatedDataCropLoading,
     isFetching: isBifurcatedDataCropFetching,
   } = useQuery({
-    queryKey: ["bifurcated_data_crop", crop_id],
+    queryKey: ["bifurcated_data_crop", crop_id, searchParams.get("village")],
     queryFn: () => getBifurcatedCropData(crop_id, searchParams.get("village")),
     enabled: Boolean(crop_id),
   });
@@ -49,7 +49,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     isLoading: isProcessingMethodLoading,
     isFetching: isProcessingMethodFetching,
   } = useQuery({
-    queryKey: ["processing_method", crop_id],
+    queryKey: ["processing_method", crop_id, searchParams.get("village")],
     queryFn: () => getProcessingMethod(crop_id, searchParams.get("village")),
     enabled: Boolean(crop_id),
   });
@@ -59,7 +59,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     isLoading: is_other_info_loading,
     isFetching: is_other_info_fetching,
   } = useQuery({
-    queryKey: ["other_informations", crop_id],
+    queryKey: ["other_informations", crop_id, searchParams.get("village")],
     queryFn: () => getOtherInformations(crop_id, searchParams.get("village")),
     enabled: Boolean(crop_id),
   });
@@ -207,7 +207,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
       bifurcated_data_label?.self_consumed.map((_item) => _item.name) || [],
     dataset: [
       {
-        label: "Self Consumed",
+        name: "Self Consumed",
         data:
           bifurcated_data_label?.self_consumed.map((_item) =>
             weightConverter(weight_unit, _item.self_consumed)
@@ -221,7 +221,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
       bifurcated_data_label?.sold_to_neighbour.map((_item) => _item.name) || [],
     dataset: [
       {
-        label: "Sold To Neighbours",
+        name: "Sold To Neighbours",
         data:
           bifurcated_data_label?.sold_to_neighbour.map((_item) =>
             weightConverter(weight_unit, _item.sold_to_neighbour)
@@ -235,7 +235,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
       bifurcated_data_label?.sold_to_market.map((_item) => _item.name) || [],
     dataset: [
       {
-        label: "Sold To Market",
+        name: "Sold To Market",
         data:
           bifurcated_data_label?.sold_to_market.map((_item) =>
             weightConverter(weight_unit, _item.sold_to_market)
@@ -249,7 +249,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
       bifurcated_data_label?.fed_to_livestock.map((_item) => _item.name) || [],
     dataset: [
       {
-        label: "Fed To Live Stock",
+        name: "Fed To Live Stock",
         data:
           bifurcated_data_label?.fed_to_livestock.map((_item) =>
             weightConverter(weight_unit, _item.fed_to_livestock)
@@ -262,7 +262,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     xAxis: bifurcated_data_label?.wastage.map((_item) => _item.name) || [],
     dataset: [
       {
-        label: "Wastage",
+        name: "Wastage",
         data:
           bifurcated_data_label?.wastage.map((_item) =>
             weightConverter(weight_unit, _item.wastage)
@@ -275,7 +275,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     xAxis: bifurcated_data_label?.income.map((_item) => _item.name) || [],
     dataset: [
       {
-        label: "Income Generated",
+        name: "Income Generated",
         data:
           bifurcated_data_label?.income.map((_item) =>
             Math.round(_item.income)
@@ -287,7 +287,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     xAxis: bifurcated_data_label?.expenditure.map((_item) => _item.name) || [],
     dataset: [
       {
-        label: "Expenditure",
+        name: "Expenditure",
         data:
           bifurcated_data_label?.expenditure.map((_item) =>
             Math.round(_item.expenditure)

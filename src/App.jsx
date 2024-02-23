@@ -42,7 +42,7 @@ function App() {
       searchParams.set("village", data[0]?.name);
       setSearchParams(searchParams);
     }
-  }, [data, isLoading]);
+  }, [data, isLoading, searchParams, setSearchParams]);
 
   const renderSelectGroup = (item) => {
     const items = item[1].map((p) => {

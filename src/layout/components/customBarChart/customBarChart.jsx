@@ -97,7 +97,7 @@ function CustomBarChart({ header, data, measurement, helper_text }) {
   return (
     <div
       style={{
-        width: "48%",
+        // width: "48%",
         fontFamily: "inherit",
         borderRadius: "10px",
         display: "flex",

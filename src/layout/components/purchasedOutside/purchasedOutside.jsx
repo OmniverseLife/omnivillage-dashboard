@@ -7,33 +7,35 @@ import { useQuery } from "@tanstack/react-query";
 import { getPurchasedFromMarketData } from "../../../functions/dashboard";
 import Loading from "../loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
 function PurchasedOutside({ type_id, weight_unit }) {
+  const [searchParams] = useSearchParams();
+
   const { data: purchased_from_market = [], isLoading } = useQuery({
-    queryKey: ["purchased from market", type_id],
-    queryFn: () => getPurchasedFromMarketData(type_id),
+    queryKey: ["purchased from market", type_id, searchParams.get("village")],
+    queryFn: () =>
+      getPurchasedFromMarketData(type_id, searchParams.get("village")),
   });
 
   const data = {
-    labels: purchased_from_market.map((_item) => _item.name),
-    datasets: [
+    xAxis: purchased_from_market.map((_item) => _item.name),
+    dataset: [
       {
-        label: "Purchased From Outside",
+        name: "Purchased From Outside",
         data: purchased_from_market.map((_item) =>
           weightConverter(weight_unit, _item.output)
         ),
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
+
   return (
-    <Box width={"100%"}>
+    <Box width="48%">
       <Loading isLoading={isLoading} />
       <CustomBarChart
         header="Purchased From Outside"

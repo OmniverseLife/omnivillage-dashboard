@@ -10,50 +10,47 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
 function SelfGrown({ type_id, weight_unit }) {
+  const [searchParams] = useSearchParams();
   const { data: self_grown = [], isSelfGrownLoading } = useQuery({
-    queryKey: ["self grown", type_id],
-    queryFn: () => getSelfGrownByTagsData(type_id),
+    queryKey: ["self grown", type_id, searchParams.get("village")],
+    queryFn: () => getSelfGrownByTagsData(type_id, searchParams.get("village")),
   });
   const { data: self_consumed = [], isSelfConsumedLoading } = useQuery({
-    queryKey: ["self consumed", type_id],
-    queryFn: () => getSelfConsumedData(type_id),
+    queryKey: ["self consumed", type_id, searchParams.get("village")],
+    queryFn: () => getSelfConsumedData(type_id, searchParams.get("village")),
   });
 
   const selfGrownData = {
-    labels: self_grown
+    xAxis: self_grown
       .map((_item) => _item.name)
       .sort((a, b) => a.localeCompare(b)),
-    datasets: [
+    dataset: [
       {
-        label: "Self Grown",
+        name: "Self Grown",
         data: self_grown.map((_item) =>
           weightConverter(weight_unit, _item.output)
         ),
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
+
   const selfConsumedData = {
-    labels: self_consumed
+    xAxis: self_consumed
       .map((_item) => _item.name)
       .sort((a, b) => a.localeCompare(b)),
-    datasets: [
+    dataset: [
       {
-        label: "Self Consumed",
-        data: self_consumed.map((_item) =>
+        name: "Self Consumed",
+        data: self_grown.map((_item) =>
           weightConverter(weight_unit, _item.output)
         ),
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
@@ -63,11 +60,16 @@ function SelfGrown({ type_id, weight_unit }) {
       direction={"row"}
       justifyContent={"space-between"}
       flexWrap={"wrap"}
+      // gap={2}
       width={"100%"}
     >
       <Loading isLoading={isSelfConsumedLoading || isSelfGrownLoading} />
-      <CustomBarChart header="Self Grown" data={selfGrownData} />
-      <CustomBarChart header="Self Consumed" data={selfConsumedData} />
+      <Box width="48%">
+        <CustomBarChart header="Self Grown" data={selfGrownData} />
+      </Box>
+      <Box width="48%">
+        <CustomBarChart header="Self Consumed" data={selfConsumedData} />
+      </Box>
     </Stack>
     // </Box>
   );
