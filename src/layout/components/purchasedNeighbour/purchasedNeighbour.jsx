@@ -7,33 +7,37 @@ import { useQuery } from "@tanstack/react-query";
 import { getPurchasedFromNeighboursData } from "../../../functions/dashboard";
 import Loading from "../loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
 function PurchasedNeighbour({ type_id, weight_unit }) {
+  const [searchParams] = useSearchParams();
   const { data: purchased_from_neighbour = [], isLoading } = useQuery({
-    queryKey: ["purchased from neighbour", type_id],
-    queryFn: () => getPurchasedFromNeighboursData(type_id),
+    queryKey: [
+      "purchased from neighbour",
+      type_id,
+      searchParams.get("village"),
+    ],
+    queryFn: () =>
+      getPurchasedFromNeighboursData(type_id, searchParams.get("village")),
   });
 
   const data = {
-    labels: purchased_from_neighbour.map((_item) => _item.name),
-    datasets: [
+    xAxis: purchased_from_neighbour.map((_item) => _item.name),
+    dataset: [
       {
-        label: "Purchased From Neighbours",
+        name: "Purchased From Neighbours",
         data: purchased_from_neighbour.map((_item) =>
           weightConverter(weight_unit, _item.output)
         ),
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
       },
     ],
   };
   return (
-    <Box width={"100%"}>
+    <Box width="48%">
       <Loading isLoading={isLoading} />
       <CustomBarChart
         header="Purchased From Neighbours"

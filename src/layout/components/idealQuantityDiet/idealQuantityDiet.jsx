@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
@@ -10,16 +10,20 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 import convert from "convert-units";
+import { useSearchParams } from "react-router-dom";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
 function IdealQuantityDiet({ type_id, weight_unit }) {
+  const [searchParams] = useSearchParams();
+
   const { data: ideal_consumption_bar = [], isIdealConsumptionBarLoading } =
     useQuery({
-      queryKey: ["ideal_consumption_bar"],
-      queryFn: getIdealConsumptionByLabelData,
+      queryKey: ["ideal_consumption_bar", searchParams.get("village")],
+      queryFn: () =>
+        getIdealConsumptionByLabelData(searchParams.get("village")),
     });
 
   // const {
@@ -34,21 +38,19 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
   const tags = ideal_consumption_bar.map((_item) => _item.label_name);
 
   const tagsData = {
-    labels: tags,
-    datasets: [
+    xAxis: tags,
+    dataset: [
       {
-        label: "Ideal Quantity To Be Consumed",
+        name: "Ideal Quantity To Be Consumed",
         data: ideal_consumption_bar.map((_item) =>
           weightConverter(weight_unit, _item.ideal_consumption)
         ),
-        backgroundColor: backgroundColor[2],
       },
       {
-        label: "Current Consumed Quantity",
+        name: "Current Consumed Quantity",
         data: ideal_consumption_bar.map((_item) =>
           weightConverter(weight_unit, _item.total_consumed)
         ),
-        backgroundColor: backgroundColor[1],
       },
     ],
   };
@@ -90,7 +92,7 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
       justifyContent={"space-between"}
       flexWrap={"wrap"}
       rowGap={5}
-      width={"100%"}
+      width="48%"
     >
       <Loading
         isLoading={
@@ -99,11 +101,13 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
           // isFetching
         }
       />
-      <CustomBarChart
-        header="Ideal Quantity Consumption (Tags)"
-        data={tagsData}
-        // style={{ width: "100%" }}
-      />
+      <Box width="100%">
+        <CustomBarChart
+          header="Ideal Quantity Consumption (Tags)"
+          data={tagsData}
+          // style={{ width: "100%" }}
+        />
+      </Box>
       {/* <CustomPieChart
         header="Ideal Quantity To Be Consumed"
         data={quantityToBeConsumed}
