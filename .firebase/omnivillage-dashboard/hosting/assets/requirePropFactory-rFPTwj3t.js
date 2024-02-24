@@ -1,1 +1,0 @@
-import{_ as h}from"./index-1tNYw4bp.js";function T(s,t){const n=t?h({},t.propTypes):null;return o=>(e,r,l,p,u,...y)=>{const c=u||r,f=n==null?void 0:n[c];if(f){const i=f(e,r,l,p,u,...y);if(i)return i}return typeof e[r]<"u"&&!e[o]?new Error(`The prop \`${c}\` of \`${s}\` can only be used together with the \`${o}\` prop.`):null}}export{T as r};

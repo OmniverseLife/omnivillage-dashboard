@@ -65,10 +65,18 @@ function SelfGrown({ type_id, weight_unit }) {
     >
       <Loading isLoading={isSelfConsumedLoading || isSelfGrownLoading} />
       <Box width="48%">
-        <CustomBarChart header="Self Grown" data={selfGrownData} />
+        <CustomBarChart
+          header="Self Grown"
+          data={selfGrownData}
+          helper_text="Each bar represents how much crop is self grown"
+        />
       </Box>
       <Box width="48%">
-        <CustomBarChart header="Self Consumed" data={selfConsumedData} />
+        <CustomBarChart
+          header="Self Consumed"
+          data={selfConsumedData}
+          helper_text="Each bar represents how much crop is self consumed"
+        />
       </Box>
     </Stack>
     // </Box>

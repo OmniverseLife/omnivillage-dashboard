@@ -105,6 +105,7 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
         <CustomBarChart
           header="Ideal Quantity Consumption (Tags)"
           data={tagsData}
+          helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
           // style={{ width: "100%" }}
         />
       </Box>

@@ -41,6 +41,7 @@ function PurchasedOutside({ type_id, weight_unit }) {
         header="Purchased From Outside"
         data={data}
         style={{ width: "100%" }}
+        helper_text="Each bar represents how much crop is purchased from market"
       />
     </Box>
   );

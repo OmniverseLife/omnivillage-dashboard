@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
@@ -371,13 +371,21 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
         }
       />
       {crop_id ? (
-        <>
+        <Stack
+          // justifyContent="space-between"
+          // alignItems="center"
+          rowGap={4}
+          columnGap={5}
+          direction="row"
+          flexWrap="wrap"
+        >
           <CustomPieChart
             header={`${crops
               ?.find((_crop) => _crop._id === crop_id)
               ?.name.toUpperCase()} Information`}
             data={singleCropInfo}
             measurement={`${single_crop_sum} ${weight_unit}`}
+            helper_text="Each Slice represents Quantity Produced"
           />
           <div
             style={{
@@ -404,7 +412,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
                 </strong>{" "}
                 {bifurcated_data_crop?.area_allocated || "-"} km<sup>2</sup>
               </p>
-              <p>
+              <p style={{ marginBottom: 20 }}>
                 <strong style={{ fontWeight: "500", marginRight: 10 }}>
                   Average Number
                   <br />
@@ -414,7 +422,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
               </p>
               {!other_informations?.type ? (
                 other_informations?.crop_type?.includes("fish") ? (
-                  <p>
+                  <p style={{ marginBottom: 20 }}>
                     <strong>
                       Total Number of Fishes from{" "}
                       {other_informations?.crop_type?.includes("river")
@@ -425,24 +433,24 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
                     {other_informations?.data?.[0]?.count}
                   </p>
                 ) : other_informations?.crop_type === "hunting" ? (
-                  <p>
+                  <p style={{ marginBottom: 20 }}>
                     <strong>Total Number of Huntings: </strong>
                     {other_informations?.data?.[0]?.count}
                   </p>
                 ) : other_informations?.crop_type === "poultry" ? (
                   <>
-                    <p>
+                    <p style={{ marginBottom: 20 }}>
                       <strong>Total Number of poultries: </strong>
                       {other_informations?.data?.[0]?.count}
                     </p>
-                    <p>
+                    <p style={{ marginBottom: 20 }}>
                       <strong>Average age of poultries: </strong>
                       {other_informations?.data?.[0]?.average} years
                     </p>
                   </>
                 ) : null
               ) : null}
-              <p>
+              <p style={{ marginBottom: 20 }}>
                 <strong>Average yeild: </strong>
                 {bifurcated_data_crop?.yeild || "-"}
               </p>
@@ -456,19 +464,44 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
               </p> */}
             </div>
           </div>
-          <CustomBarChart
-            header="Income & Expenditure"
-            data={singleCropIncomeInfo}
-          />
-          {other_informations?.type === "chart" && (
+          <Box width="48%">
             <CustomBarChart
-              header="Average age of trees"
-              data={cropAvgAgeTrees}
-              helper_text="Each bar represents number of crops"
+              header="Income & Expenditure"
+              data={singleCropIncomeInfo}
+              helper_text="Each bar represents data in currency"
             />
+          </Box>
+          {other_informations?.type === "chart" && (
+            <Box width="48%">
+              <CustomBarChart
+                header="Average age of trees"
+                data={cropAvgAgeTrees}
+                helper_text="Each bar represents number of crops"
+              />
+            </Box>
           )}
-          <CustomBarChart header="Fertilizers" data={cropFertilizers} />
-          <CustomBarChart header="Pesticides" data={cropPesticides} />
+          <Box width="48%">
+            <CustomBarChart
+              header="Fertilizers"
+              data={cropFertilizers}
+              helper_text={`Each bar represents ${
+                bifurcated_data_crop?.fertilizer_used?.type === "land"
+                  ? "land used by crop"
+                  : "number of crop"
+              }`}
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Pesticides"
+              data={cropPesticides}
+              helper_text={`Each bar represents ${
+                bifurcated_data_crop?.pesticide_used?.type === "land"
+                  ? "land used by crop"
+                  : "number of crop"
+              }`}
+            />
+          </Box>
           {processing_methods?.length && (
             <div style={{ width: "100%" }}>
               <h4 style={{ marginBottom: 10 }}>Processing Method</h4>
@@ -499,49 +532,73 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
               />
             </div>
           )}
-        </>
+        </Stack>
       ) : (
         <>
-          <CustomBarChart
-            header="Quantity Produced"
-            data={cropData}
-            measurement={`${quantity_produced_sum} ${weight_unit}`}
-          />
-          <CustomBarChart
-            header="Self Consumed"
-            data={selfConsumed}
-            measurement={`${self_consumed_sum} ${weight_unit}`}
-          />
-          <CustomBarChart
-            header="Sold To Neighbours"
-            data={soldToNeighbours}
-            measurement={`${sold_to_neighbour_sum} ${weight_unit}`}
-          />
-          <CustomBarChart
-            header="Sold To Market"
-            data={soldToMarket}
-            measurement={`${sold_to_market_sum} ${weight_unit}`}
-          />
-          <CustomBarChart
-            header="Fed To Live Stock"
-            data={fedToLiveStock}
-            measurement={`${fed_to_livestock_sum} ${weight_unit}`}
-          />
-          <CustomBarChart
-            header="Wastage"
-            data={wastage}
-            measurement={`${wastage_sum} ${weight_unit}`}
-          />
-          <CustomBarChart
-            header="Income By Crops"
-            data={incomeByCrops}
-            measurement={`${income_sum} USD`}
-          />
-          <CustomBarChart
-            header="Expenditure By Crops"
-            data={expenditureByCrops}
-            measurement={`${expenditure_sum} USD`}
-          />
+          <Box width="48%">
+            <CustomBarChart
+              header="Quantity Produced"
+              data={cropData}
+              measurement={`${quantity_produced_sum} ${weight_unit}`}
+              helper_text="Each bar represents amount of each crop produced"
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Self Consumed"
+              data={selfConsumed}
+              measurement={`${self_consumed_sum} ${weight_unit}`}
+              helper_text="Each bar represents amount of each crop consumed"
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Sold To Neighbours"
+              data={soldToNeighbours}
+              measurement={`${sold_to_neighbour_sum} ${weight_unit}`}
+              helper_text="Each bar represents amount of each crop sold to neighbours"
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Sold To Market"
+              data={soldToMarket}
+              measurement={`${sold_to_market_sum} ${weight_unit}`}
+              helper_text="Each bar represents amount of each crop sold to market"
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Fed To Live Stock"
+              data={fedToLiveStock}
+              measurement={`${fed_to_livestock_sum} ${weight_unit}`}
+              helper_text="Each bar represents amount of each crop fed to livestock"
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Wastage"
+              data={wastage}
+              measurement={`${wastage_sum} ${weight_unit}`}
+              helper_text="Each bar represents amount of each crop wasted"
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Income By Crops"
+              data={incomeByCrops}
+              measurement={`${income_sum} USD`}
+              helper_text="Each bar represents currency earned by each crop"
+            />
+          </Box>
+          <Box width="48%">
+            <CustomBarChart
+              header="Expenditure By Crops"
+              data={expenditureByCrops}
+              measurement={`${expenditure_sum} USD`}
+              helper_text="Each bar represents currency spent on each crop"
+            />
+          </Box>
         </>
       )}
     </Stack>

@@ -15,24 +15,14 @@ function SellingChannel() {
     queryFn: () => getSellingChannelData(searchParams.get("village")),
   });
 
-  const sellingChannel = {
-    labels: ["Local Market", "Agent", "Ecommerce", "Export", "None"],
-    datasets: [
-      {
-        label: "Selling Channel",
-        data: [
-          data?.local_market,
-          data?.agent,
-          data?.ecommerce,
-          data?.export,
-          data?.none,
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  const sellingChannel = [
+    { name: "Local Market", y: data?.local_market },
+    { name: "Agent", y: data?.agent },
+    { name: "Ecommerce", y: data?.ecommerce },
+    { name: "Export", y: data?.export },
+    { name: "None", y: data?.none },
+  ];
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"}>
       <Loading isLoading={isLoading} />
@@ -43,6 +33,7 @@ function SellingChannel() {
           (prev, current) => prev + current,
           0
         )}`}
+        helper_text="Each Slice represents number of farmers in each segment"
       />
     </Stack>
   );

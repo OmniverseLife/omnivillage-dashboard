@@ -27,7 +27,11 @@ function FoodBalanceAnalytics() {
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <Loading isLoading={isLoading} />
-      <CustomPieChart header="Analytics" data={chartData} />
+      <CustomPieChart
+        header="Analytics"
+        data={chartData}
+        helper_text="Each slice only contains data for tags that are in deficiency"
+      />
     </Stack>
   );
 }

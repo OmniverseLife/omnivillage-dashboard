@@ -44,7 +44,7 @@ export const customDatalabels = {
   },
 };
 
-function CustomPieChart({ header, data, measurement, style }) {
+function CustomPieChart({ header, data, measurement, style, helper_text }) {
   ChartJS.register(
     ArcElement,
     Tooltip,
@@ -169,6 +169,18 @@ function CustomPieChart({ header, data, measurement, style }) {
       <div style={{ width: "100%" }}>
         <HighchartsReact highcharts={Highcharts} options={options1} />
       </div>
+      {Boolean(helper_text) && (
+        <span
+          style={{
+            fontSize: "12px",
+            color: "#777",
+            display: "block",
+            textAlign: "center",
+          }}
+        >
+          &#9432; {helper_text}
+        </span>
+      )}
     </div>
   );
 }

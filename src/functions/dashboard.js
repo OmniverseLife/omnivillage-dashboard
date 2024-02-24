@@ -48,6 +48,16 @@ export const getBifurcatedCropData = async (crop_id, village) => {
   return res?.data;
 };
 
+export const getSoilHealth = async (crop_id, village) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production.soil_health,
+    {
+      params: { crop_id, village },
+    }
+  );
+  return res?.data;
+};
+
 export const getIncomeExpenditureData = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.income_expenditure,

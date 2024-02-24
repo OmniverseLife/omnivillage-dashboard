@@ -104,11 +104,13 @@ function LandChart({ land_unit }) {
         header="Land Allocated"
         data={data}
         measurement={`${Math.round(land_allocated_sum)} ${land_unit}`}
+        helper_text="Each slice represent amount of land."
       />
       <CustomPieChart
         header="Land Used"
         data={usedLand}
         measurement={`${Math.round(land_used_sum)} ${land_unit}`}
+        helper_text="Each slice represent amount of land."
       />
     </Stack>
   );

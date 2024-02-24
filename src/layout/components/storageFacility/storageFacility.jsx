@@ -1,12 +1,11 @@
-import React from "react";
-import { backgroundColor, borderColor } from "../../pages/dashboard/production";
-import CustomPieChart from "../customPieChart/customPieChart";
 import { Stack } from "@mui/material";
-import { getStorageData } from "../../../functions/dashboard";
 import { useQuery } from "@tanstack/react-query";
-import Loading from "../loading";
 import convert from "convert-units";
+import React from "react";
 import { useSearchParams } from "react-router-dom";
+import { getStorageData } from "../../../functions/dashboard";
+import CustomPieChart from "../customPieChart/customPieChart";
+import Loading from "../loading";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
@@ -20,71 +19,54 @@ function StorageFacility({ weight_unit }) {
     queryFn: () => getStorageData(searchParams.get("village")),
   });
 
-  const grains = {
-    labels: ["Bags", "Containers", "Piles", "Warehouse"],
-    datasets: [
-      {
-        label: "Storage Facility Grains",
-        data: [
-          weightConverter(weight_unit, data?.grain?.bags ?? 0),
-          weightConverter(weight_unit, data?.grain?.containers ?? 0),
-          weightConverter(weight_unit, data?.grain?.piles ?? 0),
-          weightConverter(weight_unit, data?.grain?.warehouse ?? 0),
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const poultry = {
-    labels: ["Common Storage", "Refrigeration"],
-    datasets: [
-      {
-        label: "Storage Facility Poultry",
-        data: [
-          weightConverter(weight_unit, data?.poultry?.common_storage),
-          weightConverter(weight_unit, data?.poultry?.refrigeration),
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const meat = {
-    labels: ["Common Storage", "Refrigeration"],
-    datasets: [
-      {
-        label: "Storage Facility Meat",
-        data: [
-          weightConverter(weight_unit, data?.meat?.common_storage),
-          weightConverter(weight_unit, data?.meat?.refrigeration),
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
-  const fruits = {
-    labels: ["Bags", "Containers", "Freezing", "Drying", "Canning"],
-    datasets: [
-      {
-        label: "Storage Facility Fruits",
-        data: [
-          weightConverter(weight_unit, data?.fruits?.bags),
-          weightConverter(weight_unit, data?.fruits?.containers),
-          weightConverter(weight_unit, data?.fruits?.freezing),
-          weightConverter(weight_unit, data?.fruits?.drying),
-          weightConverter(weight_unit, data?.fruits?.canning),
-        ],
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 1,
-      },
-    ],
-  };
+  const grains = [
+    { name: "Bags", y: weightConverter(weight_unit, data?.grain?.bags ?? 0) },
+    {
+      name: "Containers",
+      y: weightConverter(weight_unit, data?.grain?.containers ?? 0),
+    },
+    { name: "Piles", y: weightConverter(weight_unit, data?.grain?.piles ?? 0) },
+    {
+      name: "Warehouse",
+      y: weightConverter(weight_unit, data?.grain?.warehouse ?? 0),
+    },
+  ];
+
+  const poultry = [
+    {
+      name: "Common Storage",
+      y: weightConverter(weight_unit, data?.poultry?.common_storage),
+    },
+    {
+      name: "Refrigeration",
+      y: weightConverter(weight_unit, data?.poultry?.refrigeration),
+    },
+  ];
+
+  const meat = [
+    {
+      name: "Common Storage",
+      y: weightConverter(weight_unit, data?.meat?.common_storage),
+    },
+    {
+      name: "Refrigeration",
+      y: weightConverter(weight_unit, data?.meat?.refrigeration),
+    },
+  ];
+
+  const fruits = [
+    { name: "Bags", y: weightConverter(weight_unit, data?.fruits?.bags) },
+    {
+      name: "Containers",
+      y: weightConverter(weight_unit, data?.fruits?.containers),
+    },
+    {
+      name: "Freezing",
+      y: weightConverter(weight_unit, data?.fruits?.freezing),
+    },
+    { name: "Drying", y: weightConverter(weight_unit, data?.fruits?.drying) },
+    { name: "Canning", y: weightConverter(weight_unit, data?.fruits?.canning) },
+  ];
 
   // Sum
 
@@ -120,21 +102,25 @@ function StorageFacility({ weight_unit }) {
         header="Storage Facility Grains"
         data={grains}
         measurement={`${grains_sum} ${weight_unit}`}
+        helper_text="Each slice represents amount of crop stored"
       />
       <CustomPieChart
         header="Storage Facility Poultry"
         data={poultry}
         measurement={`${poultry_sum} ${weight_unit}`}
+        helper_text="Each slice represents amount of crop stored"
       />
       <CustomPieChart
         header="Storage Facility Meat"
         data={meat}
         measurement={`${meat_sum} ${weight_unit}`}
+        helper_text="Each slice represents amount of crop stored"
       />
       <CustomPieChart
         header="Storage Facility Fruits & Vegetables"
         data={fruits}
         measurement={`${fruits_sum} ${weight_unit}`}
+        helper_text="Each slice represents amount of crop stored"
       />
     </Stack>
   );

@@ -123,6 +123,7 @@ export const endpoints = {
       other_informations:
         "/dashboard/other_information_tree_fish_poultry_charts",
       processing_method: "/dashboard/processing_method",
+      soil_health: "/dashboard/soil-health",
     },
     consumption: {
       consumption_from_production: "/dashboard/consumption_from_production",

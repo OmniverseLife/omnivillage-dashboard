@@ -83,7 +83,11 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
     >
       <Loading isLoading={isLoading} />
       {crop_id ? (
-        <CustomPieChart header="Individual Crop Consumption" data={data} />
+        <CustomPieChart
+          header="Individual Crop Consumption"
+          data={data}
+          helper_text="Each slice represents amount of crop being consumed"
+        />
       ) : (
         <Stack
           direction="row"

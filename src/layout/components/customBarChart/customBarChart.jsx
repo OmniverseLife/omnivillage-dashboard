@@ -113,9 +113,18 @@ function CustomBarChart({ header, data, measurement, helper_text }) {
       <div style={{ width: "100%", marginTop: "auto" }}>
         <HighchartsReact highcharts={Highcharts} options={options1} />
       </div>
-      <span style={{ fontSize: "12px", color: "#777" }}>
-        &#9432; {helper_text}
-      </span>
+      {Boolean(helper_text) && (
+        <span
+          style={{
+            fontSize: "12px",
+            color: "#777",
+            display: "block",
+            textAlign: "center",
+          }}
+        >
+          &#9432; {helper_text}
+        </span>
+      )}
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 import BifurcatedChart from "../../components/bifurcatedChart/bifurcatedChart";
-import IncomeSaleChart from "../../components/incomeSaleChart/incomeSaleChart";
+import IncomeSaleChart from "../../components/SoilHealth/SoilHealth";
 import LandChart from "../../components/landChart/landChart";
 import SellingChannel from "../../components/sellingChannel/sellingChannel";
 import StorageFacility from "../../components/storageFacility/storageFacility";
@@ -19,6 +19,7 @@ import { fetchTagWiseCrops } from "../../../functions/consumption";
 import Loading from "../../components/loading";
 import convert from "convert-units";
 import { useSearchParams } from "react-router-dom";
+import SoilHealth from "../../components/SoilHealth/SoilHealth";
 
 export const backgroundColor = [
   "rgba(255, 99, 132, 0.35)",
@@ -89,7 +90,8 @@ function Production() {
             <MenuItem value="storage-facility">Storage Facility</MenuItem>
           </Select>
         </FormControl>
-        {searchParams.get("option") === "output-utilisation" ? (
+        {searchParams.get("option") === "output-utilisation" ||
+        searchParams.get("option") === "soil-health" ? (
           <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
@@ -113,7 +115,8 @@ function Production() {
             </Select>
           </FormControl>
         ) : null}
-        {searchParams.get("option") === "output-utilisation" && (
+        {(searchParams.get("option") === "output-utilisation" ||
+          searchParams.get("option") === "soil-health") && (
           <FormControl size="small">
             <InputLabel id="demo-simple-select-label">Crops</InputLabel>
             <Select
@@ -123,14 +126,12 @@ function Production() {
               style={{ width: 200 }}
               label="Crops"
               onChange={(e) => {
-                console.log(e.target.value);
                 searchParams.set("crop", e.target.value);
                 setSearchParams(searchParams);
               }}
             >
               <MenuItem value="">Select</MenuItem>
               {crops.map((_crop) => {
-                console.log(_crop._id, _crop.name);
                 return (
                   <MenuItem value={_crop._id} key={_crop._id}>
                     {_crop.name}
@@ -191,8 +192,8 @@ function Production() {
       ) : // <></>
       searchParams.get("option") === "output-utilisation" ? (
         <BifurcatedChart weight_unit={selectedWeight} crops={crops} />
-      ) : searchParams.get("option") === "income-chart" ? (
-        <IncomeSaleChart />
+      ) : searchParams.get("option") === "soil-health" ? (
+        <SoilHealth />
       ) : searchParams.get("option") === "selling-channel" ? (
         <SellingChannel />
       ) : searchParams.get("option") === "storage-facility" ? (

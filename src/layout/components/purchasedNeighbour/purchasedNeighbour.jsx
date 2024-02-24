@@ -43,6 +43,7 @@ function PurchasedNeighbour({ type_id, weight_unit }) {
         header="Purchased From Neighbours"
         data={data}
         style={{ width: "100%" }}
+        helper_text="Each bar represents how much crop is purchased from neighbours"
       />
     </Box>
   );
