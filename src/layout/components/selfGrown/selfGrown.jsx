@@ -1,5 +1,5 @@
 import { Box, Stack } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
@@ -16,7 +16,7 @@ const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
-function SelfGrown({ type_id, weight_unit }) {
+function SelfGrown({ type_id, weight_unit, setSummary }) {
   const [searchParams] = useSearchParams();
   const { data: self_grown = [], isSelfGrownLoading } = useQuery({
     queryKey: ["self grown", type_id, searchParams.get("village")],
@@ -64,6 +64,14 @@ function SelfGrown({ type_id, weight_unit }) {
     (prev, current) => prev + weightConverter(weight_unit, current.output),
     0
   );
+
+  useEffect(() => {
+    setSummary((prev) => ({
+      ...prev,
+      self_grown_sum,
+      self_consumed_sum,
+    }));
+  }, [self_consumed_sum, self_grown_sum, setSummary]);
 
   return (
     // <Box width={"100%"}>

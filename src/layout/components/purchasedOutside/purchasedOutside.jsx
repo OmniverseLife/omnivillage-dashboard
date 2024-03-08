@@ -1,5 +1,5 @@
 import { Box, Stack } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
@@ -13,7 +13,7 @@ const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
-function PurchasedOutside({ type_id, weight_unit }) {
+function PurchasedOutside({ type_id, weight_unit, setSummary }) {
   const [searchParams] = useSearchParams();
 
   const { data: purchased_from_market = [], isLoading } = useQuery({
@@ -38,6 +38,13 @@ function PurchasedOutside({ type_id, weight_unit }) {
     (prev, current) => prev + weightConverter(weight_unit, current.output),
     0
   );
+
+  useEffect(() => {
+    setSummary((prev) => ({
+      ...prev,
+      purchased_from_market_sum,
+    }));
+  }, [purchased_from_market_sum, setSummary]);
 
   return (
     <Box width="48%">
