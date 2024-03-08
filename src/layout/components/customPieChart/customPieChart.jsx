@@ -109,6 +109,7 @@ function CustomPieChart({ header, data, measurement, style, helper_text }) {
       series: {
         allowPointSelect: true,
         cursor: "pointer",
+        showInLegend: true,
         // dataLabels: [
         //   {
         //     enabled: true,
@@ -140,7 +141,7 @@ function CustomPieChart({ header, data, measurement, style, helper_text }) {
     },
     series: [
       {
-        name: "data",
+        name: "Value",
         colorByPoint: true,
         data: data,
       },

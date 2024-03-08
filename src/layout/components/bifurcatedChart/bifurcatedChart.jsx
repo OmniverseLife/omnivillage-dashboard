@@ -351,6 +351,34 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     0
   );
 
+  const summary = [
+    {
+      name: "Quantity Produced",
+      y: quantity_produced_sum,
+    },
+    {
+      name: "Sold To Neighbour",
+      y: sold_to_neighbour_sum,
+    },
+    {
+      name: "Self Consumed",
+      y: self_consumed_sum,
+    },
+    {
+      name: "Sold To Market",
+      y: sold_to_market_sum,
+    },
+
+    {
+      name: "Fed To Livestock",
+      y: fed_to_livestock_sum,
+    },
+    {
+      name: "Wastage",
+      y: wastage_sum,
+    },
+  ];
+
   return (
     <Stack
       direction={"row"}
@@ -535,6 +563,14 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
         </Stack>
       ) : (
         <>
+          {/* <Box width="48%"> */}
+          <CustomPieChart
+            header="Summary"
+            data={summary}
+            measurement={`${quantity_produced_sum} ${weight_unit}`}
+            helper_text="Each Slice represents Utilisation"
+          />
+          {/* </Box> */}
           <Box width="48%">
             <CustomBarChart
               header="Quantity Produced"

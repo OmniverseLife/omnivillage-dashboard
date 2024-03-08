@@ -53,6 +53,22 @@ function LandChart({ land_unit }) {
       name: "Cultivation",
       y: landConverter(land_unit, land_allocation?.cultivation ?? 0),
     },
+    {
+      name: "Fishery",
+      y: landConverter(land_unit, land_used?.fishery ?? 0),
+    },
+    {
+      name: "Poultry",
+      y: landConverter(land_unit, land_allocation?.poultry ?? 0),
+    },
+    {
+      name: "Storage",
+      y: landConverter(land_unit, land_allocation?.storage ?? 0),
+    },
+    {
+      name: "Trees",
+      y: landConverter(land_unit, land_allocation?.trees ?? 0),
+    },
   ];
 
   // , "Fishery", "Poultry", "Storage", "trees"
