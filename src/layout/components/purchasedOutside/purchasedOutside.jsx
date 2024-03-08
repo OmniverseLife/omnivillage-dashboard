@@ -34,6 +34,11 @@ function PurchasedOutside({ type_id, weight_unit }) {
     ],
   };
 
+  const purchased_from_market_sum = purchased_from_market.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
   return (
     <Box width="48%">
       <Loading isLoading={isLoading} />
@@ -41,6 +46,7 @@ function PurchasedOutside({ type_id, weight_unit }) {
         header="Purchased From Outside"
         data={data}
         style={{ width: "100%" }}
+        measurement={`${purchased_from_market_sum} kgs`}
         helper_text="Each bar represents how much crop is purchased from market"
       />
     </Box>

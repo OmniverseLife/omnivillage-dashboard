@@ -36,6 +36,12 @@ function PurchasedNeighbour({ type_id, weight_unit }) {
       },
     ],
   };
+
+  const purchased_from_neighbour_sum = purchased_from_neighbour.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
   return (
     <Box width="48%">
       <Loading isLoading={isLoading} />
@@ -43,6 +49,7 @@ function PurchasedNeighbour({ type_id, weight_unit }) {
         header="Purchased From Neighbours"
         data={data}
         style={{ width: "100%" }}
+        measurement={`${purchased_from_neighbour_sum} kgs`}
         helper_text="Each bar represents how much crop is purchased from neighbours"
       />
     </Box>

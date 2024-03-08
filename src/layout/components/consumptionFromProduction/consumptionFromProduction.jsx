@@ -48,14 +48,14 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
         weightConverter(weight_unit, consumptionFromProduction?.self_grown) ||
         0,
     },
-    {
-      name: "Self Consumed",
-      y:
-        weightConverter(
-          weight_unit,
-          consumptionFromProduction?.self_consumed
-        ) || 0,
-    },
+    // {
+    //   name: "Self Consumed",
+    //   y:
+    //     weightConverter(
+    //       weight_unit,
+    //       consumptionFromProduction?.self_consumed
+    //     ) || 0,
+    // },
     {
       name: "Purchased From Neighbours",
       y:
@@ -74,6 +74,8 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
     },
   ];
 
+  const crop_wise_sum = data.reduce((prev, current) => prev + current.y, 0);
+
   return (
     <Stack
       direction={"row"}
@@ -86,6 +88,7 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
         <CustomPieChart
           header="Individual Crop Consumption"
           data={data}
+          measurement={`${crop_wise_sum} kgs`}
           helper_text="Each slice represents amount of crop being consumed"
         />
       ) : (

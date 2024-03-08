@@ -41,6 +41,11 @@ function SelfGrown({ type_id, weight_unit }) {
     ],
   };
 
+  const self_grown_sum = self_grown.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
   const selfConsumedData = {
     xAxis: self_consumed
       .map((_item) => _item.name)
@@ -48,12 +53,18 @@ function SelfGrown({ type_id, weight_unit }) {
     dataset: [
       {
         name: "Self Consumed",
-        data: self_grown.map((_item) =>
+        data: self_consumed.map((_item) =>
           weightConverter(weight_unit, _item.output)
         ),
       },
     ],
   };
+
+  const self_consumed_sum = self_consumed.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
   return (
     // <Box width={"100%"}>
     <Stack
@@ -68,6 +79,7 @@ function SelfGrown({ type_id, weight_unit }) {
         <CustomBarChart
           header="Self Grown"
           data={selfGrownData}
+          measurement={`${self_grown_sum} kgs`}
           helper_text="Each bar represents how much crop is self grown"
         />
       </Box>
@@ -75,6 +87,7 @@ function SelfGrown({ type_id, weight_unit }) {
         <CustomBarChart
           header="Self Consumed"
           data={selfConsumedData}
+          measurement={`${self_consumed_sum} kgs`}
           helper_text="Each bar represents how much crop is self consumed"
         />
       </Box>
