@@ -24,12 +24,18 @@ function FoodBalanceAnalytics() {
     }
   }, [data, isLoading]);
 
+  const deficit_sum = Object.values(data).reduce(
+    (prev, current) => prev + current,
+    0
+  );
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <Loading isLoading={isLoading} />
       <CustomPieChart
-        header="Analytics"
+        header="Deficit"
         data={chartData}
+        measurement={`${deficit_sum} kgs`}
         helper_text="Each slice only contains data for tags that are in deficiency"
       />
     </Stack>

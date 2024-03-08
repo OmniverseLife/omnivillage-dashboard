@@ -70,32 +70,34 @@ function App() {
       <Sidebar />
       <div className="rightSide">
         <Navbar />
-        <Stack
-          alignItems="center"
-          // justifyContent="center"
-          sx={{ marginBottom: "20px" }}
-        >
-          <FormControl size="small" sx={{ marginLeft: "auto" }}>
-            <InputLabel id="demo-simple-select-label">Village</InputLabel>
-            <Select
-              label="Village"
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              defaultValue={searchParams.get("village")}
-              value={searchParams.get("village")}
-              style={{ width: 200 }}
-              onChange={(e) => {
-                searchParams.set("village", e.target.value);
-                setSearchParams(searchParams);
-              }}
-              sx={{ textTransform: "capitalize" }}
-            >
-              {Object.entries(villages).map((_data) =>
-                renderSelectGroup(_data)
-              )}
-            </Select>
-          </FormControl>
-        </Stack>
+        {location.pathname.includes("dashboard") && (
+          <Stack
+            alignItems="center"
+            // justifyContent="center"
+            sx={{ marginBottom: "20px" }}
+          >
+            <FormControl size="small" sx={{ marginLeft: "auto" }}>
+              <InputLabel id="demo-simple-select-label">Village</InputLabel>
+              <Select
+                label="Village"
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                defaultValue={searchParams.get("village")}
+                value={searchParams.get("village")}
+                style={{ width: 200 }}
+                onChange={(e) => {
+                  searchParams.set("village", e.target.value);
+                  setSearchParams(searchParams);
+                }}
+                sx={{ textTransform: "capitalize" }}
+              >
+                {Object.entries(villages).map((_data) =>
+                  renderSelectGroup(_data)
+                )}
+              </Select>
+            </FormControl>
+          </Stack>
+        )}
         <Suspense fallback={<Loading />}>
           <Routes location={location}>
             {routes.map((item, id) => (
