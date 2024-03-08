@@ -118,7 +118,7 @@ function Production() {
         {(searchParams.get("option") === "output-utilisation" ||
           searchParams.get("option") === "soil-health") && (
           <FormControl size="small">
-            <InputLabel id="demo-simple-select-label">Crops</InputLabel>
+            <InputLabel id="demo-simple-select-label">Name</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"

@@ -1,5 +1,5 @@
 import { Box, Stack } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
@@ -16,7 +16,7 @@ const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
-function SelfGrown({ type_id, weight_unit }) {
+function SelfGrown({ type_id, weight_unit, setSummary }) {
   const [searchParams] = useSearchParams();
   const { data: self_grown = [], isSelfGrownLoading } = useQuery({
     queryKey: ["self grown", type_id, searchParams.get("village")],
@@ -41,6 +41,11 @@ function SelfGrown({ type_id, weight_unit }) {
     ],
   };
 
+  const self_grown_sum = self_grown.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
   const selfConsumedData = {
     xAxis: self_consumed
       .map((_item) => _item.name)
@@ -48,12 +53,26 @@ function SelfGrown({ type_id, weight_unit }) {
     dataset: [
       {
         name: "Self Consumed",
-        data: self_grown.map((_item) =>
+        data: self_consumed.map((_item) =>
           weightConverter(weight_unit, _item.output)
         ),
       },
     ],
   };
+
+  const self_consumed_sum = self_consumed.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
+  useEffect(() => {
+    setSummary((prev) => ({
+      ...prev,
+      self_grown_sum,
+      self_consumed_sum,
+    }));
+  }, [self_consumed_sum, self_grown_sum, setSummary]);
+
   return (
     // <Box width={"100%"}>
     <Stack
@@ -68,6 +87,7 @@ function SelfGrown({ type_id, weight_unit }) {
         <CustomBarChart
           header="Self Grown"
           data={selfGrownData}
+          measurement={`${self_grown_sum} kgs`}
           helper_text="Each bar represents how much crop is self grown"
         />
       </Box>
@@ -75,6 +95,7 @@ function SelfGrown({ type_id, weight_unit }) {
         <CustomBarChart
           header="Self Consumed"
           data={selfConsumedData}
+          measurement={`${self_consumed_sum} kgs`}
           helper_text="Each bar represents how much crop is self consumed"
         />
       </Box>

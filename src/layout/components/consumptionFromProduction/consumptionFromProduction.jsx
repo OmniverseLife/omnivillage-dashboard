@@ -1,5 +1,5 @@
 import { Box, Stack } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
@@ -19,6 +19,13 @@ const weightConverter = (unit, value) => {
 
 function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
   const [searchParams] = useSearchParams();
+  const [summary_data, setSummaryData] = useState({
+    self_grown_sum: 0,
+    self_consumed_sum: 0,
+    purchased_from_market_sum: 0,
+    purchased_from_neighbour_sum: 0,
+  });
+
   const { data: consumptionFromProduction, isLoading } = useQuery({
     queryKey: [
       "consumption-from-production",
@@ -48,14 +55,14 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
         weightConverter(weight_unit, consumptionFromProduction?.self_grown) ||
         0,
     },
-    {
-      name: "Self Consumed",
-      y:
-        weightConverter(
-          weight_unit,
-          consumptionFromProduction?.self_consumed
-        ) || 0,
-    },
+    // {
+    //   name: "Self Consumed",
+    //   y:
+    //     weightConverter(
+    //       weight_unit,
+    //       consumptionFromProduction?.self_consumed
+    //     ) || 0,
+    // },
     {
       name: "Purchased From Neighbours",
       y:
@@ -74,6 +81,27 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
     },
   ];
 
+  const crop_wise_sum = data.reduce((prev, current) => prev + current.y, 0);
+
+  const summary_chart = [
+    {
+      name: "Self Grown",
+      y: summary_data.self_grown_sum,
+    },
+    {
+      name: "Purchased From Neighbours",
+      y: summary_data.purchased_from_neighbour_sum,
+    },
+    {
+      name: "Purshased From Outside",
+      y: summary_data.purchased_from_market_sum,
+    },
+    {
+      name: "Self Consumed",
+      y: summary_data.self_consumed_sum,
+    },
+  ];
+
   return (
     <Stack
       direction={"row"}
@@ -86,6 +114,7 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
         <CustomPieChart
           header="Individual Crop Consumption"
           data={data}
+          measurement={`${crop_wise_sum} kgs`}
           helper_text="Each slice represents amount of crop being consumed"
         />
       ) : (
@@ -96,10 +125,28 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
           justifyContent="space-between"
           rowGap={5}
         >
-          <SelfGrown type_id={type_id} weight_unit={weight_unit} />
-          <PurchasedNeighbour type_id={type_id} weight_unit={weight_unit} />
-          <PurchasedOutside type_id={type_id} weight_unit={weight_unit} />
+          <CustomPieChart
+            header="Summary"
+            data={summary_chart}
+            measurement={`${summary_data.self_consumed_sum} kgs`}
+            helper_text="Each slice represents consumption"
+          />
           <IdealQuantityDiet type_id={type_id} weight_unit={weight_unit} />
+          <SelfGrown
+            type_id={type_id}
+            weight_unit={weight_unit}
+            setSummary={setSummaryData}
+          />
+          <PurchasedNeighbour
+            type_id={type_id}
+            weight_unit={weight_unit}
+            setSummary={setSummaryData}
+          />
+          <PurchasedOutside
+            type_id={type_id}
+            weight_unit={weight_unit}
+            setSummary={setSummaryData}
+          />
         </Stack>
       )}
     </Stack>

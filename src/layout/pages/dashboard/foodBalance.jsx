@@ -41,7 +41,7 @@ function FoodBalance() {
             onChange={(e) => setselectedOption(e.target.value)}
           >
             <MenuItem value={"analytics"} sx={{ textTransform: "capitalize" }}>
-              Analytics
+              Deficit
             </MenuItem>
             <MenuItem
               value={"food_balance"}

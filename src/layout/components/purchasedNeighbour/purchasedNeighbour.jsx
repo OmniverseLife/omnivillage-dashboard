@@ -1,5 +1,5 @@
 import { Box, Stack } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
@@ -13,7 +13,7 @@ const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
 };
 
-function PurchasedNeighbour({ type_id, weight_unit }) {
+function PurchasedNeighbour({ type_id, weight_unit, setSummary }) {
   const [searchParams] = useSearchParams();
   const { data: purchased_from_neighbour = [], isLoading } = useQuery({
     queryKey: [
@@ -36,6 +36,19 @@ function PurchasedNeighbour({ type_id, weight_unit }) {
       },
     ],
   };
+
+  const purchased_from_neighbour_sum = purchased_from_neighbour.reduce(
+    (prev, current) => prev + weightConverter(weight_unit, current.output),
+    0
+  );
+
+  useEffect(() => {
+    setSummary((prev) => ({
+      ...prev,
+      purchased_from_neighbour_sum,
+    }));
+  }, [purchased_from_neighbour_sum, setSummary]);
+
   return (
     <Box width="48%">
       <Loading isLoading={isLoading} />
@@ -43,6 +56,7 @@ function PurchasedNeighbour({ type_id, weight_unit }) {
         header="Purchased From Neighbours"
         data={data}
         style={{ width: "100%" }}
+        measurement={`${purchased_from_neighbour_sum} kgs`}
         helper_text="Each bar represents how much crop is purchased from neighbours"
       />
     </Box>
