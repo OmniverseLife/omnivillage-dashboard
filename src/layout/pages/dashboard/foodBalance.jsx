@@ -27,6 +27,15 @@ function FoodBalance() {
     }
   }, [isLoading, labels]);
 
+  const renderComponent = () => {
+    switch (selectedOption) {
+      case "analytics":
+        return <FoodBalanceAnalytics />;
+      case "food_balance":
+        return <DeficitCrops parentLoading={isLoading} tag={selectedTag} />;
+    }
+  };
+
   return (
     <Stack className="container">
       <Stack direction={"row"} spacing={3} marginBottom={3}>
@@ -105,11 +114,7 @@ function FoodBalance() {
           </FormControl>
         )} */}
       </Stack>
-      {selectedOption === "analytics" ? (
-        <FoodBalanceAnalytics />
-      ) : selectedOption === "food_balance" ? (
-        <DeficitCrops parentLoading={isLoading} tag={selectedTag} />
-      ) : null}
+      {renderComponent()}
       {/* <DeficitCrops /> */}
     </Stack>
   );

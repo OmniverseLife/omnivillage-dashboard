@@ -41,7 +41,7 @@ function DeficitCrops({ parentLoading, tag }) {
                   ? `${(
                       (_item.ideal_consumption - _item.self_consumed) /
                       _item.yeild
-                    ).toFixed(2)} km`
+                    ).toFixed(2)} km²`
                   : `${Math.round(
                       (_item.ideal_consumption - _item.self_consumed) /
                         _item.yeild
@@ -293,6 +293,10 @@ function DeficitCrops({ parentLoading, tag }) {
   return (
     <>
       <Loading isLoading={parentLoading || isLoading || isFetching} />
+      <span style={{ fontSize: 12, marginBottom: 10 }}>
+        *Note* - Here the currency that you enter is your local currency and the
+        Economic gain calculated will also be shown in same currency
+      </span>
       <DataGrid
         style={{ boxShadow: "none" }}
         rows={rows}

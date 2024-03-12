@@ -86,8 +86,14 @@ function Production() {
             <MenuItem value="land-use">Land Use</MenuItem>
             <MenuItem value="output-utilisation">Output & Utilisation</MenuItem>
             <MenuItem value="soil-health">Soil Health</MenuItem>
+            <MenuItem value="organic-inorganic">Organic/Inorganic</MenuItem>
+            <MenuItem value="processing-information">
+              Processing Information
+            </MenuItem>
+            <MenuItem value="income-expenditure">Income & Expenditure</MenuItem>
             <MenuItem value="selling-channel">Selling Channel</MenuItem>
             <MenuItem value="storage-facility">Storage Facility</MenuItem>
+            <MenuItem value="other-informations">Other Informations</MenuItem>
           </Select>
         </FormControl>
         {searchParams.get("option") === "output-utilisation" ||
