@@ -9,6 +9,7 @@ import {
 } from "../../../functions/crops";
 import { useQuery } from "@tanstack/react-query";
 import { Menu, MenuItem, Stack, Typography } from "@mui/material";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Fishery() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -131,19 +132,21 @@ function Fishery() {
   ];
 
   return (
-    <Crops
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
-      editItem={editItem}
-      setEdit={setEditItem}
-      editFn={editFisheryCrops}
-      refetch={refetch}
-      addFn={addFisheryCrops}
-      deleteFn={deleteFisheryCrops}
-      setDeleteId={setDeleteId}
-      deleteId={deleteId}
-    />
+    <Wrapper>
+      <Crops
+        rows={rows}
+        columns={columns}
+        isLoading={isLoading}
+        editItem={editItem}
+        setEdit={setEditItem}
+        editFn={editFisheryCrops}
+        refetch={refetch}
+        addFn={addFisheryCrops}
+        deleteFn={deleteFisheryCrops}
+        setDeleteId={setDeleteId}
+        deleteId={deleteId}
+      />
+    </Wrapper>
   );
 }
 

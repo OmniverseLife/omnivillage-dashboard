@@ -9,6 +9,7 @@ import {
 import { toast } from "sonner";
 import moment from "moment";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Cultivation() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -127,25 +128,27 @@ function Cultivation() {
     },
   ];
   return (
-    <div>
-      <Production
-        rows={rows}
-        columns={columns}
-        isLoading={isLoading}
-        refetch={refetch}
-        setDeleteId={setDeleteId}
-        deleteFn={deleteCultivation}
-        deleteId={deleteId}
-      />
-      {selectedrow && (
-        <ViewDetails
-          open={modalOpen}
-          setOpen={() => setmodalOpen(false)}
-          data={modalData}
-          heading="Cultivation"
+    <Wrapper>
+      <div>
+        <Production
+          rows={rows}
+          columns={columns}
+          isLoading={isLoading}
+          refetch={refetch}
+          setDeleteId={setDeleteId}
+          deleteFn={deleteCultivation}
+          deleteId={deleteId}
         />
-      )}
-    </div>
+        {selectedrow && (
+          <ViewDetails
+            open={modalOpen}
+            setOpen={() => setmodalOpen(false)}
+            data={modalData}
+            heading="Cultivation"
+          />
+        )}
+      </div>
+    </Wrapper>
   );
 }
 

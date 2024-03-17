@@ -9,6 +9,7 @@ import {
   fetchTreeCrops,
 } from "../../../functions/crops";
 import Crops from "./crops";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function TreesShrubs() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -131,19 +132,21 @@ function TreesShrubs() {
   ];
 
   return (
-    <Crops
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
-      editItem={editItem}
-      setEdit={setEditItem}
-      editFn={editTreeCrops}
-      refetch={refetch}
-      addFn={addTreeCrops}
-      deleteFn={deleteTreeCrops}
-      setDeleteId={setDeleteId}
-      deleteId={deleteId}
-    />
+    <Wrapper>
+      <Crops
+        rows={rows}
+        columns={columns}
+        isLoading={isLoading}
+        editItem={editItem}
+        setEdit={setEditItem}
+        editFn={editTreeCrops}
+        refetch={refetch}
+        addFn={addTreeCrops}
+        deleteFn={deleteTreeCrops}
+        setDeleteId={setDeleteId}
+        deleteId={deleteId}
+      />
+    </Wrapper>
   );
 }
 

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "./sidebar.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
-export default function Sidebar() {
+export default function Sidebar({ role }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const paths = location.pathname.split("/");
+
   const [productionMenu, setproductionMenu] = useState(
     paths.includes("production") && !paths.includes("dashboard") && true
   );
@@ -41,7 +43,7 @@ export default function Sidebar() {
       {dashboardMenu && (
         <div className="menu">
           <Link
-            to="/dashboard/production?option=land-use"
+            to="/dashboard/production"
             className={paths.includes("production") ? "link active" : "link"}
           >
             Production
@@ -53,65 +55,71 @@ export default function Sidebar() {
             Consumption
           </Link>
           <Link
-            to="/dashboard/food-balance?village=kolkata"
+            to="/dashboard/food-balance"
             className={paths.includes("food-balance") ? "link active" : "link"}
           >
             Food Balance
           </Link>
         </div>
       )}
-      <Link
-        className={
-          paths.includes("production") && !paths.includes("dashboard")
-            ? "link active"
-            : "link"
-        }
-        onClick={() => setproductionMenu(!productionMenu)}
-        // to="/production"
-      >
-        <i className="fa-solid fa-seedling"></i>
-        <p>Production</p>
-        <span>
-          {productionMenu ? (
-            <i className="fa-solid fa-minus"></i>
-          ) : (
-            <i className="fa-solid fa-plus"></i>
-          )}
-        </span>
-      </Link>
-      {productionMenu && (
-        <div className="menu">
+      {role === "admin" && (
+        <>
           <Link
-            to="/production/cultivation"
-            className={paths.includes("cultivation") ? "link active" : "link"}
+            className={
+              paths.includes("production") && !paths.includes("dashboard")
+                ? "link active"
+                : "link"
+            }
+            onClick={() => setproductionMenu(!productionMenu)}
+            // to="/production"
           >
-            Cultivation
+            <i className="fa-solid fa-seedling"></i>
+            <p>Production</p>
+            <span>
+              {productionMenu ? (
+                <i className="fa-solid fa-minus"></i>
+              ) : (
+                <i className="fa-solid fa-plus"></i>
+              )}
+            </span>
           </Link>
-          <Link
-            to="/production/trees&shrubs"
-            className={paths.includes("trees&shrubs") ? "link active" : "link"}
-          >
-            Trees/Shrubs
-          </Link>
-          <Link
-            to="/production/poultry"
-            className={paths.includes("poultry") ? "link active" : "link"}
-          >
-            Poultry
-          </Link>
-          <Link
-            to="/production/fishery"
-            className={paths.includes("fishery") ? "link active" : "link"}
-          >
-            Fishery
-          </Link>
-          <Link
-            to="/production/hunting"
-            className={paths.includes("hunting") ? "link active" : "link"}
-          >
-            Hunting
-          </Link>
-          {/* <Link
+          {productionMenu && (
+            <div className="menu">
+              <Link
+                to="/production/cultivation"
+                className={
+                  paths.includes("cultivation") ? "link active" : "link"
+                }
+              >
+                Cultivation
+              </Link>
+              <Link
+                to="/production/trees&shrubs"
+                className={
+                  paths.includes("trees&shrubs") ? "link active" : "link"
+                }
+              >
+                Trees/Shrubs
+              </Link>
+              <Link
+                to="/production/poultry"
+                className={paths.includes("poultry") ? "link active" : "link"}
+              >
+                Poultry
+              </Link>
+              <Link
+                to="/production/fishery"
+                className={paths.includes("fishery") ? "link active" : "link"}
+              >
+                Fishery
+              </Link>
+              <Link
+                to="/production/hunting"
+                className={paths.includes("hunting") ? "link active" : "link"}
+              >
+                Hunting
+              </Link>
+              {/* <Link
             to="/production/storage"
             className={paths.includes("storage") ? "link active" : "link"}
           >
@@ -125,166 +133,179 @@ export default function Sidebar() {
           >
             Selling Channel
           </Link> */}
-        </div>
-      )}
-      <Link
-        onClick={() => setconsumtionMenu(!consumtionMenu)}
-        className={
-          paths.includes("consumption") && !paths.includes("dashboard")
-            ? "link active"
-            : "link"
-        }
-      >
-        <i className="fa-solid fa-utensils"></i>
-        <p>Consumption</p>
-        <span>
-          {consumtionMenu ? (
-            <i className="fa-solid fa-minus"></i>
-          ) : (
-            <i className="fa-solid fa-plus"></i>
+            </div>
           )}
-        </span>
-      </Link>
-      {consumtionMenu && (
-        <div className="menu">
           <Link
-            to="/consumption/grains-nuts"
-            className={paths.includes("grains-nuts") ? "link active" : "link"}
+            onClick={() => setconsumtionMenu(!consumtionMenu)}
+            className={
+              paths.includes("consumption") && !paths.includes("dashboard")
+                ? "link active"
+                : "link"
+            }
           >
-            Grains & Nuts
+            <i className="fa-solid fa-utensils"></i>
+            <p>Consumption</p>
+            <span>
+              {consumtionMenu ? (
+                <i className="fa-solid fa-minus"></i>
+              ) : (
+                <i className="fa-solid fa-plus"></i>
+              )}
+            </span>
           </Link>
-          {/* <Link
+          {consumtionMenu && (
+            <div className="menu">
+              <Link
+                to="/consumption/grains-nuts"
+                className={
+                  paths.includes("grains-nuts") ? "link active" : "link"
+                }
+              >
+                Grains & Nuts
+              </Link>
+              {/* <Link
             to="/consumption/herbs"
             className={paths.includes("herbs") ? "link active" : "link"}
           >
             Herbs
           </Link> */}
-          <Link
-            to="/consumption/legumes"
-            className={paths.includes("legumes") ? "link active" : "link"}
-          >
-            Legumes
-          </Link>
-          <Link
-            to="/consumption/fuits-vegetables"
-            className={
-              paths.includes("fuits-vegetables") ? "link active" : "link"
-            }
-          >
-            Fruits & Vegetables
-          </Link>
-          <Link
-            to="/consumption/dairy"
-            className={paths.includes("dairy") ? "link active" : "link"}
-          >
-            Dairy
-          </Link>
-          <Link
-            to="/consumption/meat"
-            className={paths.includes("meat") ? "link active" : "link"}
-          >
-            Meat
-          </Link>
-          <Link
-            to="/consumption/spices"
-            className={paths.includes("spices") ? "link active" : "link"}
-          >
-            Sauces
-          </Link>
-          <Link
-            to="/consumption/tea-coffee"
-            className={paths.includes("tea-coffee") ? "link active" : "link"}
-          >
-            Tea/Coffee
-          </Link>
-          <Link
-            to="/consumption/oils"
-            className={paths.includes("oils") ? "link active" : "link"}
-          >
-            Oils
-          </Link>
-          <Link
-            to="/consumption/processed-foods"
-            className={
-              paths.includes("processed-foods") ? "link active" : "link"
-            }
-          >
-            Processed Foods
-          </Link>
-          <Link
-            to="/consumption/alcohol"
-            className={paths.includes("alcohol") ? "link active" : "link"}
-          >
-            Tobacco & Alcohol
-          </Link>
-        </div>
-      )}
-      <Link
-        to="/users"
-        className={paths.includes("users") ? "link active" : "link"}
-      >
-        <i className="fa-solid fa-user-group"></i>
-        <p>Users</p>
-      </Link>
-      <a
-        onClick={() => setcropsMenu(!cropsMenu)}
-        className={paths.includes("crops") ? "link active" : "link"}
-      >
-        <i className="fa-solid fa-utensils"></i>
-        <p>Crops</p>
-        <span>
-          {cropsMenu ? (
-            <i className="fa-solid fa-minus"></i>
-          ) : (
-            <i className="fa-solid fa-plus"></i>
+              <Link
+                to="/consumption/legumes"
+                className={paths.includes("legumes") ? "link active" : "link"}
+              >
+                Legumes
+              </Link>
+              <Link
+                to="/consumption/fuits-vegetables"
+                className={
+                  paths.includes("fuits-vegetables") ? "link active" : "link"
+                }
+              >
+                Fruits & Vegetables
+              </Link>
+              <Link
+                to="/consumption/dairy"
+                className={paths.includes("dairy") ? "link active" : "link"}
+              >
+                Dairy
+              </Link>
+              <Link
+                to="/consumption/meat"
+                className={paths.includes("meat") ? "link active" : "link"}
+              >
+                Meat
+              </Link>
+              <Link
+                to="/consumption/spices"
+                className={paths.includes("spices") ? "link active" : "link"}
+              >
+                Sauces
+              </Link>
+              <Link
+                to="/consumption/tea-coffee"
+                className={
+                  paths.includes("tea-coffee") ? "link active" : "link"
+                }
+              >
+                Tea/Coffee
+              </Link>
+              <Link
+                to="/consumption/oils"
+                className={paths.includes("oils") ? "link active" : "link"}
+              >
+                Oils
+              </Link>
+              <Link
+                to="/consumption/processed-foods"
+                className={
+                  paths.includes("processed-foods") ? "link active" : "link"
+                }
+              >
+                Processed Foods
+              </Link>
+              <Link
+                to="/consumption/alcohol"
+                className={paths.includes("alcohol") ? "link active" : "link"}
+              >
+                Tobacco & Alcohol
+              </Link>
+            </div>
           )}
-        </span>
-      </a>
-      {cropsMenu && (
-        <div className="menu">
           <Link
-            to="/crops/cultivation"
-            className={paths.includes("cultivation") ? "link active" : "link"}
+            to="/users"
+            className={paths.includes("users") ? "link active" : "link"}
           >
-            Cultivation
+            <i className="fa-solid fa-user-group"></i>
+            <p>Users</p>
           </Link>
+          <a
+            onClick={() => setcropsMenu(!cropsMenu)}
+            className={paths.includes("crops") ? "link active" : "link"}
+          >
+            <i className="fa-solid fa-utensils"></i>
+            <p>Crops</p>
+            <span>
+              {cropsMenu ? (
+                <i className="fa-solid fa-minus"></i>
+              ) : (
+                <i className="fa-solid fa-plus"></i>
+              )}
+            </span>
+          </a>
+          {cropsMenu && (
+            <div className="menu">
+              <Link
+                to="/crops/cultivation"
+                className={
+                  paths.includes("cultivation") ? "link active" : "link"
+                }
+              >
+                Cultivation
+              </Link>
+              <Link
+                to="/crops/trees&shrubs"
+                className={
+                  paths.includes("trees&shrubs") ? "link active" : "link"
+                }
+              >
+                Trees/Shrubs
+              </Link>
+              <Link
+                to="/crops/poultry"
+                className={paths.includes("poultry") ? "link active" : "link"}
+              >
+                Poultry
+              </Link>
+              <Link
+                to="/crops/fishery"
+                className={paths.includes("fishery") ? "link active" : "link"}
+              >
+                Fishery
+              </Link>
+              <Link
+                to="/crops/hunting"
+                className={paths.includes("hunting") ? "link active" : "link"}
+              >
+                Hunting
+              </Link>
+            </div>
+          )}
           <Link
-            to="/crops/trees&shrubs"
-            className={paths.includes("trees&shrubs") ? "link active" : "link"}
+            to="/settings"
+            className={paths.includes("settings") ? "link active" : "link"}
           >
-            Trees/Shrubs
+            <i className="fa-solid fa-gear"></i>
+            <p>Settings</p>
           </Link>
-          <Link
-            to="/crops/poultry"
-            className={paths.includes("poultry") ? "link active" : "link"}
-          >
-            Poultry
-          </Link>
-          <Link
-            to="/crops/fishery"
-            className={paths.includes("fishery") ? "link active" : "link"}
-          >
-            Fishery
-          </Link>
-          <Link
-            to="/crops/hunting"
-            className={paths.includes("hunting") ? "link active" : "link"}
-          >
-            Hunting
-          </Link>
-        </div>
+        </>
       )}
       <Link
-        to="/settings"
-        className={paths.includes("settings") ? "link active" : "link"}
-      >
-        <i className="fa-solid fa-gear"></i>
-        <p>Settings</p>
-      </Link>
-      <Link
-        to="/logout"
+        to="/login"
+        onClick={() => {
+          localStorage.clear();
+        }}
         style={{ marginTop: "auto" }}
-        className={paths.includes("logout") ? "link active" : "link"}
+        className="link"
       >
         <i className="fa-solid fa-power-off"></i>
         <p>Logout</p>

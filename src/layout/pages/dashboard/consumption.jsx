@@ -18,6 +18,7 @@ import { fetchLabels } from "../../../functions/others";
 import Loading from "../../components/loading";
 import { fetchTagWiseCrops } from "../../../functions/consumption";
 import convert from "convert-units";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Consumption() {
   const [selectedOption, setselectedOption] = useState(
@@ -88,10 +89,11 @@ function Consumption() {
   };
 
   return (
-    <Stack className="container">
-      <Loading isLoading={isLoading || isCropsLoading || isFetching} />
-      <Stack direction={"row"} spacing={3} marginBottom={3}>
-        {/* <FormControl size="small">
+    <Wrapper>
+      <Stack className="container">
+        <Loading isLoading={isLoading || isCropsLoading || isFetching} />
+        <Stack direction={"row"} spacing={3} marginBottom={3}>
+          {/* <FormControl size="small">
           <InputLabel id="demo-simple-select-label">
             Consumption Information
           </InputLabel>
@@ -120,71 +122,72 @@ function Consumption() {
             <MenuItem value="ideal-diet">Ideal Quantity Healthy Diet</MenuItem>
           </Select>
         </FormControl> */}
-        <FormControl size="small">
-          <InputLabel id="demo-simple-select-label">Tags</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={selectedTag}
-            style={{ width: 300 }}
-            label="Production Information"
-            onChange={(e) => setselectedTag(e.target.value)}
-          >
-            <MenuItem value={""}>Select</MenuItem>
-            {labels.map((_label) => {
-              return (
-                <MenuItem value={_label._id} key={_label._id}>
-                  {_label.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-        {selectedOption === "consumption-production" && (
           <FormControl size="small">
-            <InputLabel id="demo-simple-select-label">Name</InputLabel>
+            <InputLabel id="demo-simple-select-label">Tags</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={selectedCrop}
-              style={{ width: 200 }}
+              value={selectedTag}
+              style={{ width: 300 }}
               label="Production Information"
-              onChange={(e) => setselectedCrop(e.target.value)}
+              onChange={(e) => setselectedTag(e.target.value)}
             >
               <MenuItem value={""}>Select</MenuItem>
-              {crops.map((_crop) => {
+              {labels.map((_label) => {
                 return (
-                  <MenuItem value={_crop._id} key={_crop._id}>
-                    {_crop.name}
+                  <MenuItem value={_label._id} key={_label._id}>
+                    {_label.name}
                   </MenuItem>
                 );
               })}
             </Select>
           </FormControl>
-        )}
+          {selectedOption === "consumption-production" && (
+            <FormControl size="small">
+              <InputLabel id="demo-simple-select-label">Name</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={selectedCrop}
+                style={{ width: 200 }}
+                label="Production Information"
+                onChange={(e) => setselectedCrop(e.target.value)}
+              >
+                <MenuItem value={""}>Select</MenuItem>
+                {crops.map((_crop) => {
+                  return (
+                    <MenuItem value={_crop._id} key={_crop._id}>
+                      {_crop.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          )}
 
-        <FormControl size="small" style={{ marginLeft: "auto" }}>
-          <InputLabel id="demo-simple-select-label">Weight</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={selectedWeight}
-            style={{ width: 200 }}
-            label="Production Information"
-            onChange={(e) => setselectedWeight(e.target.value)}
-          >
-            {convert()
-              .list("mass")
-              .map((_unit) => (
-                <MenuItem value={_unit.abbr} key={_unit.abbr}>
-                  {_unit.plural}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
+          <FormControl size="small" style={{ marginLeft: "auto" }}>
+            <InputLabel id="demo-simple-select-label">Weight</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectedWeight}
+              style={{ width: 200 }}
+              label="Production Information"
+              onChange={(e) => setselectedWeight(e.target.value)}
+            >
+              {convert()
+                .list("mass")
+                .map((_unit) => (
+                  <MenuItem value={_unit.abbr} key={_unit.abbr}>
+                    {_unit.plural}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Stack>
+        {renderItems()}
       </Stack>
-      {renderItems()}
-    </Stack>
+    </Wrapper>
   );
 }
 

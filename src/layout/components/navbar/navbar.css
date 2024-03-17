@@ -22,7 +22,7 @@
   align-items: center;
   margin-right: 10px;
 }
-.navbar .navbar-items .profile > span::after {
+/* .navbar .navbar-items .profile > span::after {
   content: "";
   width: 10px;
   height: 10px;
@@ -32,15 +32,16 @@
   bottom: 0;
   right: -2px;
   border: 2px solid #fff;
-}
+} */
 .navbar .navbar-items .profile > span {
   margin-right: 13px;
-  background-color: aqua;
+  /* background-color: aqua; */
   display: flex;
   justify-content: center;
   position: relative;
   align-items: center;
   border-radius: 50%;
+  cursor: pointer;
   /* overflow: hidden; */
 }
 .navbar .navbar-items .profile img {

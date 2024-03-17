@@ -5,6 +5,7 @@ import { deletePoultry, fetchPoultry } from "../../../functions/production";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Poultry() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -124,7 +125,7 @@ function Poultry() {
   ];
 
   return (
-    <div>
+    <Wrapper>
       <Production
         rows={rows}
         columns={columns}
@@ -142,7 +143,7 @@ function Poultry() {
           heading="Poultry"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

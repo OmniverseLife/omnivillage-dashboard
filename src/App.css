@@ -1,8 +1,5 @@
 .App {
-  display: flex;
-  background-color: rgb(240, 240, 240);
-  padding: 15px;
-  width: 100vw;
+  background-color: #f8f8f8;
 }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -34,26 +31,25 @@ input[type="number"]::-webkit-outer-spin-button {
   color: #333;
   padding: 20px;
 }
-.rightSide .css-ptkaw2-MuiDataGrid-root {
+.MuiDataGrid-root {
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  border-radius: 10px;
-  font-family: inherit;
+  border-radius: 10px !important;
   background-color: #fff;
 }
-.rightSide .css-t89xny-MuiDataGrid-columnHeaderTitle {
+.MuiDataGrid-columnHeaderTitle {
   font-size: 17px;
   font-family: inherit;
 }
-.rightSide .css-ptkaw2-MuiDataGrid-root .MuiDataGrid-row {
+.MuiDataGrid-root .MuiDataGrid-row {
   position: relative;
 }
-.rightSide .css-ptkaw2-MuiDataGrid-root .MuiDataGrid-row:nth-child(odd) {
+.MuiDataGrid-root .MuiDataGrid-row:nth-child(odd) {
   background-color: rgb(240, 240, 240);
 }
-.rightSide .css-4rnjzp-MuiFormLabel-root-MuiInputLabel-root {
+.MuiFormLabel-root-MuiInputLabel-root {
   color: rgba(62, 62, 62, 0.6);
 }
-.rightSide .css-v4u5dn-MuiInputBase-root-MuiInput-root:before {
+.MuiInputBase-root-MuiInput-root:before {
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   /* bottom: -3px; */
 }

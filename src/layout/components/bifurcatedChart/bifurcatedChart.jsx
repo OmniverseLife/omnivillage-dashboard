@@ -44,15 +44,15 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     enabled: Boolean(crop_id),
   });
 
-  const {
-    data: processing_methods,
-    isLoading: isProcessingMethodLoading,
-    isFetching: isProcessingMethodFetching,
-  } = useQuery({
-    queryKey: ["processing_method", crop_id, searchParams.get("village")],
-    queryFn: () => getProcessingMethod(crop_id, searchParams.get("village")),
-    enabled: Boolean(crop_id),
-  });
+  // const {
+  //   data: processing_methods,
+  //   isLoading: isProcessingMethodLoading,
+  //   isFetching: isProcessingMethodFetching,
+  // } = useQuery({
+  //   queryKey: ["processing_method", crop_id, searchParams.get("village")],
+  //   queryFn: () => getProcessingMethod(crop_id, searchParams.get("village")),
+  //   enabled: Boolean(crop_id),
+  // });
 
   const {
     data: other_informations,
@@ -163,21 +163,21 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     ],
   };
 
-  const processing_method_rows = processing_methods?.map(
-    (_processing_method, index) => ({
-      id: index + 1,
-      crop_name: _processing_method.crop_name,
-      user: `${_processing_method.user_first_name} ${_processing_method.user_last_name}`,
-      processing_method: _processing_method.processing_method,
-    })
-  );
+  // const processing_method_rows = processing_methods?.map(
+  //   (_processing_method, index) => ({
+  //     id: index + 1,
+  //     crop_name: _processing_method.crop_name,
+  //     user: `${_processing_method.user_first_name} ${_processing_method.user_last_name}`,
+  //     processing_method: _processing_method.processing_method,
+  //   })
+  // );
 
-  const processing_method_columns = [
-    { field: "id", headerName: "S.NO", width: 150 },
-    { field: "crop_name", headerName: "Crop Name", width: 150 },
-    { field: "user", headerName: "User's Name", width: 200 },
-    { field: "processing_method", headerName: "Description", width: 200 },
-  ];
+  // const processing_method_columns = [
+  //   { field: "id", headerName: "S.NO", width: 150 },
+  //   { field: "crop_name", headerName: "Crop Name", width: 150 },
+  //   { field: "user", headerName: "User's Name", width: 200 },
+  //   { field: "processing_method", headerName: "Description", width: 200 },
+  // ];
 
   const product_rows = other_informations?.products?.map((_product, index) => ({
     id: index + 1,
@@ -393,9 +393,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
           isBifurcatedDataLabelFetching ||
           is_other_info_loading ||
           isBifurcatedDataCropLoading ||
-          isBifurcatedDataCropFetching ||
-          isProcessingMethodLoading ||
-          isProcessingMethodFetching
+          isBifurcatedDataCropFetching
         }
       />
       {crop_id ? (
@@ -530,7 +528,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
               }`}
             />
           </Box>
-          {processing_methods?.length && (
+          {/* {processing_methods?.length && (
             <div style={{ width: "100%" }}>
               <h4 style={{ marginBottom: 10 }}>Processing Method</h4>
               <DataGrid
@@ -544,8 +542,8 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
                 pageSizeOptions={[5, 10]}
               />
             </div>
-          )}
-          {other_informations?.products?.length && (
+          )} */}
+          {/* {other_informations?.products?.length && (
             <div style={{ width: "100%" }}>
               <h4 style={{ marginBottom: 10 }}>Products</h4>
               <DataGrid
@@ -559,7 +557,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
                 pageSizeOptions={[5, 10]}
               />
             </div>
-          )}
+          )} */}
         </Stack>
       ) : (
         <>

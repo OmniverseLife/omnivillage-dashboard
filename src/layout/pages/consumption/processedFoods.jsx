@@ -9,6 +9,7 @@ import {
 import { deleteCultivation } from "../../../functions/production";
 import Consumption from "./consumption";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function ProcessedFoods() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -127,7 +128,7 @@ function ProcessedFoods() {
     },
   ];
   return (
-    <div>
+    <Wrapper>
       <Consumption
         rows={rows}
         columns={columns}
@@ -145,7 +146,7 @@ function ProcessedFoods() {
           heading="Processed Foods"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

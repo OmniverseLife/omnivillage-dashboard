@@ -48,22 +48,23 @@ export const getBifurcatedCropData = async (crop_id, village) => {
   return res?.data;
 };
 
-export const getSoilHealth = async (crop_id, village) => {
+export const getSoilHealth = async (village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.soil_health,
     {
-      params: { crop_id, village },
+      params: { village },
     }
   );
   return res?.data;
 };
 
-export const getIncomeExpenditureData = async (village) => {
+export const getIncomeExpenditureData = async (crop_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.income_expenditure,
     {
       params: {
         village,
+        crop_id,
       },
     }
   );
@@ -94,12 +95,12 @@ export const getStorageData = async (village) => {
   return res?.data;
 };
 
-export const getProcessingMethod = async (crop_id, village) => {
+export const getProcessingMethod = async (category, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.processing_method,
     {
       params: {
-        crop_id,
+        category,
         village,
       },
     }
@@ -118,6 +119,30 @@ export const getOtherInformations = async (crop_id, village) => {
     }
   );
   return res?.data;
+};
+
+export const getOrganicInOrganic = async (village, category) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production.organic_inorganic,
+    {
+      params: {
+        village,
+        category,
+      },
+    }
+  );
+  return res.data;
+};
+
+export const getOtherInformationsAll = async (village) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production
+      .other_information_tree_fish_poultry_charts_all,
+    {
+      params: { village },
+    }
+  );
+  return res.data;
 };
 
 export const getConsumptionFromProductionData = async (
@@ -231,4 +256,42 @@ export const fetchFoodBalance = async (tag, village) => {
     },
   });
   return res?.data;
+};
+
+export const getCategoryWiseCropNames = async (type) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production.category_wise_crops,
+    {
+      params: {
+        type,
+      },
+    }
+  );
+  return res.data;
+};
+
+export const getProductNames = async (type, crop_id) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production.crop_based_product_names,
+    {
+      params: {
+        type,
+        crop_id,
+      },
+    }
+  );
+  return res.data;
+};
+
+export const getHarvestedProducts = async (type, product_id) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production.harvested_products,
+    {
+      params: {
+        type,
+        product_id,
+      },
+    }
+  );
+  return res.data;
 };

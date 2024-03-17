@@ -10,28 +10,28 @@ import {
 } from "../../../functions/dashboard";
 import Loading from "../loading";
 import { useSearchParams } from "react-router-dom";
+import convert from "convert-units";
 
-function SoilHealth() {
+const landConverter = (unit, value) => {
+  return Math.round(convert(value).from("km2").to(unit));
+};
+
+function SoilHealth({ land_unit }) {
   const [searchParams] = useSearchParams();
 
-  const { data: { soil_health, type } = [], isLoading } = useQuery({
-    queryKey: [
-      "soil_health",
-      searchParams.get("crop"),
-      searchParams.get("village"),
-    ],
-    queryFn: () =>
-      getSoilHealth(searchParams.get("crop"), searchParams.get("village")),
+  const { data: { soil_health } = [], isLoading } = useQuery({
+    queryKey: ["soil_health", searchParams.get("village")],
+    queryFn: () => getSoilHealth(searchParams.get("village")),
   });
 
   const soilHealthData = [
     {
       name: "Stable",
-      y: soil_health?.stable,
+      y: landConverter(land_unit, soil_health?.stable),
     },
     {
       name: "Decreasing Yeild",
-      y: soil_health?.decreasing_yeild,
+      y: landConverter(land_unit, soil_health?.decreasing_yeild),
     },
   ];
 

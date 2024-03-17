@@ -5,6 +5,7 @@ import { deleteHunting, fetchHunting } from "../../../functions/production";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Hunting() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -124,7 +125,7 @@ function Hunting() {
   ];
 
   return (
-    <div>
+    <Wrapper>
       <Production
         rows={rows}
         columns={columns}
@@ -142,7 +143,7 @@ function Hunting() {
           heading="Hunting"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

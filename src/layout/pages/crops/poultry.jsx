@@ -9,6 +9,7 @@ import {
   fetchPoultryCrops,
 } from "../../../functions/crops";
 import Crops from "./crops";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Poultry() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -131,19 +132,21 @@ function Poultry() {
   ];
 
   return (
-    <Crops
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
-      editItem={editItem}
-      setEdit={setEditItem}
-      editFn={editPoultryCrops}
-      refetch={refetch}
-      addFn={addPoultryCrops}
-      deleteFn={deletePoultryCrops}
-      setDeleteId={setDeleteId}
-      deleteId={deleteId}
-    />
+    <Wrapper>
+      <Crops
+        rows={rows}
+        columns={columns}
+        isLoading={isLoading}
+        editItem={editItem}
+        setEdit={setEditItem}
+        editFn={editPoultryCrops}
+        refetch={refetch}
+        addFn={addPoultryCrops}
+        deleteFn={deletePoultryCrops}
+        setDeleteId={setDeleteId}
+        deleteId={deleteId}
+      />
+    </Wrapper>
   );
 }
 

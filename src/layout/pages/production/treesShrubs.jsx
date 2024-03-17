@@ -5,6 +5,7 @@ import moment from "moment";
 import { deleteTree, fetchTrees } from "../../../functions/production";
 import { useQuery } from "@tanstack/react-query";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function TreesShrubs() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -124,7 +125,7 @@ function TreesShrubs() {
   ];
 
   return (
-    <div>
+    <Wrapper>
       <Production
         rows={rows}
         columns={columns}
@@ -142,7 +143,7 @@ function TreesShrubs() {
           heading="Trees And Shrubs"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

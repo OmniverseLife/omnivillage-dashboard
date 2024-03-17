@@ -2,10 +2,11 @@ import { Menu, MenuItem, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import React, { useState } from "react";
-import { fetchGrains, fetchLegumes } from "../../../functions/consumption";
+import { fetchLegumes } from "../../../functions/consumption";
 import { deleteCultivation } from "../../../functions/production";
-import Consumption from "./consumption";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
+import Consumption from "./consumption";
 
 function Legumes() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -124,7 +125,7 @@ function Legumes() {
     },
   ];
   return (
-    <div>
+    <Wrapper>
       <Consumption
         rows={rows}
         columns={columns}
@@ -142,7 +143,7 @@ function Legumes() {
           heading="Legumes"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

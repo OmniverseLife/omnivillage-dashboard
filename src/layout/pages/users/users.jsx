@@ -6,6 +6,7 @@ import { fetchAllUsers } from "../../../functions/users";
 import Loading from "../../components/loading";
 import { Menu, MenuItem, Stack } from "@mui/material";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Users() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -121,31 +122,33 @@ function Users() {
   ];
   console.log(selectedrow);
   return (
-    <div className="users">
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 10 },
-          },
-        }}
-        // columnVisibilityModel={{
-        //   totalLand: false,
-        // }}
-        pageSizeOptions={[5, 10]}
-        loading={isLoading}
-      />
-      <Loading isLoading={isLoading} />
-      {selectedrow && (
-        <ViewDetails
-          open={modalOpen}
-          setOpen={() => setmodalOpen(false)}
-          data={modalData}
-          heading="User"
+    <Wrapper>
+      <div className="users">
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          // columnVisibilityModel={{
+          //   totalLand: false,
+          // }}
+          pageSizeOptions={[5, 10]}
+          loading={isLoading}
         />
-      )}
-    </div>
+        <Loading isLoading={isLoading} />
+        {selectedrow && (
+          <ViewDetails
+            open={modalOpen}
+            setOpen={() => setmodalOpen(false)}
+            data={modalData}
+            heading="User"
+          />
+        )}
+      </div>
+    </Wrapper>
   );
 }
 

@@ -9,6 +9,7 @@ import {
   editCultivationCrops,
   fetchCultivationCrops,
 } from "../../../functions/crops";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Cultivation() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -123,19 +124,21 @@ function Cultivation() {
   ];
 
   return (
-    <Crops
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
-      editItem={editItem}
-      setEdit={setEditItem}
-      editFn={editCultivationCrops}
-      refetch={refetch}
-      addFn={addCultivationCrops}
-      deleteFn={deleteCultivationCrops}
-      setDeleteId={setDeleteId}
-      deleteId={deleteId}
-    />
+    <Wrapper>
+      <Crops
+        rows={rows}
+        columns={columns}
+        isLoading={isLoading}
+        editItem={editItem}
+        setEdit={setEditItem}
+        editFn={editCultivationCrops}
+        refetch={refetch}
+        addFn={addCultivationCrops}
+        deleteFn={deleteCultivationCrops}
+        setDeleteId={setDeleteId}
+        deleteId={deleteId}
+      />
+    </Wrapper>
   );
 }
 

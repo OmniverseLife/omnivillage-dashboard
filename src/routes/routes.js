@@ -109,4 +109,16 @@ export const routes = [
     path: "/dashboard/food-balance",
     Component: lazy(() => import("../layout/pages/dashboard/foodBalance")),
   },
+  {
+    path: "/login",
+    Component: lazy(() => import("../layout/pages/login/login")),
+  },
+  {
+    path: "/forgot-password",
+    Component: lazy(() => import("../layout/pages/login/forgotPassword")),
+  },
+  {
+    path: "/settings",
+    Component: lazy(() => import("../layout/pages/settings/settings")),
+  },
 ];

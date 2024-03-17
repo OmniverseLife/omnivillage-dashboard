@@ -6,6 +6,7 @@ import { fetchDairy, fetchGrains } from "../../../functions/consumption";
 import { deleteCultivation } from "../../../functions/production";
 import Consumption from "./consumption";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Dairy() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -124,7 +125,7 @@ function Dairy() {
     },
   ];
   return (
-    <div>
+    <Wrapper>
       <Consumption
         rows={rows}
         columns={columns}
@@ -142,7 +143,7 @@ function Dairy() {
           heading="Dairy"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

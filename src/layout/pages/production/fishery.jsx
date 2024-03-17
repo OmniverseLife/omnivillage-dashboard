@@ -9,6 +9,7 @@ import {
 import moment from "moment";
 import { useQuery } from "@tanstack/react-query";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Fishery() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -128,7 +129,7 @@ function Fishery() {
   ];
 
   return (
-    <div>
+    <Wrapper>
       <Production
         rows={rows}
         columns={columns}
@@ -146,7 +147,7 @@ function Fishery() {
           heading="Fishery"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

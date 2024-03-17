@@ -6,6 +6,7 @@ import { fetchAlcohol, fetchGrains } from "../../../functions/consumption";
 import { deleteCultivation } from "../../../functions/production";
 import Consumption from "./consumption";
 import ViewDetails from "../../components/viewDetails/viewDetails";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Alcohol() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -21,6 +22,7 @@ function Alcohol() {
     queryKey: ["alcohols"],
     queryFn: fetchAlcohol,
   });
+
   function deepFlattenToObject(obj, prefix = "") {
     return Object.keys(obj).reduce((acc, k) => {
       const pre = prefix.length ? prefix + "#" : "";
@@ -32,6 +34,7 @@ function Alcohol() {
       return acc;
     }, {});
   }
+
   const selectData = (data) => {
     let obj = deepFlattenToObject(data);
     console.log(obj);
@@ -123,8 +126,9 @@ function Alcohol() {
       },
     },
   ];
+
   return (
-    <div>
+    <Wrapper>
       <Consumption
         rows={rows}
         columns={columns}
@@ -142,7 +146,7 @@ function Alcohol() {
           heading="Alcohols"
         />
       )}
-    </div>
+    </Wrapper>
   );
 }
 

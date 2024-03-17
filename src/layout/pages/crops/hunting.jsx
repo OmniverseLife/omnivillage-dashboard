@@ -9,6 +9,7 @@ import {
 } from "../../../functions/crops";
 import { useQuery } from "@tanstack/react-query";
 import { Menu, MenuItem, Stack, Typography } from "@mui/material";
+import Wrapper from "../../components/wrapper/wrapper";
 
 function Hunting() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -131,19 +132,21 @@ function Hunting() {
   ];
 
   return (
-    <Crops
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
-      editItem={editItem}
-      setEdit={setEditItem}
-      editFn={editHuntingCrops}
-      refetch={refetch}
-      addFn={addHuntingCrops}
-      deleteFn={deleteHuntingCrops}
-      setDeleteId={setDeleteId}
-      deleteId={deleteId}
-    />
+    <Wrapper>
+      <Crops
+        rows={rows}
+        columns={columns}
+        isLoading={isLoading}
+        editItem={editItem}
+        setEdit={setEditItem}
+        editFn={editHuntingCrops}
+        refetch={refetch}
+        addFn={addHuntingCrops}
+        deleteFn={deleteHuntingCrops}
+        setDeleteId={setDeleteId}
+        deleteId={deleteId}
+      />
+    </Wrapper>
   );
 }
 

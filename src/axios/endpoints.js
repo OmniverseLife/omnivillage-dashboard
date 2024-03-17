@@ -1,4 +1,9 @@
 export const endpoints = {
+  admin: {
+    login: "/admin/login",
+    forgot_password: "/admin/forgot-password",
+    change_password: "/admin/change-password",
+  },
   user: {
     list_all: "/user/list-all",
   },
@@ -124,6 +129,12 @@ export const endpoints = {
         "/dashboard/other_information_tree_fish_poultry_charts",
       processing_method: "/dashboard/processing_method",
       soil_health: "/dashboard/soil-health",
+      crop_based_product_names: "/dashboard/crop_based_product_names",
+      harvested_products: "/dashboard/harvested_products",
+      category_wise_crops: "/dashboard/category_wise_crops",
+      other_information_tree_fish_poultry_charts_all:
+        "/dashboard/other_information_tree_fish_poultry_charts_all",
+      organic_inorganic: "/dashboard/organic-inorganic",
     },
     consumption: {
       consumption_from_production: "/dashboard/consumption_from_production",
@@ -141,5 +152,17 @@ export const endpoints = {
   },
   others: {
     villages: "/villages",
+    add_village: "/villages/add_village",
+    edit_village: "/villages/edit_village",
+    delete_village: "/villages/delete_village",
+    feeds: "/feeds/get-all",
+    add_feed: "/feeds/add-feed",
+    edit_feed: "/feeds/edit-feed",
+    delete_feed: "/feeds/delete-feed",
+    fishFeeds: "/fish_feeds/get-all",
+    addFishFeed: "/fish_feeds/add-fish-feed",
+    editFishFeed: "/fish_feeds/edit-fish-feed",
+    deleteFishFeed: "/fish_feeds/delete-fish-feed",
+    get_all_crops: "/dashboard/all-crops",
   },
 };
