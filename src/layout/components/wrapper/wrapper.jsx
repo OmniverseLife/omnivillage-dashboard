@@ -1,7 +1,9 @@
 import {
   Box,
+  Checkbox,
   FormControl,
   InputLabel,
+  ListItemText,
   ListSubheader,
   MenuItem,
   Select,
@@ -19,6 +21,11 @@ export default function Wrapper({ children }) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [villages, setVillages] = useState([]);
+  const [selectedVillages, setSelectedVillages] = useState(
+    typeof searchParams.get("village") === "string"
+      ? searchParams.get("village")
+      : [searchParams.get("village")]
+  );
   const role = JSON.parse(localStorage.getItem("user"))?.role;
 
   const { data = [], isLoading } = useQuery({
@@ -46,20 +53,6 @@ export default function Wrapper({ children }) {
       setSearchParams(searchParams);
     }
   }, [data, isLoading, searchParams, setSearchParams]);
-
-  // const renderSelectGroup = (item) => {
-  //   const items = item[1].map((p) => {
-  //     return (
-
-  //     );
-  //   });
-  //   return [
-  //     <ListSubheader key={item[0]} sx={{ textTransform: "uppercase" }}>
-  //       {item[0]}
-  //     </ListSubheader>,
-  //     items,
-  //   ];
-  // };
 
   return (
     <Box
@@ -124,11 +117,18 @@ export default function Wrapper({ children }) {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 notched={Boolean(searchParams.get("village"))}
-                value={searchParams.get("village")}
+                value={selectedVillages}
                 style={{ width: 200 }}
-                onChange={(e) => {
-                  searchParams.set("village", e.target.value);
+                multiple
+                onChange={({ target: { value } }) => {
+                  const values = typeof value === "string" ? [value] : value;
+                  values.forEach((_value) =>
+                    searchParams.set("village", _value)
+                  );
                   setSearchParams(searchParams);
+                  setSelectedVillages(
+                    typeof value === "string" ? [value] : value
+                  );
                 }}
                 sx={{ textTransform: "capitalize" }}
               >
@@ -138,7 +138,12 @@ export default function Wrapper({ children }) {
                     value={_data.name}
                     sx={{ textTransform: "capitalize" }}
                   >
-                    {_data.name}
+                    <Checkbox
+                      checked={Boolean(
+                        selectedVillages.find((name) => name === _data.name)
+                      )}
+                    />
+                    <ListItemText primary={_data.name} />
                   </MenuItem>
                 ))}
               </Select>
