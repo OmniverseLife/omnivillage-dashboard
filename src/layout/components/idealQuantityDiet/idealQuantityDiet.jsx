@@ -21,9 +21,9 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
 
   const { data: ideal_consumption_bar = [], isIdealConsumptionBarLoading } =
     useQuery({
-      queryKey: ["ideal_consumption_bar", searchParams.get("village")],
+      queryKey: ["ideal_consumption_bar", searchParams.getAll("village")],
       queryFn: () =>
-        getIdealConsumptionByLabelData(searchParams.get("village")),
+        getIdealConsumptionByLabelData(searchParams.getAll("village")),
     });
 
   // const {

@@ -19,12 +19,13 @@ const weightConverter = (unit, value) => {
 function SelfGrown({ type_id, weight_unit, setSummary }) {
   const [searchParams] = useSearchParams();
   const { data: self_grown = [], isSelfGrownLoading } = useQuery({
-    queryKey: ["self grown", type_id, searchParams.get("village")],
-    queryFn: () => getSelfGrownByTagsData(type_id, searchParams.get("village")),
+    queryKey: ["self grown", type_id, searchParams.getAll("village")],
+    queryFn: () =>
+      getSelfGrownByTagsData(type_id, searchParams.getAll("village")),
   });
   const { data: self_consumed = [], isSelfConsumedLoading } = useQuery({
-    queryKey: ["self consumed", type_id, searchParams.get("village")],
-    queryFn: () => getSelfConsumedData(type_id, searchParams.get("village")),
+    queryKey: ["self consumed", type_id, searchParams.getAll("village")],
+    queryFn: () => getSelfConsumedData(type_id, searchParams.getAll("village")),
   });
 
   const selfGrownData = {

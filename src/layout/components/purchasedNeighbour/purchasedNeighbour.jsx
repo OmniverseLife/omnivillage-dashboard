@@ -19,10 +19,10 @@ function PurchasedNeighbour({ type_id, weight_unit, setSummary }) {
     queryKey: [
       "purchased from neighbour",
       type_id,
-      searchParams.get("village"),
+      searchParams.getAll("village"),
     ],
     queryFn: () =>
-      getPurchasedFromNeighboursData(type_id, searchParams.get("village")),
+      getPurchasedFromNeighboursData(type_id, searchParams.getAll("village")),
   });
 
   const data = {

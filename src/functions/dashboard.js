@@ -258,12 +258,13 @@ export const fetchFoodBalance = async (tag, village) => {
   return res?.data;
 };
 
-export const getCategoryWiseCropNames = async (type) => {
+export const getCategoryWiseCropNames = async (type, country) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.category_wise_crops,
     {
       params: {
         type,
+        country,
       },
     }
   );

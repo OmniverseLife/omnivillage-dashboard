@@ -24,6 +24,7 @@ import Loading from "./layout/components/loading";
 import Navbar from "./layout/components/navbar/navbar";
 import Sidebar from "./layout/components/sidebar/sidebar";
 import { routes } from "./routes/routes";
+import AuthProvider from "./layout/components/AuthProvider/AuthProvider";
 
 function App() {
   const THEME = createTheme({
@@ -43,31 +44,62 @@ function App() {
           <Routes location={location}>
             <Route
               path="/"
-              element={<Navigate to="/dashboard/production" replace={true} />}
+              element={
+                <AuthProvider role="admin,viewer" route="/">
+                  <Navigate to="/dashboard/production" replace={true} />
+                </AuthProvider>
+              }
             />
+
             <Route
               path="/production"
-              element={<Navigate to="/production/cultivation" replace={true} />}
+              element={
+                <AuthProvider role="admin" route="/production">
+                  <Navigate to="/production/cultivation" replace={true} />
+                </AuthProvider>
+              }
             />
+
             <Route
               path="/consumption"
               element={
-                <Navigate to="/consumption/grains-nuts" replace={true} />
+                <AuthProvider role="admin" route="/consumption">
+                  <Navigate to="/consumption/grains-nuts" replace={true} />
+                </AuthProvider>
               }
             />
+
             <Route
               path="/dashboard"
-              element={<Navigate to="/dashboard/production" replace={true} />}
+              element={
+                <AuthProvider role="admin,viewer" route="/dashboard">
+                  <Navigate to="/dashboard/production" replace={true} />
+                </AuthProvider>
+              }
             />
+
             <Route
               path="/crops"
-              element={<Navigate to="/crops/cultivation" replace={true} />}
+              element={
+                <AuthProvider role="admin" route="/crops">
+                  <Navigate to="/crops/cultivation" replace={true} />
+                </AuthProvider>
+              }
             />
+
             {routes.map((item, id) => (
               <Route
                 exact
                 path={item.path}
-                element={<item.Component />}
+                element={
+                  <AuthProvider
+                    role={item.role}
+                    route={item.path}
+                    key={item.path}
+                  >
+                    <item.Component />
+                  </AuthProvider>
+                }
                 key={id}
               />
             ))}

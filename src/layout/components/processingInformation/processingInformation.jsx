@@ -11,8 +11,13 @@ export default function ProcessingInformation({ category }) {
   const [rows, setRows] = useState([]);
 
   const { data = { type: "", data: [] }, isLoading } = useQuery({
-    queryKey: ["processing-information", category, searchParams.get("village")],
-    queryFn: () => getProcessingMethod(category, searchParams.get("village")),
+    queryKey: [
+      "processing-information",
+      category,
+      searchParams.getAll("village"),
+    ],
+    queryFn: () =>
+      getProcessingMethod(category, searchParams.getAll("village")),
   });
 
   useEffect(() => {

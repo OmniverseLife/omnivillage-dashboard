@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import Production from "./production";
-import { Menu, MenuItem, Stack } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+} from "@mui/material";
 import {
   deleteFishery,
   fetchCultivations,
@@ -17,6 +27,8 @@ function Fishery() {
   const [deleteId, setDeleteId] = useState(null);
   const [modalData, setmodalData] = useState({});
   const [modalOpen, setmodalOpen] = useState(false);
+  const [optionsModal, setOptionsModal] = useState(false);
+
   const {
     data: fishery = [],
     isLoading,
@@ -24,7 +36,22 @@ function Fishery() {
   } = useQuery({
     queryKey: ["fishery"],
     queryFn: fetchFishery,
+    select: (data) => {
+      const obj = {};
+      data.forEach((_data) => {
+        obj[_data.user._id] = [...(obj[_data.user._id] || []), _data];
+      });
+      const arr = [];
+      Object.entries(obj).forEach((_data) => {
+        arr.push({
+          ..._data[1][0].user,
+          entries: _data[1],
+        });
+      });
+      return arr;
+    },
   });
+
   function deepFlattenToObject(obj, prefix = "") {
     return Object.keys(obj).reduce((acc, k) => {
       const pre = prefix.length ? prefix + "#" : "";
@@ -36,37 +63,40 @@ function Fishery() {
       return acc;
     }, {});
   }
+
   const selectData = (data) => {
     let obj = deepFlattenToObject(data);
-    console.log(obj);
+    delete obj["crop_name"];
     setmodalData({ ...obj });
   };
+
   const rows = fishery.map((_fishery, index) => ({
     id: index + 1,
     _id: _fishery._id,
-    name: `${_fishery.user.first_name} ${_fishery.user.last_name}`,
-    phone: `${_fishery.user.country_code} ${_fishery.user.phone}`,
-    crop_name: _fishery.crop.name.en,
-    date: moment(_fishery.created_at).format("ll"),
+    name: `${_fishery.first_name} ${_fishery.last_name}`,
+    phone: `${_fishery.country_code} ${_fishery.phone}`,
+    data: _fishery,
+    // crop_name: _fishery.crop.name.en,
+    // date: moment(_fishery.created_at).format("ll"),
   }));
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },
     { field: "_id", headerName: "Crop ID", width: 150 },
-    { field: "name", headerName: "User's Name", width: 200 },
-    { field: "phone", headerName: "Phone Number", width: 200 },
-    { field: "crop_name", headerName: "Crop", width: 200 },
-    {
-      field: "date",
-      headerName: "Date",
-      width: 200,
-    },
+    { field: "name", headerName: "User's Name", width: 300 },
+    { field: "phone", headerName: "Phone Number", width: 300 },
+    // { field: "crop_name", headerName: "Crop", width: 200 },
+    // {
+    //   field: "date",
+    //   headerName: "Date",
+    //   width: 200,
+    // },
     {
       field: "actions",
       headerName: "Actions",
       sortable: false,
       disableClickEventBubbling: true,
-      width: 100,
+      width: 200,
       renderCell: (params) => {
         return (
           <div>
@@ -74,15 +104,15 @@ function Fishery() {
               className="fa-solid fa-ellipsis-vertical actionIcon"
               style={{ fontSize: 25, marginLeft: 15, paddingInline: 10 }}
               onClick={(e) => {
-                setSelectedrow(params.row.id);
+                setSelectedrow(params.row);
                 setAnchorEl(e.currentTarget);
-                selectData(fishery[params.row.id]);
+                // selectData(fishery[params.row.id]);
               }}
               id={params.row.id}
             ></i>
             <Menu
               anchorEl={anchorEl}
-              open={selectedrow === params.row.id && Boolean(anchorEl)}
+              open={selectedrow?.id === params.row.id && Boolean(anchorEl)}
               onClose={() => {
                 setAnchorEl(null);
                 setSelectedrow(null);
@@ -92,7 +122,8 @@ function Fishery() {
               <MenuItem
                 onClick={() => {
                   setAnchorEl(null);
-                  setmodalOpen(true);
+                  // setmodalOpen(true);
+                  setOptionsModal(true);
                 }}
               >
                 <Stack direction="row" alignItems="center">
@@ -103,24 +134,6 @@ function Fishery() {
                   View Detail
                 </Stack>
               </MenuItem>
-              {/* <MenuItem
-                onClick={() => {
-                  setDeleteId(params.row._id);
-                  setAnchorEl(null);
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  sx={{ color: "#f45536" }}
-                >
-                  <i
-                    className="fa-regular fa-trash-can"
-                    style={{ marginRight: 10 }}
-                  ></i>{" "}
-                  Delete
-                </Stack>
-              </MenuItem> */}
             </Menu>
           </div>
         );
@@ -139,14 +152,40 @@ function Fishery() {
         deleteFn={deleteFishery}
         deleteId={deleteId}
       />
-      {selectedrow && (
-        <ViewDetails
-          open={modalOpen}
-          setOpen={() => setmodalOpen(false)}
-          data={modalData}
-          heading="Fishery"
-        />
-      )}
+      <Dialog
+        onClose={() => {
+          setOptionsModal(false);
+          setSelectedrow(null);
+        }}
+        open={optionsModal}
+      >
+        <DialogTitle>Choose</DialogTitle>
+        <List sx={{ pt: 0, width: "300px", height: "250px" }}>
+          {selectedrow?.data?.entries?.map((_entry) => {
+            return (
+              <ListItem disableGutters key={_entry._id}>
+                <ListItemButton
+                  onClick={() => {
+                    selectData(_entry);
+                    setmodalOpen(true);
+                  }}
+                >
+                  <ListItemText
+                    primary={_entry.crop.name.en}
+                    sx={{ textTransform: "capitalize" }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Dialog>
+      <ViewDetails
+        open={modalOpen}
+        setOpen={() => setmodalOpen(false)}
+        data={modalData}
+        heading="Fishery"
+      />
     </Wrapper>
   );
 }

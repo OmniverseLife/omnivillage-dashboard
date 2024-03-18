@@ -11,8 +11,8 @@ function SellingChannel() {
   const [searchParams] = useSearchParams();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["selling_channel"],
-    queryFn: () => getSellingChannelData(searchParams.get("village")),
+    queryKey: ["selling_channel", searchParams.getAll("village")],
+    queryFn: () => getSellingChannelData(searchParams.getAll("village")),
   });
 
   const sellingChannel = [

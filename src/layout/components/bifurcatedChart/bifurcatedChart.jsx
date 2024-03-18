@@ -30,8 +30,9 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     isLoading: isBifurcatedDataLabelLoading,
     isFetching: isBifurcatedDataLabelFetching,
   } = useQuery({
-    queryKey: ["bifurcated_data", type_id, searchParams.get("village")],
-    queryFn: () => getBifurcatedLabelData(type_id, searchParams.get("village")),
+    queryKey: ["bifurcated_data", type_id, searchParams.getAll("village")],
+    queryFn: () =>
+      getBifurcatedLabelData(type_id, searchParams.getAll("village")),
   });
 
   const {
@@ -39,8 +40,9 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     isLoading: isBifurcatedDataCropLoading,
     isFetching: isBifurcatedDataCropFetching,
   } = useQuery({
-    queryKey: ["bifurcated_data_crop", crop_id, searchParams.get("village")],
-    queryFn: () => getBifurcatedCropData(crop_id, searchParams.get("village")),
+    queryKey: ["bifurcated_data_crop", crop_id, searchParams.getAll("village")],
+    queryFn: () =>
+      getBifurcatedCropData(crop_id, searchParams.getAll("village")),
     enabled: Boolean(crop_id),
   });
 
@@ -49,8 +51,8 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
   //   isLoading: isProcessingMethodLoading,
   //   isFetching: isProcessingMethodFetching,
   // } = useQuery({
-  //   queryKey: ["processing_method", crop_id, searchParams.get("village")],
-  //   queryFn: () => getProcessingMethod(crop_id, searchParams.get("village")),
+  //   queryKey: ["processing_method", crop_id, searchParams.getAll("village")],
+  //   queryFn: () => getProcessingMethod(crop_id, searchParams.getAll("village")),
   //   enabled: Boolean(crop_id),
   // });
 
@@ -59,8 +61,9 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     isLoading: is_other_info_loading,
     isFetching: is_other_info_fetching,
   } = useQuery({
-    queryKey: ["other_informations", crop_id, searchParams.get("village")],
-    queryFn: () => getOtherInformations(crop_id, searchParams.get("village")),
+    queryKey: ["other_informations", crop_id, searchParams.getAll("village")],
+    queryFn: () =>
+      getOtherInformations(crop_id, searchParams.getAll("village")),
     enabled: Boolean(crop_id),
   });
 

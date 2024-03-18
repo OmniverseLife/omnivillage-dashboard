@@ -11,7 +11,7 @@ export default function OtherInformations() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["other-informations"],
-    queryFn: () => getOtherInformationsAll(searchParams.get("village")),
+    queryFn: () => getOtherInformationsAll(searchParams.getAll("village")),
   });
 
   const treeColumns = [

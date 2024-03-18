@@ -19,8 +19,8 @@ function DeficitCrops({ parentLoading, tag }) {
   const [searchParams] = useSearchParams();
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["food_balance", tag, searchParams.get("village")],
-    queryFn: () => fetchFoodBalance(tag, searchParams.get("village")),
+    queryKey: ["food_balance", tag, searchParams.getAll("village")],
+    queryFn: () => fetchFoodBalance(tag, searchParams.getAll("village")),
     initialData: [],
   });
 
