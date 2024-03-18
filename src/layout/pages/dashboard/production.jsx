@@ -71,8 +71,9 @@ function Production() {
   });
 
   const { data: crop_names, isLoading: isCropNamesLoading } = useQuery({
-    queryKey: ["crop_names", selectedCategory],
-    queryFn: () => getCategoryWiseCropNames(selectedCategory),
+    queryKey: ["crop_names", selectedCategory, searchParams.get("country")],
+    queryFn: () =>
+      getCategoryWiseCropNames(selectedCategory, searchParams.get("country")),
     enabled: selectedCategory === "trees" || selectedCategory === "poultry",
   });
 
