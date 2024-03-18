@@ -12,8 +12,8 @@ function FoodBalanceAnalytics() {
   const [chartData, setChartData] = useState([]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["Deficiet_chart", searchParams.get("village")],
-    queryFn: () => fetchDeficietChart(searchParams.get("village")),
+    queryKey: ["Deficiet_chart", searchParams.getAll("village")],
+    queryFn: () => fetchDeficietChart(searchParams.getAll("village")),
     initialData: [],
   });
 

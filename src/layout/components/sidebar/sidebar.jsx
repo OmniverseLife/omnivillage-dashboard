@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import "./sidebar.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
 export default function Sidebar({ role }) {
   const location = useLocation();
   const navigate = useNavigate();
   const paths = location.pathname.split("/");
+  const [searchParams] = useSearchParams();
 
   const [productionMenu, setproductionMenu] = useState(
     paths.includes("production") && !paths.includes("dashboard") && true
@@ -43,19 +49,19 @@ export default function Sidebar({ role }) {
       {dashboardMenu && (
         <div className="menu">
           <Link
-            to="/dashboard/production"
+            to={`/dashboard/production`}
             className={paths.includes("production") ? "link active" : "link"}
           >
             Production
           </Link>
           <Link
-            to="/dashboard/consumption"
+            to={`/dashboard/consumption`}
             className={paths.includes("consumption") ? "link active" : "link"}
           >
             Consumption
           </Link>
           <Link
-            to="/dashboard/food-balance"
+            to={`/dashboard/food-balance`}
             className={paths.includes("food-balance") ? "link active" : "link"}
           >
             Food Balance

@@ -31,13 +31,13 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
       "consumption-from-production",
       crop_id,
       type_id,
-      searchParams.get("village"),
+      searchParams.getAll("village"),
     ],
     queryFn: () =>
       getConsumptionFromProductionData(
         type_id,
         crop_id,
-        searchParams.get("village")
+        searchParams.getAll("village")
       ),
     enabled: !!crop_id && !!type_id,
     // placeholderData: {

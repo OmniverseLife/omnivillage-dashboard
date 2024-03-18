@@ -21,11 +21,12 @@ export default function Wrapper({ children }) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [villages, setVillages] = useState([]);
-  const [selectedVillages, setSelectedVillages] = useState(
-    typeof searchParams.get("village") === "string"
-      ? searchParams.get("village")
-      : [searchParams.get("village")]
-  );
+  // const [selectedVillages, setSelectedVillages] = useState(
+  //   typeof searchParams.getAll("village") === "string"
+  //     ? [searchParams.getAll("village")]
+  //     : searchParams.getAll("village")
+  // );
+
   const role = JSON.parse(localStorage.getItem("user"))?.role;
 
   const { data = [], isLoading } = useQuery({
@@ -47,7 +48,7 @@ export default function Wrapper({ children }) {
   }, [data, isLoading]);
 
   useEffect(() => {
-    if (searchParams.get("village") === null && !isLoading) {
+    if (searchParams.getAll("village").length === 0 && !isLoading) {
       searchParams.set("country", data[0]?.country);
       searchParams.set("village", data[0]?.name);
       setSearchParams(searchParams);
@@ -108,28 +109,30 @@ export default function Wrapper({ children }) {
             <FormControl size="small" sx={{ marginLeft: "10px" }}>
               <InputLabel
                 id="demo-simple-select-label"
-                shrink={Boolean(searchParams.get("village"))}
+                shrink={Boolean(searchParams.getAll("village"))}
               >
                 Village
               </InputLabel>
               <Select
                 label="Village"
                 labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                notched={Boolean(searchParams.get("village"))}
-                value={selectedVillages}
-                style={{ width: 200 }}
                 multiple
+                id="demo-simple-select"
+                notched={Boolean(searchParams.getAll("village"))}
+                value={searchParams.getAll("village")}
+                style={{ width: 250 }}
                 onChange={({ target: { value } }) => {
                   const values = typeof value === "string" ? [value] : value;
+                  searchParams.delete("village");
                   values.forEach((_value) =>
-                    searchParams.set("village", _value)
+                    searchParams.append("village", _value)
                   );
                   setSearchParams(searchParams);
-                  setSelectedVillages(
-                    typeof value === "string" ? [value] : value
-                  );
+                  // setSelectedVillages(
+                  //   typeof value === "string" ? [value] : value
+                  // );
                 }}
+                renderValue={(selected) => selected.join(", ")}
                 sx={{ textTransform: "capitalize" }}
               >
                 {villages[searchParams.get("country")]?.map((_data) => (
@@ -140,7 +143,9 @@ export default function Wrapper({ children }) {
                   >
                     <Checkbox
                       checked={Boolean(
-                        selectedVillages.find((name) => name === _data.name)
+                        searchParams
+                          .getAll("village")
+                          .find((name) => name === _data?.name)
                       )}
                     />
                     <ListItemText primary={_data.name} />

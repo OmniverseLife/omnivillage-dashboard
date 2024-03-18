@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import Production from "./production";
-import { Menu, MenuItem, Stack } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+} from "@mui/material";
 import moment from "moment";
 import { deleteTree, fetchTrees } from "../../../functions/production";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +23,8 @@ function TreesShrubs() {
   const [deleteId, setDeleteId] = useState(null);
   const [modalData, setmodalData] = useState({});
   const [modalOpen, setmodalOpen] = useState(false);
+  const [optionsModal, setOptionsModal] = useState(false);
+
   const {
     data: trees = [],
     isLoading,
@@ -20,7 +32,22 @@ function TreesShrubs() {
   } = useQuery({
     queryKey: ["trees"],
     queryFn: fetchTrees,
+    select: (data) => {
+      const obj = {};
+      data.forEach((_data) => {
+        obj[_data.user._id] = [...(obj[_data.user._id] || []), _data];
+      });
+      const arr = [];
+      Object.entries(obj).forEach((_data) => {
+        arr.push({
+          ..._data[1][0].user,
+          entries: _data[1],
+        });
+      });
+      return arr;
+    },
   });
+
   function deepFlattenToObject(obj, prefix = "") {
     return Object.keys(obj).reduce((acc, k) => {
       const pre = prefix.length ? prefix + "#" : "";
@@ -32,37 +59,40 @@ function TreesShrubs() {
       return acc;
     }, {});
   }
+
   const selectData = (data) => {
     let obj = deepFlattenToObject(data);
-    console.log(obj);
+    delete obj["crop_name"];
     setmodalData({ ...obj });
   };
+
   const rows = trees.map((_tree, index) => ({
     id: index + 1,
     _id: _tree._id,
-    name: `${_tree.user.first_name} ${_tree.user.last_name}`,
-    phone: `${_tree.user.country_code} ${_tree.user.phone}`,
-    crop_name: _tree.crop.name.en,
-    date: moment(_tree.created_at).format("ll"),
+    name: `${_tree.first_name} ${_tree.last_name}`,
+    phone: `${_tree.country_code} ${_tree.phone}`,
+    data: _tree,
+    // crop_name: _tree.crop.name.en,
+    // date: moment(_tree.created_at).format("ll"),
   }));
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },
     { field: "_id", headerName: "Crop ID", width: 150 },
-    { field: "name", headerName: "User's Name", width: 200 },
-    { field: "phone", headerName: "Phone Number", width: 200 },
-    { field: "crop_name", headerName: "Crop", width: 200 },
-    {
-      field: "date",
-      headerName: "Date",
-      width: 200,
-    },
+    { field: "name", headerName: "User's Name", width: 300 },
+    { field: "phone", headerName: "Phone Number", width: 300 },
+    // { field: "crop_name", headerName: "Crop", width: 200 },
+    // {
+    //   field: "date",
+    //   headerName: "Date",
+    //   width: 200,
+    // },
     {
       field: "actions",
       headerName: "Actions",
       sortable: false,
       disableClickEventBubbling: true,
-      width: 100,
+      width: 200,
       renderCell: (params) => {
         return (
           <div>
@@ -70,15 +100,15 @@ function TreesShrubs() {
               className="fa-solid fa-ellipsis-vertical actionIcon"
               style={{ fontSize: 25, marginLeft: 15, paddingInline: 10 }}
               onClick={(e) => {
-                setSelectedrow(params.row.id);
+                setSelectedrow(params.row);
                 setAnchorEl(e.currentTarget);
-                selectData(trees[params.row.id]);
+                // selectData(trees[params.row.id]);
               }}
               id={params.row.id}
             ></i>
             <Menu
               anchorEl={anchorEl}
-              open={selectedrow === params.row.id && Boolean(anchorEl)}
+              open={selectedrow?.id === params.row.id && Boolean(anchorEl)}
               onClose={() => {
                 setAnchorEl(null);
                 setSelectedrow(null);
@@ -88,7 +118,8 @@ function TreesShrubs() {
               <MenuItem
                 onClick={() => {
                   setAnchorEl(null);
-                  setmodalOpen(true);
+                  // setmodalOpen(true);
+                  setOptionsModal(true);
                 }}
               >
                 <Stack direction="row" alignItems="center">
@@ -99,24 +130,6 @@ function TreesShrubs() {
                   View Detail
                 </Stack>
               </MenuItem>
-              {/* <MenuItem
-                onClick={() => {
-                  setDeleteId(params.row._id);
-                  setAnchorEl(null);
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  sx={{ color: "#f45536" }}
-                >
-                  <i
-                    className="fa-regular fa-trash-can"
-                    style={{ marginRight: 10 }}
-                  ></i>{" "}
-                  Delete
-                </Stack>
-              </MenuItem> */}
             </Menu>
           </div>
         );
@@ -135,14 +148,40 @@ function TreesShrubs() {
         deleteFn={deleteTree}
         deleteId={deleteId}
       />
-      {selectedrow && (
-        <ViewDetails
-          open={modalOpen}
-          setOpen={() => setmodalOpen(false)}
-          data={modalData}
-          heading="Trees And Shrubs"
-        />
-      )}
+      <Dialog
+        onClose={() => {
+          setOptionsModal(false);
+          setSelectedrow(null);
+        }}
+        open={optionsModal}
+      >
+        <DialogTitle>Choose</DialogTitle>
+        <List sx={{ pt: 0, width: "300px", height: "250px" }}>
+          {selectedrow?.data?.entries?.map((_entry) => {
+            return (
+              <ListItem disableGutters key={_entry._id}>
+                <ListItemButton
+                  onClick={() => {
+                    selectData(_entry);
+                    setmodalOpen(true);
+                  }}
+                >
+                  <ListItemText
+                    primary={_entry.crop.name.en}
+                    sx={{ textTransform: "capitalize" }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Dialog>
+      <ViewDetails
+        open={modalOpen}
+        setOpen={() => setmodalOpen(false)}
+        data={modalData}
+        heading="Trees And Shrubs"
+      />
     </Wrapper>
   );
 }

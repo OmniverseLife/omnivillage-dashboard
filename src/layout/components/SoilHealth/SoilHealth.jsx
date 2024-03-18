@@ -20,8 +20,8 @@ function SoilHealth({ land_unit }) {
   const [searchParams] = useSearchParams();
 
   const { data: { soil_health } = [], isLoading } = useQuery({
-    queryKey: ["soil_health", searchParams.get("village")],
-    queryFn: () => getSoilHealth(searchParams.get("village")),
+    queryKey: ["soil_health", searchParams.getAll("village")],
+    queryFn: () => getSoilHealth(searchParams.getAll("village")),
   });
 
   const soilHealthData = [

@@ -1,4 +1,14 @@
-import { Menu, MenuItem, Stack } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+} from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import React, { useState } from "react";
@@ -14,6 +24,8 @@ function Legumes() {
   const [deleteId, setDeleteId] = useState(null);
   const [modalData, setmodalData] = useState({});
   const [modalOpen, setmodalOpen] = useState(false);
+  const [optionsModal, setOptionsModal] = useState(false);
+
   const {
     data: legumes = [],
     isLoading,
@@ -21,7 +33,22 @@ function Legumes() {
   } = useQuery({
     queryKey: ["legumes"],
     queryFn: fetchLegumes,
+    select: (data) => {
+      const obj = {};
+      data.forEach((_data) => {
+        obj[_data.user._id] = [...(obj[_data.user._id] || []), _data];
+      });
+      const arr = [];
+      Object.entries(obj).forEach((_data) => {
+        arr.push({
+          ..._data[1][0].user,
+          entries: _data[1],
+        });
+      });
+      return arr;
+    },
   });
+
   function deepFlattenToObject(obj, prefix = "") {
     return Object.keys(obj).reduce((acc, k) => {
       const pre = prefix.length ? prefix + "#" : "";
@@ -33,37 +60,40 @@ function Legumes() {
       return acc;
     }, {});
   }
+
   const selectData = (data) => {
     let obj = deepFlattenToObject(data);
-    console.log(obj);
+    delete obj["crop_name"];
     setmodalData({ ...obj });
   };
+
   const rows = legumes.map((_cultivation, index) => ({
     id: index + 1,
     _id: _cultivation._id,
-    name: `${_cultivation.user.first_name} ${_cultivation.user.last_name}`,
-    phone: `${_cultivation.user.country_code} ${_cultivation.user.phone}`,
-    crop_name: _cultivation.consumption_crop.name,
-    date: moment(_cultivation.created_at).format("ll"),
+    name: `${_cultivation.first_name} ${_cultivation.last_name}`,
+    phone: `${_cultivation.country_code} ${_cultivation.phone}`,
+    data: _cultivation,
+    //   crop_name: _cultivation.crop.name.en,
+    //   date: moment(_cultivation.created_at).format("ll"),
   }));
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },
     { field: "_id", headerName: "Crop ID", width: 150 },
-    { field: "name", headerName: "User's Name", width: 200 },
-    { field: "phone", headerName: "Phone Number", width: 200 },
-    { field: "crop_name", headerName: "Crop", width: 200 },
-    {
-      field: "date",
-      headerName: "Date",
-      width: 200,
-    },
+    { field: "name", headerName: "User's Name", width: 300 },
+    { field: "phone", headerName: "Phone Number", width: 300 },
+    // { field: "crop_name", headerName: "Crop", width: 200 },
+    // {
+    //   field: "date",
+    //   headerName: "Date",
+    //   width: 200,
+    // },
     {
       field: "actions",
       headerName: "Actions",
       sortable: false,
       disableClickEventBubbling: true,
-      width: 100,
+      width: 200,
       renderCell: (params) => {
         return (
           <div>
@@ -71,15 +101,15 @@ function Legumes() {
               className="fa-solid fa-ellipsis-vertical actionIcon"
               style={{ fontSize: 25, marginLeft: 15, paddingInline: 10 }}
               onClick={(e) => {
-                setSelectedrow(params.row.id);
+                setSelectedrow(params.row);
                 setAnchorEl(e.currentTarget);
-                selectData(legumes[params.row.id]);
+                // selectData(legumes[params.row.id]);
               }}
               id={params.row.id}
             ></i>
             <Menu
               anchorEl={anchorEl}
-              open={selectedrow === params.row.id && Boolean(anchorEl)}
+              open={selectedrow?.id === params.row.id && Boolean(anchorEl)}
               onClose={() => {
                 setAnchorEl(null);
                 setSelectedrow(null);
@@ -89,7 +119,8 @@ function Legumes() {
               <MenuItem
                 onClick={() => {
                   setAnchorEl(null);
-                  setmodalOpen(true);
+                  // setmodalOpen(true);
+                  setOptionsModal(true);
                 }}
               >
                 <Stack direction="row" alignItems="center">
@@ -100,30 +131,13 @@ function Legumes() {
                   View Detail
                 </Stack>
               </MenuItem>
-              {/* <MenuItem
-                onClick={() => {
-                  setDeleteId(params.row._id);
-                  setAnchorEl(null);
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  sx={{ color: "#f45536" }}
-                >
-                  <i
-                    className="fa-regular fa-trash-can"
-                    style={{ marginRight: 10 }}
-                  ></i>
-                  Delete
-                </Stack>
-              </MenuItem> */}
             </Menu>
           </div>
         );
       },
     },
   ];
+
   return (
     <Wrapper>
       <Consumption
@@ -135,14 +149,40 @@ function Legumes() {
         deleteFn={deleteCultivation}
         deleteId={deleteId}
       />
-      {selectedrow && (
-        <ViewDetails
-          open={modalOpen}
-          setOpen={() => setmodalOpen(false)}
-          data={modalData}
-          heading="Legumes"
-        />
-      )}
+      <Dialog
+        onClose={() => {
+          setOptionsModal(false);
+          setSelectedrow(null);
+        }}
+        open={optionsModal}
+      >
+        <DialogTitle>Choose</DialogTitle>
+        <List sx={{ pt: 0, width: "300px", height: "250px" }}>
+          {selectedrow?.data?.entries?.map((_entry) => {
+            return (
+              <ListItem disableGutters key={_entry._id}>
+                <ListItemButton
+                  onClick={() => {
+                    selectData(_entry);
+                    setmodalOpen(true);
+                  }}
+                >
+                  <ListItemText
+                    primary={_entry.consumption_crop.name}
+                    sx={{ textTransform: "capitalize" }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Dialog>
+      <ViewDetails
+        open={modalOpen}
+        setOpen={() => setmodalOpen(false)}
+        data={modalData}
+        heading="Legumes"
+      />
     </Wrapper>
   );
 }

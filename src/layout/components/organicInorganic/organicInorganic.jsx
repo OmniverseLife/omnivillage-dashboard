@@ -11,8 +11,9 @@ export default function OrganicInorganic({ category }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["organic-inorganic", searchParams.get("village"), category],
-    queryFn: () => getOrganicInOrganic(searchParams.get("village"), category),
+    queryKey: ["organic-inorganic", searchParams.getAll("village"), category],
+    queryFn: () =>
+      getOrganicInOrganic(searchParams.getAll("village"), category),
   });
 
   const pieDataFertilizer = [

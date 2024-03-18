@@ -13,12 +13,12 @@ export default function IncomeExpnditure() {
     queryKey: [
       "income-expenditure",
       searchParams.get("crop"),
-      searchParams.get("village"),
+      searchParams.getAll("village"),
     ],
     queryFn: () =>
       getIncomeExpenditureData(
         searchParams.get("crop"),
-        searchParams.get("village")
+        searchParams.getAll("village")
       ),
   });
 

@@ -12,7 +12,6 @@ export default function HarvestedProducts({ category }) {
     queryKey: [
       "harvested-products",
       category,
-      searchParams.get("village"),
       searchParams.get("product"),
       searchParams.get("crop"),
     ],

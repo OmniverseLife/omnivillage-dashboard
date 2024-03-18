@@ -17,9 +17,13 @@ function PurchasedOutside({ type_id, weight_unit, setSummary }) {
   const [searchParams] = useSearchParams();
 
   const { data: purchased_from_market = [], isLoading } = useQuery({
-    queryKey: ["purchased from market", type_id, searchParams.get("village")],
+    queryKey: [
+      "purchased from market",
+      type_id,
+      searchParams.getAll("village"),
+    ],
     queryFn: () =>
-      getPurchasedFromMarketData(type_id, searchParams.get("village")),
+      getPurchasedFromMarketData(type_id, searchParams.getAll("village")),
   });
 
   const data = {

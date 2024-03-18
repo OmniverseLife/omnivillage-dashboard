@@ -19,13 +19,13 @@ function LandChart({ land_unit }) {
   const [searchParams] = useSearchParams();
 
   const { data: land_allocation = {}, isLandAllocationLoading } = useQuery({
-    queryKey: ["land_allocation", searchParams.get("village")],
-    queryFn: () => getLandAllocationData(searchParams.get("village")),
+    queryKey: ["land_allocation", searchParams.getAll("village")],
+    queryFn: () => getLandAllocationData(searchParams.getAll("village")),
   });
 
   const { data: land_used = {}, isLandUsedLoading } = useQuery({
-    queryKey: ["land_used", searchParams.get("village")],
-    queryFn: () => getLandUsedData(searchParams.get("village")),
+    queryKey: ["land_used", searchParams.getAll("village")],
+    queryFn: () => getLandUsedData(searchParams.getAll("village")),
   });
 
   // , "Fishery", "Poultry", "Storage", "trees"

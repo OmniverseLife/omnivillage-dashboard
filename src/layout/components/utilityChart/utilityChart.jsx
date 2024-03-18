@@ -13,7 +13,7 @@ function UtilityChart() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["utilization_data"],
-    queryFn: () => getUtilizationData(searchParams.get("village")),
+    queryFn: () => getUtilizationData(searchParams.getAll("village")),
   });
 
   const soilHealth = {

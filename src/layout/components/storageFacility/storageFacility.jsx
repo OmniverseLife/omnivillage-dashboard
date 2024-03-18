@@ -15,8 +15,8 @@ function StorageFacility({ weight_unit }) {
   const [searchParams] = useSearchParams();
 
   const { data = {}, isLoading } = useQuery({
-    queryKey: ["storage_data"],
-    queryFn: () => getStorageData(searchParams.get("village")),
+    queryKey: ["storage_data", searchParams.getAll("village")],
+    queryFn: () => getStorageData(searchParams.getAll("village")),
   });
 
   const grains = [
