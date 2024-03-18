@@ -5,6 +5,7 @@ import CustomPieChart from "../customPieChart/customPieChart";
 import { useQuery } from "@tanstack/react-query";
 import {
   getLandAllocationData,
+  getLandUsedCultivation,
   getLandUsedData,
 } from "../../../functions/dashboard";
 import Loading from "../loading";
@@ -23,9 +24,13 @@ function LandChart({ land_unit }) {
     queryFn: () => getLandAllocationData(searchParams.getAll("village")),
   });
 
+  // const { data: land_used = {}, isLandUsedLoading } = useQuery({
+  //   queryKey: ["land_used", searchParams.getAll("village")],
+  //   queryFn: () => getLandUsedData(searchParams.getAll("village")),
+  // });
   const { data: land_used = {}, isLandUsedLoading } = useQuery({
     queryKey: ["land_used", searchParams.getAll("village")],
-    queryFn: () => getLandUsedData(searchParams.getAll("village")),
+    queryFn: () => getLandUsedCultivation(searchParams.getAll("village")),
   });
 
   // , "Fishery", "Poultry", "Storage", "trees"
@@ -91,12 +96,16 @@ function LandChart({ land_unit }) {
   //   ],
   // };
 
-  const usedLand = [
-    {
-      name: "Cultivation",
-      y: landConverter(land_unit, land_used?.cultivation ?? 0),
-    },
-  ];
+  const usedLand = Object.entries(land_used).map((_used) => ({
+    name: _used[0],
+    y: landConverter(land_unit, _used[1]),
+  }));
+  //   [
+  //   {
+  //     name: "Cultivation",
+  //     y: landConverter(land_unit, land_used?.cultivation ?? 0),
+  //   },
+  // ];
 
   const land_allocated_sum = Object.values(land_allocation).reduce(
     (prev, current) => prev + landConverter(land_unit, current),
@@ -121,12 +130,14 @@ function LandChart({ land_unit }) {
         data={data}
         measurement={`${Math.round(land_allocated_sum)} ${land_unit}`}
         helper_text="Each slice represent amount of land."
+        style={{ width: "100%" }}
       />
       <CustomPieChart
         header="Land Used"
         data={usedLand}
         measurement={`${Math.round(land_used_sum)} ${land_unit}`}
         helper_text="Each slice represent amount of land."
+        style={{ width: "100%" }}
       />
     </Stack>
   );

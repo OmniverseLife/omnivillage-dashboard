@@ -119,6 +119,7 @@ export const endpoints = {
     production: {
       land_allocation_category_data: "/dashboard/land_allocation_category_data",
       land_used_category_data: "/dashboard/land_used_category_data",
+      land_used_cultivation: "/dashboard/land_used_cultivation",
       bifurcated_chart_label: "/dashboard/bifurcated_chart_label",
       bifurcated_chart_crop: "/dashboard/bifurcated_chart_crop",
       utilization_chart: "/dashboard/utilization_chart",

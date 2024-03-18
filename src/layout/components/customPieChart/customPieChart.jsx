@@ -100,6 +100,7 @@ function CustomPieChart({ header, data, measurement, style, helper_text }) {
   const options1 = {
     chart: {
       type: "pie",
+      height: "47%",
     },
     title: {
       text: header,
@@ -167,7 +168,7 @@ function CustomPieChart({ header, data, measurement, style, helper_text }) {
         className="pieChart"
         plugins={[customDatalabels]}
       /> */}
-      <div style={{ width: "100%" }}>
+      <div style={{ width: "100%", height: "100%" }}>
         <HighchartsReact highcharts={Highcharts} options={options1} />
       </div>
       {Boolean(helper_text) && (

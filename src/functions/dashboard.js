@@ -25,6 +25,18 @@ export const getLandUsedData = async (village) => {
   return res?.data;
 };
 
+export const getLandUsedCultivation = async (village) => {
+  const res = await axiosInstance.get(
+    endpoints.dashboard.production.land_used_cultivation,
+    {
+      params: {
+        village,
+      },
+    }
+  );
+  return res?.data;
+};
+
 export const getBifurcatedLabelData = async (type_id, village) => {
   const res = await axiosInstance.get(
     endpoints.dashboard.production.bifurcated_chart_label,

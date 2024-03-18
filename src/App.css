@@ -164,6 +164,7 @@ text {
   border: 1px solid #4b465c1f;
   padding: 15px;
   align-items: center;
+  height: 600px;
 }
 canvas.pieChart {
   /* width: 370px !important;

@@ -301,14 +301,14 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
 
   // Sums of each section
 
-  const single_crop_sum = Object.values(bifurcated_data_crop || {}).reduce(
-    (prev, current) => {
-      if (typeof current === "number")
-        return prev + weightConverter(weight_unit, current);
-      return prev;
-    },
-    0
-  );
+  const single_crop_sum =
+    weightConverter(weight_unit, bifurcated_data_crop?.fed_to_livestock) +
+    weightConverter(weight_unit, bifurcated_data_crop?.sold_to_market) +
+    weightConverter(weight_unit, bifurcated_data_crop?.sold_to_neighbour) +
+    weightConverter(weight_unit, bifurcated_data_crop?.wastage) +
+    // weightConverter(weight_unit, bifurcated_data_crop?.other) +
+    weightConverter(weight_unit, bifurcated_data_crop?.self_consumed);
+  console.log(bifurcated_data_crop);
 
   const quantity_produced_sum = bifurcated_data_label?.output.reduce(
     (prev, current) => prev + weightConverter(weight_unit, current.output),
@@ -355,10 +355,10 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
   );
 
   const summary = [
-    {
-      name: "Quantity Produced",
-      y: quantity_produced_sum,
-    },
+    // {
+    //   name: "Quantity Produced",
+    //   y: quantity_produced_sum,
+    // },
     {
       name: "Sold To Neighbour",
       y: sold_to_neighbour_sum,
@@ -482,6 +482,14 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
               <p style={{ marginBottom: 20 }}>
                 <strong>Average yeild: </strong>
                 {bifurcated_data_crop?.yeild || "-"}
+              </p>
+              <p style={{ marginBottom: 20 }}>
+                <strong>Median yeild: </strong>
+                {bifurcated_data_crop?.yeild_median || "-"}
+              </p>
+              <p style={{ marginBottom: 20 }}>
+                <strong>Mode yeild: </strong>
+                {bifurcated_data_crop?.yeild_mode || "-"}
               </p>
               {/* <p>
                 <strong>Expenditure Incurred:</strong>{" "}
