@@ -13,6 +13,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import { customDatalabels } from "../customPieChart/customPieChart";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import _ from "underscore";
 // ChartJS.unregister(customDatalabels);
 
 ChartJS.register(
@@ -24,40 +25,40 @@ ChartJS.register(
   Legend
 );
 
-const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "bottom",
-    },
-    datalabels: {
-      formatter: (value) => {
-        return value ? value : null;
-      },
-      color: "#333",
-      font: {
-        size: 16,
-      },
-      clamp: true,
-    },
-    afterDraw: function (chart) {
-      if (chart.data.datasets.length === 0) {
-        // No data is present
-        var ctx = chart.chart.ctx;
-        var width = chart.chart.width;
-        var height = chart.chart.height;
-        chart.clear();
+// const options = {
+//   responsive: true,
+//   plugins: {
+//     legend: {
+//       position: "bottom",
+//     },
+//     datalabels: {
+//       formatter: (value) => {
+//         return value ? value : null;
+//       },
+//       color: "#333",
+//       font: {
+//         size: 16,
+//       },
+//       clamp: true,
+//     },
+//     afterDraw: function (chart) {
+//       if (chart.data.datasets.length === 0) {
+//         // No data is present
+//         var ctx = chart.chart.ctx;
+//         var width = chart.chart.width;
+//         var height = chart.chart.height;
+//         chart.clear();
 
-        ctx.save();
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = "14px normal 'Helvetica Nueue'";
-        ctx.fillText("No data to display", width / 2, height / 2);
-        ctx.restore();
-      }
-    },
-  },
-};
+//         ctx.save();
+//         ctx.textAlign = "center";
+//         ctx.textBaseline = "middle";
+//         ctx.font = "14px normal 'Helvetica Nueue'";
+//         ctx.fillText("No data to display", width / 2, height / 2);
+//         ctx.restore();
+//       }
+//     },
+//   },
+// };
 
 function CustomBarChart({ header, data, measurement = "", helper_text }) {
   // console.log(data.dataset);
@@ -123,7 +124,8 @@ function CustomBarChart({ header, data, measurement = "", helper_text }) {
         }}
       >
         <span>{measurement.slice(0, -1)}</span>
-        {!Number.isInteger(parseInt(measurement.slice(-2, -1))) &&
+        {!_.isNumber(parseInt(measurement.slice(-2, -1))) &&
+        !_.isSymbol(measurement.slice(-2, -1)) &&
         Number.isInteger(parseInt(measurement.slice(-1))) ? (
           <sup>{measurement.slice(-1)}</sup>
         ) : (

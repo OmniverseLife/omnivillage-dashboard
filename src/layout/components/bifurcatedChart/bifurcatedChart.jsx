@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
@@ -571,6 +571,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
         </Stack>
       ) : (
         <>
+          <Typography variant="h4">Output</Typography>
           {/* <Box width="48%"> */}
           <CustomPieChart
             header="Summary"
@@ -587,6 +588,7 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
             helper_text="Each bar represents amount of each crop produced"
           />
           {/* </Box> */}
+          <Typography variant="h4">Utilization</Typography>
           {/* <Box width="48%"> */}
           <CustomBarChart
             header="Self Consumed"

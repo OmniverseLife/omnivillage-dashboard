@@ -35,6 +35,11 @@ function SoilHealth({ land_unit }) {
     },
   ];
 
+  const soil_health_sum = Object.values(soil_health || {})?.reduce(
+    (prev, _value) => prev + landConverter(land_unit, _value),
+    0
+  );
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <Loading isLoading={isLoading} />
@@ -44,6 +49,7 @@ function SoilHealth({ land_unit }) {
         helper_text={`Each slice represents ${
           soil_health?.type !== "tree" ? "amount of land" : "number of crops"
         }`}
+        measurement={`${soil_health_sum} ${land_unit}`}
       />
     </Stack>
   );
