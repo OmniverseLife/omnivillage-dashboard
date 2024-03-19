@@ -6,13 +6,14 @@ import {
   RadioGroup,
   TextField,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import Loading from "../loading";
 import { useQuery } from "@tanstack/react-query";
 import { fetchFoodBalance } from "../../../functions/dashboard";
 import { useSearchParams } from "react-router-dom";
+import CustomToolbar from "../CustomToolbar/CustomToolbar";
 
 function DeficitCrops({ parentLoading, tag }) {
   const [rows, setRows] = useState([]);
@@ -311,6 +312,7 @@ function DeficitCrops({ parentLoading, tag }) {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
     </>

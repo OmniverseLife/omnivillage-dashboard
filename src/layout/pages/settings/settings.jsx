@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import * as yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 
 const StyledSettings = styled(Box)`
   .header-row {
@@ -449,6 +450,10 @@ export default function Settings() {
               paginationModel: { page: 0, pageSize: 5 },
             },
           }}
+          slots={{ toolbar: CustomToolbar }}
+          slotProps={{
+            toolbar: { printOptions: { disableToolbarButton: true } },
+          }}
           pageSizeOptions={[5, 10]}
         />
         <Stack
@@ -476,6 +481,10 @@ export default function Settings() {
               paginationModel: { page: 0, pageSize: 5 },
             },
           }}
+          slots={{ toolbar: CustomToolbar }}
+          slotProps={{
+            toolbar: { printOptions: { disableToolbarButton: true } },
+          }}
           pageSizeOptions={[5, 10]}
         />
         <Stack
@@ -502,6 +511,10 @@ export default function Settings() {
             pagination: {
               paginationModel: { page: 0, pageSize: 5 },
             },
+          }}
+          slots={{ toolbar: CustomToolbar }}
+          slotProps={{
+            toolbar: { printOptions: { disableToolbarButton: true } },
           }}
           pageSizeOptions={[5, 10]}
         />

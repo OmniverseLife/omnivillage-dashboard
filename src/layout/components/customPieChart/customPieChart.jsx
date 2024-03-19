@@ -44,7 +44,13 @@ export const customDatalabels = {
   },
 };
 
-function CustomPieChart({ header, data, measurement, style, helper_text }) {
+function CustomPieChart({
+  header,
+  data,
+  measurement = "",
+  style,
+  helper_text,
+}) {
   ChartJS.register(
     ArcElement,
     Tooltip,
@@ -100,7 +106,7 @@ function CustomPieChart({ header, data, measurement, style, helper_text }) {
   const options1 = {
     chart: {
       type: "pie",
-      height: "47%",
+      height: "520px",
     },
     title: {
       text: header,
@@ -160,7 +166,24 @@ function CustomPieChart({ header, data, measurement, style, helper_text }) {
           width: "100%",
         }}
       > */}
-      <p style={{ color: "#888", alignSelf: "flex-end" }}>{measurement}</p>
+      <p
+        style={{
+          color: "#888",
+          alignSelf: "flex-end",
+          position: "absolute",
+          top: "15px",
+          right: "20px",
+          zIndex: 9,
+        }}
+      >
+        <span>{measurement.slice(0, -1)}</span>
+        {!Number.isInteger(parseInt(measurement.slice(-2, -1))) &&
+        Number.isInteger(parseInt(measurement.slice(-1))) ? (
+          <sup>{measurement.slice(-1)}</sup>
+        ) : (
+          measurement.slice(-1)
+        )}
+      </p>
       {/* </h3> */}
       {/* <Pie
         options={options}

@@ -5,12 +5,13 @@ import { getOtherInformationsAll } from "../../../functions/dashboard";
 import { useSearchParams } from "react-router-dom";
 import Loading from "../loading";
 import { DataGrid } from "@mui/x-data-grid";
+import CustomToolbar from "../CustomToolbar/CustomToolbar";
 
 export default function OtherInformations() {
   const [searchParams] = useSearchParams();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["other-informations"],
+    queryKey: ["other-informations", searchParams.getAll("village")],
     queryFn: () => getOtherInformationsAll(searchParams.getAll("village")),
   });
 
@@ -21,8 +22,8 @@ export default function OtherInformations() {
       headerName: "Row Id",
       width: 100,
     },
-    { field: "crop_name", headerName: "Tree Name", width: 250 },
-    { field: "count", headerName: "Total Number of Trees", width: 250 },
+    { field: "crop_name", headerName: "Name", width: 250 },
+    { field: "count", headerName: "Total Number", width: 250 },
     { field: "avg_age", headerName: "Average Age", width: 250 },
     // { field: "crop_name", headerName: "Tree Name", width: 180 },
   ];
@@ -40,11 +41,18 @@ export default function OtherInformations() {
       headerName: "Row Id",
       width: 100,
     },
-    { field: "crop_name", headerName: "Tree Name", width: 200 },
-    { field: "count", headerName: "Total Number of Poultries", width: 200 },
+    { field: "crop_name", headerName: "Name", width: 200 },
+    { field: "count", headerName: "Total Number", width: 200 },
     { field: "average_age", headerName: "Average Age", width: 200 },
     { field: "feed", headerName: "Feed", width: 200 },
-    { field: "feed_quantity", headerName: "Feed Quantity", width: 200 },
+    {
+      field: "feed_quantity",
+      headerName: "Feed Quantity",
+      width: 200,
+      renderCell: (params) => {
+        return params.value + " kgs";
+      },
+    },
     // { field: "crop_name", headerName: "Tree Name", width: 180 },
   ];
 
@@ -61,10 +69,17 @@ export default function OtherInformations() {
       headerName: "Row Id",
       width: 100,
     },
-    { field: "crop_name", headerName: "Tree Name", width: 250 },
-    { field: "count", headerName: "Total Number of Fishes", width: 250 },
+    { field: "crop_name", headerName: "Name", width: 250 },
+    { field: "count", headerName: "Total Number", width: 250 },
     { field: "feed", headerName: "Feed", width: 250 },
-    { field: "feed_quantity", headerName: "Feed Quantity", width: 250 },
+    {
+      field: "feed_quantity",
+      headerName: "Feed Quantity",
+      width: 250,
+      renderCell: (params) => {
+        return params.value + " kgs";
+      },
+    },
     // { field: "crop_name", headerName: "Tree Name", width: 180 },
   ];
 
@@ -81,8 +96,8 @@ export default function OtherInformations() {
       headerName: "Row Id",
       width: 100,
     },
-    { field: "crop_name", headerName: "Tree Name", width: 300 },
-    { field: "count", headerName: "Total Number of Fishes", width: 300 },
+    { field: "crop_name", headerName: "Name", width: 300 },
+    { field: "count", headerName: "Total Number", width: 300 },
     // { field: "crop_name", headerName: "Tree Name", width: 180 },
   ];
 
@@ -99,8 +114,8 @@ export default function OtherInformations() {
       headerName: "Row Id",
       width: 100,
     },
-    { field: "crop_name", headerName: "Tree Name", width: 300 },
-    { field: "count", headerName: "Total Number of LiveStocks", width: 300 },
+    { field: "crop_name", headerName: "Name", width: 300 },
+    { field: "count", headerName: "Total Number", width: 300 },
     // { field: "crop_name", headerName: "Tree Name", width: 180 },
   ];
 
@@ -129,6 +144,7 @@ export default function OtherInformations() {
             paginationModel: { page: 0, pageSize: 5 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
       <Typography variant="h5" sx={{ marginTop: "30px", marginBottom: "20px" }}>
@@ -147,6 +163,7 @@ export default function OtherInformations() {
             paginationModel: { page: 0, pageSize: 5 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
       <Typography variant="h5" sx={{ marginTop: "30px", marginBottom: "20px" }}>
@@ -165,6 +182,7 @@ export default function OtherInformations() {
             paginationModel: { page: 0, pageSize: 5 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
       <Typography variant="h5" sx={{ marginTop: "30px", marginBottom: "20px" }}>
@@ -183,6 +201,7 @@ export default function OtherInformations() {
             paginationModel: { page: 0, pageSize: 5 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
       <Typography variant="h5" sx={{ marginTop: "30px", marginBottom: "20px" }}>
@@ -201,6 +220,7 @@ export default function OtherInformations() {
             paginationModel: { page: 0, pageSize: 5 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
     </Box>

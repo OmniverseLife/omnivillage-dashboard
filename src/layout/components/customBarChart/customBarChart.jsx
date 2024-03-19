@@ -59,11 +59,12 @@ const options = {
   },
 };
 
-function CustomBarChart({ header, data, measurement, helper_text }) {
+function CustomBarChart({ header, data, measurement = "", helper_text }) {
   // console.log(data.dataset);
   const options1 = {
     chart: {
       type: "column",
+      height: "560px",
       // spacingBottom: 0,
     },
     title: {
@@ -90,7 +91,7 @@ function CustomBarChart({ header, data, measurement, helper_text }) {
     },
     series: data.dataset,
     legend: {
-      enabled: false,
+      enabled: true,
     },
   };
 
@@ -105,10 +106,30 @@ function CustomBarChart({ header, data, measurement, helper_text }) {
         border: "1px solid #4b465c1f",
         padding: "15px 5px",
         alignItems: "center",
+        width: "100%",
+        height: "600px",
+        position: "relative",
       }}
     >
       {/* <h3>{header}</h3> */}
-      <p style={{ color: "#888", alignSelf: "flex-end" }}>{measurement}</p>
+      <p
+        style={{
+          color: "#888",
+          alignSelf: "flex-end",
+          position: "absolute",
+          top: "15px",
+          right: "20px",
+          zIndex: 9,
+        }}
+      >
+        <span>{measurement.slice(0, -1)}</span>
+        {!Number.isInteger(parseInt(measurement.slice(-2, -1))) &&
+        Number.isInteger(parseInt(measurement.slice(-1))) ? (
+          <sup>{measurement.slice(-1)}</sup>
+        ) : (
+          measurement.slice(-1)
+        )}
+      </p>
       {/* <Bar options={options} data={data} plugins={[ChartDataLabels]} /> */}
       <div style={{ width: "100%", marginTop: "auto" }}>
         <HighchartsReact highcharts={Highcharts} options={options1} />

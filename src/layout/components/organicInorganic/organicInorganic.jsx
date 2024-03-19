@@ -163,34 +163,34 @@ export default function OrganicInorganic({ category }) {
         }`}
       />
       {/* </Box> */}
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer}
-          header="Fertilizer Crop Chart(Organic Purchased)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer2}
-          header="Fertilizer Crop Chart(Organic Self Made)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer3}
-          header="Fertilizer Crop Chart(Chemical Based)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer4}
-          header="Fertilizer Crop Chart(None)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer}
+        header="Fertilizer Crop Chart(Organic Purchased)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer2}
+        header="Fertilizer Crop Chart(Organic Self Made)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer3}
+        header="Fertilizer Crop Chart(Chemical Based)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer4}
+        header="Fertilizer Crop Chart(None)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
       <CustomPieChart
         data={pieDataPesticide}
         header="Pesticide Land Chart"
@@ -200,34 +200,34 @@ export default function OrganicInorganic({ category }) {
         }`}
       />
       {/* </Box> */}
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide}
-          header="Pesticide Crop Chart(Organic Purchased)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide2}
-          header="Pesticide Crop Chart(Organic Self Made)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide3}
-          header="Pesticide Crop Chart(Chemical Based)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide4}
-          header="Pesticide Crop Chart(None)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide}
+        header="Pesticide Crop Chart(Organic Purchased)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide2}
+        header="Pesticide Crop Chart(Organic Self Made)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide3}
+        header="Pesticide Crop Chart(Chemical Based)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide4}
+        header="Pesticide Crop Chart(None)"
+        helper_text="Each bar represents number of farmers"
+      />
+      {/* </Box> */}
     </Stack>
   );
 }
