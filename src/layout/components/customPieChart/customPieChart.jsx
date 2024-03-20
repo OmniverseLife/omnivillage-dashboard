@@ -141,9 +141,13 @@ function CustomPieChart({
       },
       pie: {
         size: "100%",
-        // dataLabels: {
-        //     enabled: false
-        // }
+        dataLabels: {
+          formatter: function () {
+            if (this.y > 0) {
+              return this.point.name;
+            }
+          },
+        },
       },
     },
     series: [
