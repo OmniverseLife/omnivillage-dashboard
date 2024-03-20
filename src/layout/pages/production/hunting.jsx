@@ -63,15 +63,16 @@ function Hunting() {
     setmodalData({ ...obj });
   };
 
-  const rows = data?.huntings?.map((_hunting, index) => ({
-    id: index + 1,
-    _id: _hunting._id,
-    name: `${_hunting.first_name} ${_hunting.last_name}`,
-    phone: `${_hunting.country_code} ${_hunting.phone}`,
-    data: _hunting,
-    // crop_name: _hunting.crop.name.en,
-    // date: moment(_hunting.created_at).format("ll"),
-  }));
+  const rows =
+    data?.huntings?.map((_hunting, index) => ({
+      id: index + 1,
+      _id: _hunting._id,
+      name: `${_hunting.first_name} ${_hunting.last_name}`,
+      phone: `${_hunting.country_code} ${_hunting.phone}`,
+      data: _hunting,
+      // crop_name: _hunting.crop.name.en,
+      // date: moment(_hunting.created_at).format("ll"),
+    })) || [];
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },

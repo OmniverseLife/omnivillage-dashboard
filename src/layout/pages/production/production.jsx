@@ -62,7 +62,7 @@ function Production({
         columnVisibilityModel={{
           _id: false,
         }}
-        slots={{ toolbar: CustomToolbar }}
+        // slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
       {/* <Modal open={open} className="modal">

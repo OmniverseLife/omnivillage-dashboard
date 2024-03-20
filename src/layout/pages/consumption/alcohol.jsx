@@ -63,15 +63,16 @@ function Alcohol() {
     delete obj["crop_name"];
     setmodalData({ ...obj });
   };
-  const rows = data?.alcohols?.map((_cultivation, index) => ({
-    id: index + 1,
-    _id: _cultivation._id,
-    name: `${_cultivation.first_name} ${_cultivation.last_name}`,
-    phone: `${_cultivation.country_code} ${_cultivation.phone}`,
-    data: _cultivation,
-    // crop_name: _cultivation.consumption_crop.name,
-    // date: moment(_cultivation.created_at).format("ll"),
-  }));
+  const rows =
+    data?.alcohols?.map((_cultivation, index) => ({
+      id: index + 1,
+      _id: _cultivation._id,
+      name: `${_cultivation.first_name} ${_cultivation.last_name}`,
+      phone: `${_cultivation.country_code} ${_cultivation.phone}`,
+      data: _cultivation,
+      // crop_name: _cultivation.consumption_crop.name,
+      // date: moment(_cultivation.created_at).format("ll"),
+    })) || [];
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },

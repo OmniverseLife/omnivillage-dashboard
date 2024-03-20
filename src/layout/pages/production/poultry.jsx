@@ -63,15 +63,16 @@ function Poultry() {
     setmodalData({ ...obj });
   };
 
-  const rows = data?.poultry?.map((_poultry, index) => ({
-    id: index + 1,
-    _id: _poultry._id,
-    name: `${_poultry.first_name} ${_poultry.last_name}`,
-    phone: `${_poultry.country_code} ${_poultry.phone}`,
-    data: _poultry,
-    // crop_name: _poultry.crop.name.en,
-    // date: moment(_poultry.created_at).format("ll"),
-  }));
+  const rows =
+    data?.poultry?.map((_poultry, index) => ({
+      id: index + 1,
+      _id: _poultry._id,
+      name: `${_poultry.first_name} ${_poultry.last_name}`,
+      phone: `${_poultry.country_code} ${_poultry.phone}`,
+      data: _poultry,
+      // crop_name: _poultry.crop.name.en,
+      // date: moment(_poultry.created_at).format("ll"),
+    })) || [];
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },

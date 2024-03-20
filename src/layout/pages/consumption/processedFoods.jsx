@@ -67,15 +67,16 @@ function ProcessedFoods() {
     setmodalData({ ...obj });
   };
 
-  const rows = data?.processed_foods?.map((_cultivation, index) => ({
-    id: index + 1,
-    _id: _cultivation._id,
-    name: `${_cultivation.first_name} ${_cultivation.last_name}`,
-    phone: `${_cultivation.country_code} ${_cultivation.phone}`,
-    data: _cultivation,
-    //   crop_name: _cultivation.crop.name.en,
-    //   date: moment(_cultivation.created_at).format("ll"),
-  }));
+  const rows =
+    data?.processed_foods?.map((_cultivation, index) => ({
+      id: index + 1,
+      _id: _cultivation._id,
+      name: `${_cultivation.first_name} ${_cultivation.last_name}`,
+      phone: `${_cultivation.country_code} ${_cultivation.phone}`,
+      data: _cultivation,
+      //   crop_name: _cultivation.crop.name.en,
+      //   date: moment(_cultivation.created_at).format("ll"),
+    })) || [];
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },

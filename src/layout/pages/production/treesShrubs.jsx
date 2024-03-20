@@ -63,15 +63,16 @@ function TreesShrubs() {
     setmodalData({ ...obj });
   };
 
-  const rows = data?.trees?.map((_tree, index) => ({
-    id: index + 1,
-    _id: _tree._id,
-    name: `${_tree.first_name} ${_tree.last_name}`,
-    phone: `${_tree.country_code} ${_tree.phone}`,
-    data: _tree,
-    // crop_name: _tree.crop.name.en,
-    // date: moment(_tree.created_at).format("ll"),
-  }));
+  const rows =
+    data?.trees?.map((_tree, index) => ({
+      id: index + 1,
+      _id: _tree._id,
+      name: `${_tree.first_name} ${_tree.last_name}`,
+      phone: `${_tree.country_code} ${_tree.phone}`,
+      data: _tree,
+      // crop_name: _tree.crop.name.en,
+      // date: moment(_tree.created_at).format("ll"),
+    })) || [];
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },
