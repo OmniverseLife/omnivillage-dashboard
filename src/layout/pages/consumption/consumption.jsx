@@ -18,6 +18,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Loading from "../../components/loading";
+import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 
 function Consumption({
   rows,
@@ -61,6 +62,7 @@ function Consumption({
         columnVisibilityModel={{
           _id: false,
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
       {/* <Modal open={open} className="modal">

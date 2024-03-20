@@ -13,6 +13,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import { customDatalabels } from "../customPieChart/customPieChart";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import _ from "underscore";
 // ChartJS.unregister(customDatalabels);
 
 ChartJS.register(
@@ -24,46 +25,47 @@ ChartJS.register(
   Legend
 );
 
-const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "bottom",
-    },
-    datalabels: {
-      formatter: (value) => {
-        return value ? value : null;
-      },
-      color: "#333",
-      font: {
-        size: 16,
-      },
-      clamp: true,
-    },
-    afterDraw: function (chart) {
-      if (chart.data.datasets.length === 0) {
-        // No data is present
-        var ctx = chart.chart.ctx;
-        var width = chart.chart.width;
-        var height = chart.chart.height;
-        chart.clear();
+// const options = {
+//   responsive: true,
+//   plugins: {
+//     legend: {
+//       position: "bottom",
+//     },
+//     datalabels: {
+//       formatter: (value) => {
+//         return value ? value : null;
+//       },
+//       color: "#333",
+//       font: {
+//         size: 16,
+//       },
+//       clamp: true,
+//     },
+//     afterDraw: function (chart) {
+//       if (chart.data.datasets.length === 0) {
+//         // No data is present
+//         var ctx = chart.chart.ctx;
+//         var width = chart.chart.width;
+//         var height = chart.chart.height;
+//         chart.clear();
 
-        ctx.save();
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = "14px normal 'Helvetica Nueue'";
-        ctx.fillText("No data to display", width / 2, height / 2);
-        ctx.restore();
-      }
-    },
-  },
-};
+//         ctx.save();
+//         ctx.textAlign = "center";
+//         ctx.textBaseline = "middle";
+//         ctx.font = "14px normal 'Helvetica Nueue'";
+//         ctx.fillText("No data to display", width / 2, height / 2);
+//         ctx.restore();
+//       }
+//     },
+//   },
+// };
 
-function CustomBarChart({ header, data, measurement, helper_text }) {
+function CustomBarChart({ header, data, measurement = "", helper_text }) {
   // console.log(data.dataset);
   const options1 = {
     chart: {
       type: "column",
+      height: "560px",
       // spacingBottom: 0,
     },
     title: {
@@ -90,7 +92,7 @@ function CustomBarChart({ header, data, measurement, helper_text }) {
     },
     series: data.dataset,
     legend: {
-      enabled: false,
+      enabled: true,
     },
   };
 
@@ -105,10 +107,31 @@ function CustomBarChart({ header, data, measurement, helper_text }) {
         border: "1px solid #4b465c1f",
         padding: "15px 5px",
         alignItems: "center",
+        width: "100%",
+        height: "600px",
+        position: "relative",
       }}
     >
       {/* <h3>{header}</h3> */}
-      <p style={{ color: "#888", alignSelf: "flex-end" }}>{measurement}</p>
+      <p
+        style={{
+          color: "#888",
+          alignSelf: "flex-end",
+          position: "absolute",
+          top: "15px",
+          right: "20px",
+          zIndex: 9,
+        }}
+      >
+        <span>{measurement.slice(0, -1)}</span>
+        {!_.isNumber(parseInt(measurement.slice(-2, -1))) &&
+        !_.isSymbol(measurement.slice(-2, -1)) &&
+        Number.isInteger(parseInt(measurement.slice(-1))) ? (
+          <sup>{measurement.slice(-1)}</sup>
+        ) : (
+          measurement.slice(-1)
+        )}
+      </p>
       {/* <Bar options={options} data={data} plugins={[ChartDataLabels]} /> */}
       <div style={{ width: "100%", marginTop: "auto" }}>
         <HighchartsReact highcharts={Highcharts} options={options1} />

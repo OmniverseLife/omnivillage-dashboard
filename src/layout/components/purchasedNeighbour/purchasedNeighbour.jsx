@@ -50,7 +50,7 @@ function PurchasedNeighbour({ type_id, weight_unit, setSummary }) {
   }, [purchased_from_neighbour_sum, setSummary]);
 
   return (
-    <Box width="48%">
+    <Box width="100%">
       <Loading isLoading={isLoading} />
       <CustomBarChart
         header="Purchased From Neighbours"

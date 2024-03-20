@@ -22,8 +22,6 @@ export default function IncomeExpnditure() {
       ),
   });
 
-  console.log(data);
-
   const incomeExpenditureData = {
     xAxis: data.map((_data) => _data.name),
     dataset: [
@@ -41,13 +39,13 @@ export default function IncomeExpnditure() {
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
       <Loading isLoading={isLoading} />
-      <Box sx={{ width: "100%" }}>
-        <CustomBarChart
-          header="Income Expenditure"
-          data={incomeExpenditureData}
-          helper_text={`Each bar represents data in USD`}
-        />
-      </Box>
+      {/* <Box sx={{ width: "100%" }}> */}
+      <CustomBarChart
+        header="Income Expenditure"
+        data={incomeExpenditureData}
+        helper_text={`Each bar represents data in USD`}
+      />
+      {/* </Box> */}
     </Stack>
   );
 }

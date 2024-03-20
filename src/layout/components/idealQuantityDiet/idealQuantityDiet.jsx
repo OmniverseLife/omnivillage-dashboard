@@ -92,7 +92,7 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
       justifyContent={"space-between"}
       flexWrap={"wrap"}
       rowGap={5}
-      width="48%"
+      width="100%"
     >
       <Loading
         isLoading={
@@ -101,14 +101,14 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
           // isFetching
         }
       />
-      <Box width="100%">
-        <CustomBarChart
-          header="Ideal Quantity Consumption (Tags)"
-          data={tagsData}
-          helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
-          // style={{ width: "100%" }}
-        />
-      </Box>
+      {/* <Box width="100%"> */}
+      <CustomBarChart
+        header="Ideal Quantity Consumption (Tags)"
+        data={tagsData}
+        helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
+        // style={{ width: "100%" }}
+      />
+      {/* </Box> */}
       {/* <CustomPieChart
         header="Ideal Quantity To Be Consumed"
         data={quantityToBeConsumed}

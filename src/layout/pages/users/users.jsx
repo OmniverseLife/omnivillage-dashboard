@@ -7,6 +7,7 @@ import Loading from "../../components/loading";
 import { Menu, MenuItem, Stack } from "@mui/material";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
+import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 
 function Users() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -18,9 +19,9 @@ function Users() {
     queryFn: fetchAllUsers,
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
@@ -136,6 +137,10 @@ function Users() {
           //   totalLand: false,
           // }}
           pageSizeOptions={[5, 10]}
+          slots={{ toolbar: CustomToolbar }}
+          slotProps={{
+            toolbar: { printOptions: { disableToolbarButton: true } },
+          }}
           loading={isLoading}
         />
         <Loading isLoading={isLoading} />

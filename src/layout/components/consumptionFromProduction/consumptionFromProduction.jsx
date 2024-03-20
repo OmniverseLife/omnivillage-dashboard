@@ -96,10 +96,10 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
       name: "Purshased From Outside",
       y: summary_data.purchased_from_market_sum,
     },
-    {
-      name: "Self Consumed",
-      y: summary_data.self_consumed_sum,
-    },
+    // {
+    //   name: "Self Consumed",
+    //   y: summary_data.self_consumed_sum,
+    // },
   ];
 
   return (

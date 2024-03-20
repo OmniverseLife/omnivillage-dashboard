@@ -129,7 +129,7 @@ function Consumption() {
               id="demo-simple-select"
               value={selectedTag}
               style={{ width: 300 }}
-              label="Production Information"
+              label="Tags"
               onChange={(e) => setselectedTag(e.target.value)}
             >
               <MenuItem value={""}>Select</MenuItem>
@@ -150,7 +150,7 @@ function Consumption() {
                 id="demo-simple-select"
                 value={selectedCrop}
                 style={{ width: 200 }}
-                label="Production Information"
+                label="Name"
                 onChange={(e) => setselectedCrop(e.target.value)}
               >
                 <MenuItem value={""}>Select</MenuItem>

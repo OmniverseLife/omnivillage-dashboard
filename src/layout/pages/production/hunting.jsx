@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
+import CsvDownload from "react-json-to-csv";
 
 function Hunting() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -25,11 +26,7 @@ function Hunting() {
   const [modalOpen, setmodalOpen] = useState(false);
   const [optionsModal, setOptionsModal] = useState(false);
 
-  const {
-    data: huntings = [],
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["huntings"],
     queryFn: fetchHunting,
     select: (data) => {
@@ -44,13 +41,13 @@ function Hunting() {
           entries: _data[1],
         });
       });
-      return arr;
+      return { jsonData: data, huntings: arr };
     },
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
@@ -66,7 +63,7 @@ function Hunting() {
     setmodalData({ ...obj });
   };
 
-  const rows = huntings.map((_hunting, index) => ({
+  const rows = data?.huntings?.map((_hunting, index) => ({
     id: index + 1,
     _id: _hunting._id,
     name: `${_hunting.first_name} ${_hunting.last_name}`,
@@ -139,6 +136,12 @@ function Hunting() {
 
   return (
     <Wrapper>
+      <CsvDownload
+        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
+        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        delimiter=","
+        filename="Huntings"
+      />
       <Production
         rows={rows}
         columns={columns}

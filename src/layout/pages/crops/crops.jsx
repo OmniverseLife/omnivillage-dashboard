@@ -23,6 +23,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { fetchLabels } from "../../../functions/others";
+import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 
 const schema = yup.object().shape({
   name: yup.object().shape({
@@ -191,6 +192,7 @@ function Crops({
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
       <Loading isLoading={isLoading} />

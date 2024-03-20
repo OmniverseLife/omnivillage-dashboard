@@ -51,7 +51,7 @@ function PurchasedOutside({ type_id, weight_unit, setSummary }) {
   }, [purchased_from_market_sum, setSummary]);
 
   return (
-    <Box width="48%">
+    <Box width="100%">
       <Loading isLoading={isLoading} />
       <CustomBarChart
         header="Purchased From Outside"

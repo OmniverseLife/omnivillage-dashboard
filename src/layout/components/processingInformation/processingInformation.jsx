@@ -5,6 +5,7 @@ import { getProcessingMethod } from "../../../functions/dashboard";
 import moment from "moment";
 import { DataGrid } from "@mui/x-data-grid";
 import Loading from "../loading";
+import CustomToolbar from "../CustomToolbar/CustomToolbar";
 
 export default function ProcessingInformation({ category }) {
   const [searchParams] = useSearchParams();
@@ -69,6 +70,7 @@ export default function ProcessingInformation({ category }) {
         columnVisibilityModel={{
           _id: false,
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
     </div>

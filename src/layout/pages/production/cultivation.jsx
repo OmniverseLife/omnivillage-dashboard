@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-pattern */
 import React, { useState } from "react";
 import Production from "./production";
 import {
@@ -20,6 +21,7 @@ import { toast } from "sonner";
 import moment from "moment";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
+import CsvDownload from "react-json-to-csv";
 
 function Cultivation() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -29,13 +31,10 @@ function Cultivation() {
   const [modalOpen, setmodalOpen] = useState(false);
   const [optionsModal, setOptionsModal] = useState(false);
 
-  const {
-    data: cultivations = [],
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["cultivations"],
     queryFn: fetchCultivations,
+    initialData: { jsonData: [], cultivations: [] },
     select: (data) => {
       const obj = {};
       data.forEach((_data) => {
@@ -48,13 +47,13 @@ function Cultivation() {
           entries: _data[1],
         });
       });
-      return arr;
+      return { jsonData: data, cultivations: arr };
     },
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
@@ -70,15 +69,16 @@ function Cultivation() {
     setmodalData({ ...obj });
   };
 
-  const rows = cultivations.map((_cultivation, index) => ({
-    id: index + 1,
-    _id: _cultivation._id,
-    name: `${_cultivation.first_name} ${_cultivation.last_name}`,
-    phone: `${_cultivation.country_code} ${_cultivation.phone}`,
-    data: _cultivation,
-    //   crop_name: _cultivation.crop.name.en,
-    //   date: moment(_cultivation.created_at).format("ll"),
-  }));
+  const rows =
+    data?.cultivations?.map((_cultivation, index) => ({
+      id: index + 1,
+      _id: _cultivation._id,
+      name: `${_cultivation.first_name} ${_cultivation.last_name}`,
+      phone: `${_cultivation.country_code} ${_cultivation.phone}`,
+      data: _cultivation,
+      //   crop_name: _cultivation.crop.name.en,
+      //   date: moment(_cultivation.created_at).format("ll"),
+    })) || [];
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },
@@ -143,6 +143,12 @@ function Cultivation() {
 
   return (
     <Wrapper>
+      <CsvDownload
+        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
+        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        delimiter=","
+        filename="Cultivations"
+      />
       <Production
         rows={rows}
         columns={columns}

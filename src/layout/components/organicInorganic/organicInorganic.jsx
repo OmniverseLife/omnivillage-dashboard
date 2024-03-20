@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { getOrganicInOrganic } from "../../../functions/dashboard";
@@ -35,6 +35,10 @@ export default function OrganicInorganic({ category }) {
     },
   ];
 
+  const fertilizer_pie_sum = Object.values(
+    data?.fertilizer_data?.land_data || {}
+  ).reduce((prev, _value) => prev + _value, 0);
+
   const barDataFertilizer = {
     xAxis: Object.keys(data?.fertilizer_data?.crop_data || {}),
     dataset: [
@@ -46,6 +50,10 @@ export default function OrganicInorganic({ category }) {
       },
     ],
   };
+
+  const fertilizer_bar_sum1 = Object.values(
+    data?.fertilizer_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["organic purchased"], 0);
 
   const barDataFertilizer2 = {
     xAxis: Object.keys(data?.fertilizer_data?.crop_data || {}),
@@ -59,6 +67,10 @@ export default function OrganicInorganic({ category }) {
     ],
   };
 
+  const fertilizer_bar_sum2 = Object.values(
+    data?.fertilizer_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["organic self made"], 0);
+
   const barDataFertilizer3 = {
     xAxis: Object.keys(data?.fertilizer_data?.crop_data || {}),
     dataset: [
@@ -71,6 +83,10 @@ export default function OrganicInorganic({ category }) {
     ],
   };
 
+  const fertilizer_bar_sum3 = Object.values(
+    data?.fertilizer_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["chemical based"], 0);
+
   const barDataFertilizer4 = {
     xAxis: Object.keys(data?.fertilizer_data?.crop_data || {}),
     dataset: [
@@ -82,6 +98,10 @@ export default function OrganicInorganic({ category }) {
       },
     ],
   };
+
+  const fertilizer_bar_sum4 = Object.values(
+    data?.fertilizer_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["none"], 0);
 
   const pieDataPesticide = [
     {
@@ -102,6 +122,10 @@ export default function OrganicInorganic({ category }) {
     },
   ];
 
+  const pesticide_pie_sum = Object.values(
+    data?.pesticide_data?.land_data || {}
+  ).reduce((prev, _value) => prev + _value, 0);
+
   const barDataPesticide = {
     xAxis: Object.keys(data?.pesticide_data?.crop_data || {}),
     dataset: [
@@ -113,6 +137,10 @@ export default function OrganicInorganic({ category }) {
       },
     ],
   };
+
+  const pesticides_bar_sum1 = Object.values(
+    data?.pesticide_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["organic purchased"], 0);
 
   const barDataPesticide2 = {
     xAxis: Object.keys(data?.pesticide_data?.crop_data || {}),
@@ -126,6 +154,10 @@ export default function OrganicInorganic({ category }) {
     ],
   };
 
+  const pesticides_bar_sum2 = Object.values(
+    data?.pesticide_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["organic self made"], 0);
+
   const barDataPesticide3 = {
     xAxis: Object.keys(data?.pesticide_data?.crop_data || {}),
     dataset: [
@@ -137,6 +169,10 @@ export default function OrganicInorganic({ category }) {
       },
     ],
   };
+
+  const pesticides_bar_sum3 = Object.values(
+    data?.pesticide_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["chemical based"], 0);
 
   const barDataPesticide4 = {
     xAxis: Object.keys(data?.pesticide_data?.crop_data || {}),
@@ -150,9 +186,14 @@ export default function OrganicInorganic({ category }) {
     ],
   };
 
+  const pesticides_bar_sum4 = Object.values(
+    data?.pesticide_data?.crop_data || {}
+  ).reduce((prev, _value) => prev + _value["none"], 0);
+
   return (
     <Stack direction="row" alignItems="center" flexWrap="wrap" gap={3}>
       <Loading isLoading={isLoading} />
+      <Typography variant="h4">Fertilizers</Typography>
       {/* <Box width="50%"> */}
       <CustomPieChart
         data={pieDataFertilizer}
@@ -161,36 +202,42 @@ export default function OrganicInorganic({ category }) {
         helper_text={`Each slice represents number of ${
           category === "trees" ? "Trees" : "Land used"
         }`}
+        measurement={`${fertilizer_pie_sum} km2`}
       />
       {/* </Box> */}
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer}
-          header="Fertilizer Crop Chart(Organic Purchased)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer2}
-          header="Fertilizer Crop Chart(Organic Self Made)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer3}
-          header="Fertilizer Crop Chart(Chemical Based)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataFertilizer4}
-          header="Fertilizer Crop Chart(None)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer}
+        header="Fertilizer Crop Chart(Organic Purchased)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${fertilizer_bar_sum1}`}
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer2}
+        header="Fertilizer Crop Chart(Organic Self Made)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${fertilizer_bar_sum2}`}
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer3}
+        header="Fertilizer Crop Chart(Chemical Based)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${fertilizer_bar_sum3}`}
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataFertilizer4}
+        header="Fertilizer Crop Chart(None)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${fertilizer_bar_sum4}`}
+      />
+      <Typography variant="h4">Pesticides</Typography>
+      {/* </Box> */}
       <CustomPieChart
         data={pieDataPesticide}
         header="Pesticide Land Chart"
@@ -198,36 +245,41 @@ export default function OrganicInorganic({ category }) {
         helper_text={`Each slice represents number of ${
           category === "trees" ? "Trees" : "Land used"
         }`}
+        measurement={`${pesticide_pie_sum} km2`}
       />
       {/* </Box> */}
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide}
-          header="Pesticide Crop Chart(Organic Purchased)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide2}
-          header="Pesticide Crop Chart(Organic Self Made)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide3}
-          header="Pesticide Crop Chart(Chemical Based)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          data={barDataPesticide4}
-          header="Pesticide Crop Chart(None)"
-          helper_text="Each bar represents number of farmers"
-        />
-      </Box>
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide}
+        header="Pesticide Crop Chart(Organic Purchased)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${pesticides_bar_sum1}`}
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide2}
+        header="Pesticide Crop Chart(Organic Self Made)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${pesticides_bar_sum2}`}
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide3}
+        header="Pesticide Crop Chart(Chemical Based)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${pesticides_bar_sum3}`}
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        data={barDataPesticide4}
+        header="Pesticide Crop Chart(None)"
+        helper_text="Each bar represents number of farmers"
+        measurement={`Total - ${pesticides_bar_sum4}`}
+      />
+      {/* </Box> */}
     </Stack>
   );
 }

@@ -2,21 +2,28 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   TextField,
+  Typography,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import Loading from "../loading";
 import { useQuery } from "@tanstack/react-query";
 import { fetchFoodBalance } from "../../../functions/dashboard";
 import { useSearchParams } from "react-router-dom";
+import CustomToolbar from "../CustomToolbar/CustomToolbar";
 
 function DeficitCrops({ parentLoading, tag }) {
   const [rows, setRows] = useState([]);
   const [searchParams] = useSearchParams();
+  const [currency, setCurrency] = useState("RM");
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["food_balance", tag, searchParams.getAll("village")],
@@ -252,6 +259,11 @@ function DeficitCrops({ parentLoading, tag }) {
               size="small"
               style={{ border: "none", color: "#ccc" }}
               type="number"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">{currency}</InputAdornment>
+                ),
+              }}
               onKeyDown={(e) => {
                 if (
                   e.key === "e" ||
@@ -283,15 +295,34 @@ function DeficitCrops({ parentLoading, tag }) {
       headerName: "Economic Gain",
       width: 180,
       renderCell: (params) => {
-        return params.row.locallySuitable === "Yes"
-          ? (params.row.deficitAmount * params.row.marketPrice).toFixed(2)
-          : "-";
+        return params.row.locallySuitable === "Yes" ? (
+          <Typography>
+            {currency}{" "}
+            {(params.row.deficitAmount * params.row.marketPrice).toFixed(2)}
+          </Typography>
+        ) : (
+          "-"
+        );
       },
     },
   ];
 
   return (
     <>
+      <FormControl size="small" sx={{ marginBottom: "20px" }}>
+        <InputLabel>Currency</InputLabel>
+        <Select
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
+          label="Currency"
+          sx={{ width: "250px" }}
+        >
+          <MenuItem value="$">USD ($)</MenuItem>
+          <MenuItem value="₹">INR (₹)</MenuItem>
+          <MenuItem value="RM">MYR (RM)</MenuItem>
+          <MenuItem value="रु">NPR (रु)</MenuItem>
+        </Select>
+      </FormControl>
       <Loading isLoading={parentLoading || isLoading || isFetching} />
       <span style={{ fontSize: 12, marginBottom: 10 }}>
         *Note* - Here the currency that you enter is your local currency and the
@@ -311,6 +342,7 @@ function DeficitCrops({ parentLoading, tag }) {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
+        slots={{ toolbar: CustomToolbar }}
         pageSizeOptions={[5, 10]}
       />
     </>

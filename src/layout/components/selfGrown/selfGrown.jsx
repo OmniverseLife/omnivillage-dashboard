@@ -80,26 +80,26 @@ function SelfGrown({ type_id, weight_unit, setSummary }) {
       direction={"row"}
       justifyContent={"space-between"}
       flexWrap={"wrap"}
-      // gap={2}
+      gap={4}
       width={"100%"}
     >
       <Loading isLoading={isSelfConsumedLoading || isSelfGrownLoading} />
-      <Box width="48%">
-        <CustomBarChart
-          header="Self Grown"
-          data={selfGrownData}
-          measurement={`${self_grown_sum} kgs`}
-          helper_text="Each bar represents how much crop is self grown"
-        />
-      </Box>
-      <Box width="48%">
-        <CustomBarChart
-          header="Self Consumed"
-          data={selfConsumedData}
-          measurement={`${self_consumed_sum} kgs`}
-          helper_text="Each bar represents how much crop is self consumed"
-        />
-      </Box>
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        header="Self Grown"
+        data={selfGrownData}
+        measurement={`${self_grown_sum} kgs`}
+        helper_text="Each bar represents how much crop is self grown"
+      />
+      {/* </Box> */}
+      {/* <Box width="48%"> */}
+      <CustomBarChart
+        header="Self Consumed"
+        data={selfConsumedData}
+        measurement={`${self_consumed_sum} kgs`}
+        helper_text="Each bar represents how much crop is self consumed"
+      />
+      {/* </Box> */}
     </Stack>
     // </Box>
   );
