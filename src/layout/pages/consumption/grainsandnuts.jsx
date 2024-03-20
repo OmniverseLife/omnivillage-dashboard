@@ -17,6 +17,7 @@ import { deleteCultivation } from "../../../functions/production";
 import Consumption from "./consumption";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
+import CsvDownload from "react-json-to-csv";
 
 function GrainsAndNuts() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -26,11 +27,7 @@ function GrainsAndNuts() {
   const [modalOpen, setmodalOpen] = useState(false);
   const [optionsModal, setOptionsModal] = useState(false);
 
-  const {
-    data: grainandnuts = [],
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["grains_and_nuts"],
     queryFn: fetchGrains,
     select: (data) => {
@@ -45,13 +42,13 @@ function GrainsAndNuts() {
           entries: _data[1],
         });
       });
-      return arr;
+      return { jsonData: data, grainandnuts: arr };
     },
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
@@ -66,7 +63,7 @@ function GrainsAndNuts() {
     delete obj["crop_name"];
     setmodalData({ ...obj });
   };
-  const rows = grainandnuts.map((_cultivation, index) => ({
+  const rows = data?.grainandnuts?.map((_cultivation, index) => ({
     id: index + 1,
     _id: _cultivation._id,
     name: `${_cultivation.first_name} ${_cultivation.last_name}`,
@@ -139,6 +136,12 @@ function GrainsAndNuts() {
 
   return (
     <Wrapper>
+      <CsvDownload
+        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
+        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        delimiter=","
+        filename="Grains & Nuts"
+      />
       <Consumption
         rows={rows}
         columns={columns}

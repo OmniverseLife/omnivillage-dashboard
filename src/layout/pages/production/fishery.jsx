@@ -20,6 +20,7 @@ import moment from "moment";
 import { useQuery } from "@tanstack/react-query";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
+import CsvDownload from "react-json-to-csv";
 
 function Fishery() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -29,11 +30,7 @@ function Fishery() {
   const [modalOpen, setmodalOpen] = useState(false);
   const [optionsModal, setOptionsModal] = useState(false);
 
-  const {
-    data: fishery = [],
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["fishery"],
     queryFn: fetchFishery,
     select: (data) => {
@@ -48,13 +45,13 @@ function Fishery() {
           entries: _data[1],
         });
       });
-      return arr;
+      return { jsonData: [], fishery: arr };
     },
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
@@ -70,7 +67,7 @@ function Fishery() {
     setmodalData({ ...obj });
   };
 
-  const rows = fishery.map((_fishery, index) => ({
+  const rows = data?.fishery?.map((_fishery, index) => ({
     id: index + 1,
     _id: _fishery._id,
     name: `${_fishery.first_name} ${_fishery.last_name}`,
@@ -143,6 +140,12 @@ function Fishery() {
 
   return (
     <Wrapper>
+      <CsvDownload
+        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
+        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        delimiter=","
+        filename="Fishery"
+      />
       <Production
         rows={rows}
         columns={columns}

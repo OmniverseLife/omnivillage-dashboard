@@ -16,6 +16,7 @@ import { deleteTree, fetchTrees } from "../../../functions/production";
 import { useQuery } from "@tanstack/react-query";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
+import CsvDownload from "react-json-to-csv";
 
 function TreesShrubs() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -25,11 +26,7 @@ function TreesShrubs() {
   const [modalOpen, setmodalOpen] = useState(false);
   const [optionsModal, setOptionsModal] = useState(false);
 
-  const {
-    data: trees = [],
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["trees"],
     queryFn: fetchTrees,
     select: (data) => {
@@ -44,13 +41,13 @@ function TreesShrubs() {
           entries: _data[1],
         });
       });
-      return arr;
+      return { jsonData: data, trees: arr };
     },
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
@@ -66,7 +63,7 @@ function TreesShrubs() {
     setmodalData({ ...obj });
   };
 
-  const rows = trees.map((_tree, index) => ({
+  const rows = data?.trees?.map((_tree, index) => ({
     id: index + 1,
     _id: _tree._id,
     name: `${_tree.first_name} ${_tree.last_name}`,
@@ -139,6 +136,12 @@ function TreesShrubs() {
 
   return (
     <Wrapper>
+      <CsvDownload
+        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
+        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        delimiter=","
+        filename="Trees & Shrubs"
+      />
       <Production
         rows={rows}
         columns={columns}

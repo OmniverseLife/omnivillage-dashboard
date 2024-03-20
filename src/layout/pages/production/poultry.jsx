@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
+import CsvDownload from "react-json-to-csv";
 
 function Poultry() {
   const [selectedrow, setSelectedrow] = useState(null);
@@ -25,11 +26,7 @@ function Poultry() {
   const [modalOpen, setmodalOpen] = useState(false);
   const [optionsModal, setOptionsModal] = useState(false);
 
-  const {
-    data: poultry = [],
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["poultry"],
     queryFn: fetchPoultry,
     select: (data) => {
@@ -44,13 +41,13 @@ function Poultry() {
           entries: _data[1],
         });
       });
-      return arr;
+      return { jsonData: data, poultry: arr };
     },
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
@@ -66,7 +63,7 @@ function Poultry() {
     setmodalData({ ...obj });
   };
 
-  const rows = poultry.map((_poultry, index) => ({
+  const rows = data?.poultry?.map((_poultry, index) => ({
     id: index + 1,
     _id: _poultry._id,
     name: `${_poultry.first_name} ${_poultry.last_name}`,
@@ -139,6 +136,12 @@ function Poultry() {
 
   return (
     <Wrapper>
+      <CsvDownload
+        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
+        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        delimiter=","
+        filename="Poultry"
+      />
       <Production
         rows={rows}
         columns={columns}

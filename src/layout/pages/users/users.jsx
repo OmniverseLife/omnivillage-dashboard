@@ -19,9 +19,9 @@ function Users() {
     queryFn: fetchAllUsers,
   });
 
-  function deepFlattenToObject(obj, prefix = "") {
+  function deepFlattenToObject(obj, prefix = "#") {
     return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix + "#" : "";
+      const pre = prefix.length ? prefix : "";
       if (typeof obj[k] === "object" && obj[k] !== null) {
         Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
       } else {
