@@ -67,15 +67,16 @@ function Fishery() {
     setmodalData({ ...obj });
   };
 
-  const rows = data?.fishery?.map((_fishery, index) => ({
-    id: index + 1,
-    _id: _fishery._id,
-    name: `${_fishery.first_name} ${_fishery.last_name}`,
-    phone: `${_fishery.country_code} ${_fishery.phone}`,
-    data: _fishery,
-    // crop_name: _fishery.crop.name.en,
-    // date: moment(_fishery.created_at).format("ll"),
-  }));
+  const rows =
+    data?.fishery?.map((_fishery, index) => ({
+      id: index + 1,
+      _id: _fishery._id,
+      name: `${_fishery.first_name} ${_fishery.last_name}`,
+      phone: `${_fishery.country_code} ${_fishery.phone}`,
+      data: _fishery,
+      // crop_name: _fishery.crop.name.en,
+      // date: moment(_fishery.created_at).format("ll"),
+    })) || [];
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 150 },
