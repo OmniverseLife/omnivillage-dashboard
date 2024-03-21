@@ -187,7 +187,7 @@ function Production() {
                   setSearchParams(searchParams);
                 }}
               >
-                <MenuItem value="">Select</MenuItem>
+                <MenuItem value="">Aggregate</MenuItem>
                 {all_crops.map((_crop) => (
                   <MenuItem value={_crop._id} key={_crop._id}>
                     {_crop.name}
@@ -217,7 +217,7 @@ function Production() {
                   setSearchParams(searchParams);
                 }}
               >
-                <MenuItem value="">Select</MenuItem>
+                <MenuItem value="">Aggregate</MenuItem>
                 {labels.map((_label) => (
                   <MenuItem value={_label._id} key={_label._id}>
                     {_label.name}
@@ -246,7 +246,7 @@ function Production() {
                   setSearchParams(searchParams);
                 }}
               >
-                <MenuItem value="">Select</MenuItem>
+                <MenuItem value="">Aggregate</MenuItem>
                 {crops.map((_crop) => {
                   return (
                     <MenuItem value={_crop._id} key={_crop._id}>

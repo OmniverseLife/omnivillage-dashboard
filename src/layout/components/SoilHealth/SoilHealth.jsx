@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material";
 import React from "react";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
-import CustomBarChart from "../customBarChart/customBarChart";
+import CustomAreaChart from "../customAreaChart/customAreaChart";
 import CustomPieChart from "../customPieChart/customPieChart";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -19,7 +19,7 @@ const landConverter = (unit, value) => {
 function SoilHealth({ land_unit }) {
   const [searchParams] = useSearchParams();
 
-  const { data: { soil_health } = [], isLoading } = useQuery({
+  const { data: { aggregate, crop_data } = [], isLoading } = useQuery({
     queryKey: ["soil_health", searchParams.getAll("village")],
     queryFn: () => getSoilHealth(searchParams.getAll("village")),
   });
@@ -27,18 +27,38 @@ function SoilHealth({ land_unit }) {
   const soilHealthData = [
     {
       name: "Stable",
-      y: landConverter(land_unit, soil_health?.stable),
+      y: landConverter(land_unit, aggregate?.soil_health?.stable),
     },
     {
       name: "Decreasing Yeild",
-      y: landConverter(land_unit, soil_health?.decreasing_yeild),
+      y: landConverter(land_unit, aggregate?.soil_health?.decreasing_yeild),
     },
   ];
 
-  const soil_health_sum = Object.values(soil_health || {})?.reduce(
+  const soil_health_sum = Object.values(aggregate?.soil_health || {})?.reduce(
     (prev, _value) => prev + landConverter(land_unit, _value),
     0
   );
+
+  console.log(aggregate);
+
+  const crop_area_chart = {
+    xAxis: crop_data?.map((_item) => _item.crop_name),
+    dataset: [
+      {
+        name: "Stable",
+        data: crop_data?.map((_item) => landConverter(land_unit, _item.stable)),
+        color: "#8579D1",
+      },
+      {
+        name: "Decreasing Yeild",
+        data: crop_data?.map((_item) =>
+          landConverter(land_unit, _item.decreasing_yeild)
+        ),
+        color: "#6CC3FC",
+      },
+    ],
+  };
 
   return (
     <Stack direction={"row"} justifyContent={"space-between"} flexWrap={"wrap"}>
@@ -47,9 +67,17 @@ function SoilHealth({ land_unit }) {
         header="Soil Health"
         data={soilHealthData}
         helper_text={`Each slice represents ${
-          soil_health?.type !== "tree" ? "amount of land" : "number of crops"
+          aggregate?.soil_health?.type !== "tree"
+            ? "amount of land"
+            : "number of crops"
         }`}
         measurement={`${soil_health_sum} ${land_unit}`}
+      />
+      <CustomAreaChart
+        header="Cultivation Crop wise Soil health"
+        data={crop_area_chart}
+        helper_text="Each point represents land under crop baed on soil health"
+        // style={{ width: "100%" }}
       />
     </Stack>
   );

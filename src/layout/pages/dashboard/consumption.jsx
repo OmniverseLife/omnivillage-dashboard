@@ -132,7 +132,7 @@ function Consumption() {
               label="Tags"
               onChange={(e) => setselectedTag(e.target.value)}
             >
-              <MenuItem value={""}>Select</MenuItem>
+              <MenuItem value={""}>Aggregate</MenuItem>
               {labels.map((_label) => {
                 return (
                   <MenuItem value={_label._id} key={_label._id}>

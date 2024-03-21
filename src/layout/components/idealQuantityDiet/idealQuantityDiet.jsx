@@ -36,23 +36,41 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
   //   queryFn: () => getIdealConsumptionExpectedData(type_id),
   // });
 
-  const tags = ideal_consumption_bar.map((_item) => _item.label_name);
+  const tags = type_id
+    ? [ideal_consumption_bar.find((_item) => _item._id === type_id)?.label_name]
+    : ideal_consumption_bar.map((_item) => _item.label_name);
 
   const tagsData = {
     xAxis: tags,
     dataset: [
       {
         name: "Ideal Quantity To Be Consumed",
-        data: ideal_consumption_bar.map((_item) =>
-          weightConverter(weight_unit, _item.ideal_consumption)
-        ),
+        data: type_id
+          ? [
+              weightConverter(
+                weight_unit,
+                ideal_consumption_bar.find((_item) => _item._id === type_id)
+                  .ideal_consumption
+              ),
+            ]
+          : ideal_consumption_bar.map((_item) =>
+              weightConverter(weight_unit, _item.ideal_consumption)
+            ),
         color: "#8579D1",
       },
       {
         name: "Current Consumed Quantity",
-        data: ideal_consumption_bar.map((_item) =>
-          weightConverter(weight_unit, _item.total_consumed)
-        ),
+        data: type_id
+          ? [
+              weightConverter(
+                weight_unit,
+                ideal_consumption_bar.find((_item) => _item._id === type_id)
+                  .total_consumed
+              ),
+            ]
+          : ideal_consumption_bar.map((_item) =>
+              weightConverter(weight_unit, _item.total_consumed)
+            ),
         color: "#6CC3FC",
       },
     ],
@@ -105,12 +123,20 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
         }
       />
       {/* <Box width="100%"> */}
-      <CustomAreaChart
-        header="Ideal Quantity Consumption (Tags)"
-        data={tagsData}
-        helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
-        // style={{ width: "100%" }}
-      />
+      {type_id ? (
+        <CustomBarChart
+          header="Ideal Quantity Consumption (Tag)"
+          data={tagsData}
+          helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
+        />
+      ) : (
+        <CustomAreaChart
+          header="Ideal Quantity Consumption (Tags)"
+          data={tagsData}
+          helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
+          // style={{ width: "100%" }}
+        />
+      )}
       {/* </Box> */}
       {/* <CustomPieChart
         header="Ideal Quantity To Be Consumed"
