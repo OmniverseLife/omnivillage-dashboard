@@ -1,6 +1,7 @@
 import { Box, Stack } from "@mui/material";
 import React from "react";
 import CustomPieChart from "../customPieChart/customPieChart";
+import CustomAreaChart from "../customAreaChart/customAreaChart";
 import { backgroundColor, borderColor } from "../../pages/dashboard/production";
 import CustomBarChart from "../customBarChart/customBarChart";
 import { useQuery } from "@tanstack/react-query";
@@ -45,12 +46,14 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
         data: ideal_consumption_bar.map((_item) =>
           weightConverter(weight_unit, _item.ideal_consumption)
         ),
+        color: "#8579D1",
       },
       {
         name: "Current Consumed Quantity",
         data: ideal_consumption_bar.map((_item) =>
           weightConverter(weight_unit, _item.total_consumed)
         ),
+        color: "#6CC3FC",
       },
     ],
   };
@@ -102,7 +105,7 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
         }
       />
       {/* <Box width="100%"> */}
-      <CustomBarChart
+      <CustomAreaChart
         header="Ideal Quantity Consumption (Tags)"
         data={tagsData}
         helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
