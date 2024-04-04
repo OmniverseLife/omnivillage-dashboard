@@ -13,6 +13,7 @@ const StyledRow = styled(Stack)`
     padding: 10px;
     width: 50%;
     text-transform: capitalize;
+    word-break: break-all;
     /* border-bottom: 1px solid #eee; */
   }
   h2 {

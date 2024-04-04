@@ -583,8 +583,8 @@ export default function Settings() {
                   <ToggleButton value="malaysia" style={{ outline: "none" }}>
                     Malaysia
                   </ToggleButton>
-                  <ToggleButton value="nepal" style={{ outline: "none" }}>
-                    Nepal
+                  <ToggleButton value="bhutan" style={{ outline: "none" }}>
+                    Bhutan
                   </ToggleButton>
                 </ToggleButtonGroup>
               )}
@@ -715,8 +715,8 @@ export default function Settings() {
                   <ToggleButton value="malaysia" style={{ outline: "none" }}>
                     Malaysia
                   </ToggleButton>
-                  <ToggleButton value="nepal" style={{ outline: "none" }}>
-                    Nepal
+                  <ToggleButton value="bhutan" style={{ outline: "none" }}>
+                    Bhutan
                   </ToggleButton>
                 </ToggleButtonGroup>
               )}
