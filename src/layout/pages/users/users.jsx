@@ -8,6 +8,7 @@ import { Menu, MenuItem, Stack } from "@mui/material";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
 import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
+import ViewDetails2 from "../../components/viewDetails2/viewDetails2";
 
 function Users() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -30,14 +31,16 @@ function Users() {
       return acc;
     }, {});
   }
+
   const selectData = (data) => {
-    let obj = deepFlattenToObject(data);
-    delete obj["updatedAt"];
-    delete obj["__v"];
-    delete obj["_id"];
+    // let obj = deepFlattenToObject(data);
+    let obj = data;
+    // delete obj["members"];
+    // delete obj["__v"];
+    // delete obj["_id"];
 
     console.log(obj);
-    setmodalData({ ...obj });
+    setmodalData(obj);
   };
   const rows = users.map((_user, idx) => ({
     id: idx + 1,
@@ -121,7 +124,7 @@ function Users() {
       },
     },
   ];
-  console.log(selectedrow);
+
   return (
     <Wrapper>
       <div className="users">
@@ -145,7 +148,7 @@ function Users() {
         />
         <Loading isLoading={isLoading} />
         {selectedrow && (
-          <ViewDetails
+          <ViewDetails2
             open={modalOpen}
             setOpen={() => setmodalOpen(false)}
             data={modalData}

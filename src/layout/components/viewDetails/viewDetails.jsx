@@ -1,18 +1,34 @@
+import styled from "@emotion/styled";
+import { Button, Modal, Stack, Typography } from "@mui/material";
 import React from "react";
-import {
-  Button,
-  Chip,
-  Menu,
-  MenuItem,
-  Modal,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
-import moment from "moment";
 import { mediaURL } from "../../../axios/axiosInstance";
+import moment from "moment";
+
+const StyledRow = styled(Stack)`
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eee;
+  p {
+    width: 200px;
+    padding: 10px;
+    width: 50%;
+    text-transform: capitalize;
+    /* border-bottom: 1px solid #eee; */
+  }
+  h2 {
+    width: 100%;
+    padding: 20px 10px;
+    text-transform: capitalize;
+    /* border-bottom-color: #ccc; */
+  }
+  h3 {
+    width: 100%;
+    padding: 12px 10px;
+    text-transform: capitalize;
+    /* border-bottom-color: #ccc; */
+    /* border-bottom: 1px solid #eee; */
+  }
+`;
 
 function ViewDetails({ open, setOpen, data, heading }) {
   let obj = {
@@ -22,12 +38,38 @@ function ViewDetails({ open, setOpen, data, heading }) {
     phone: "+91 3674689047",
     totalLand: 50,
   };
+
+  const tableRow = (array) => {
+    return [
+      ...array.map((_item) => {
+        const item = Object.entries(_item);
+        // console.log(item.length - 1, "tie");
+        return item.map((_data, index) => {
+          console.log(index, item.length - 1);
+          return (
+            <StyledRow
+              direction="row"
+              key={_data[0]}
+              sx={{
+                borderBottomColor:
+                  index === item.length - 1 ? "#ccc !important" : "#eee",
+              }}
+            >
+              <p>{_data[0].replaceAll("_", " ")}</p>
+              <p>{_data[1]}</p>
+            </StyledRow>
+          );
+        });
+      }),
+    ];
+  };
+
   return (
     // <Stack>
     <Modal open={open} className="modal">
       <Stack
         width="auto"
-        maxWidth="90vw"
+        minWidth="40vw"
         bgcolor={"#fff"}
         borderRadius={1}
         padding={2}
