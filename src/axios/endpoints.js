@@ -6,6 +6,7 @@ export const endpoints = {
   },
   user: {
     list_all: "/user/list-all",
+    download: "/user/download-pdf",
   },
   labels: {
     get_all: "/consumption_type",

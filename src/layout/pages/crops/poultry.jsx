@@ -132,21 +132,22 @@ function Poultry() {
   ];
 
   return (
-    <Wrapper>
-      <Crops
-        rows={rows}
-        columns={columns}
-        isLoading={isLoading}
-        editItem={editItem}
-        setEdit={setEditItem}
-        editFn={editPoultryCrops}
-        refetch={refetch}
-        addFn={addPoultryCrops}
-        deleteFn={deletePoultryCrops}
-        setDeleteId={setDeleteId}
-        deleteId={deleteId}
-      />
-    </Wrapper>
+    // <Wrapper>
+    <Crops
+      rows={rows}
+      columns={columns}
+      isLoading={isLoading}
+      editItem={editItem}
+      setEdit={setEditItem}
+      editFn={editPoultryCrops}
+      refetch={refetch}
+      addFn={addPoultryCrops}
+      deleteFn={deletePoultryCrops}
+      setDeleteId={setDeleteId}
+      deleteId={deleteId}
+      sectionName="Poultry Crops"
+    />
+    // </Wrapper>
   );
 }
 

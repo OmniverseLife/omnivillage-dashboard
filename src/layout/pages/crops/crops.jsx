@@ -45,6 +45,7 @@ function Crops({
   deleteFn,
   deleteId,
   setDeleteId,
+  sectionName,
 }) {
   const [open, setopen] = useState(false);
   const [csvModal, setcsvModal] = useState(false);
@@ -165,7 +166,10 @@ function Crops({
 
   return (
     <Stack>
-      <Stack direction="row" justifyContent="flex-end">
+      <Stack direction="row">
+        <Typography variant="h5" sx={{ marginRight: "auto" }}>
+          {sectionName}
+        </Typography>
         <Button
           variant="contained"
           className="ModalOpeningButtton"
