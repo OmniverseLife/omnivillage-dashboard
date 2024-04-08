@@ -4,6 +4,7 @@ import { Menu, MenuItem, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import {
   addTreeCrops,
+  bulkUploadTreeCrops,
   deleteTreeCrops,
   editTreeCrops,
   fetchTreeCrops,
@@ -146,6 +147,7 @@ function TreesShrubs() {
       setDeleteId={setDeleteId}
       deleteId={deleteId}
       sectionName="Trees & Shrubs Crops"
+      bulkUploadFn={bulkUploadTreeCrops}
     />
     // </Wrapper>
   );

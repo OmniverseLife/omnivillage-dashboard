@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Crops from "./crops";
 import {
   addFisheryCrops,
+  bulkUploadFisheryCrops,
   deleteFisheryCrops,
   editFisheryCrops,
   fetchFisheryCrops,
@@ -146,6 +147,7 @@ function Fishery() {
       setDeleteId={setDeleteId}
       deleteId={deleteId}
       sectionName="Fishery Crops"
+      bulkUploadFn={bulkUploadFisheryCrops}
     />
     // </Wrapper>
   );

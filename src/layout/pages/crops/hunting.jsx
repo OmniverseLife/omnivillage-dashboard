@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Crops from "./crops";
 import {
   addHuntingCrops,
+  bulkUploadHuntingCrops,
   deleteHuntingCrops,
   editHuntingCrops,
   fetchHuntingCrops,
@@ -146,6 +147,7 @@ function Hunting() {
       setDeleteId={setDeleteId}
       deleteId={deleteId}
       sectionName="Hunting Crops"
+      bulkUploadFn={bulkUploadHuntingCrops}
     />
     // {/* </Wrapper> */}
   );

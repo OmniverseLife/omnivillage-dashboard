@@ -51,6 +51,44 @@ export const addHuntingCrops = async (body) => {
   return res.data;
 };
 
+export const bulkUploadCultivationCrops = async (body) => {
+  const formData = new FormData();
+  formData.append("sheet", body);
+  const res = await axiosInstance.post(
+    endpoints.cultivation.bulk_upload,
+    formData
+  );
+  return res.data;
+};
+
+export const bulkUploadTreeCrops = async (body) => {
+  const formData = new FormData();
+  formData.append("sheet", body);
+  const res = await axiosInstance.post(endpoints.trees.bulk_upload, formData);
+  return res.data;
+};
+
+export const bulkUploadPoultryCrops = async (body) => {
+  const formData = new FormData();
+  formData.append("sheet", body);
+  const res = await axiosInstance.post(endpoints.poultry.bulk_upload, formData);
+  return res.data;
+};
+
+export const bulkUploadFisheryCrops = async (body) => {
+  const formData = new FormData();
+  formData.append("sheet", body);
+  const res = await axiosInstance.post(endpoints.fishery.bulk_upload, formData);
+  return res.data;
+};
+
+export const bulkUploadHuntingCrops = async (body) => {
+  const formData = new FormData();
+  formData.append("sheet", body);
+  const res = await axiosInstance.post(endpoints.hunting.bulk_upload, formData);
+  return res.data;
+};
+
 export const editCultivationCrops = async (body) => {
   const res = await axiosInstance.post(endpoints.cultivation.edit_crop, body);
   return res.data;

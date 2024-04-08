@@ -4,6 +4,7 @@ import { Menu, MenuItem, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import {
   addPoultryCrops,
+  bulkUploadPoultryCrops,
   deletePoultryCrops,
   editPoultryCrops,
   fetchPoultryCrops,
@@ -146,6 +147,7 @@ function Poultry() {
       setDeleteId={setDeleteId}
       deleteId={deleteId}
       sectionName="Poultry Crops"
+      bulkUploadFn={bulkUploadPoultryCrops}
     />
     // </Wrapper>
   );
