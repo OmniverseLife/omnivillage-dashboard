@@ -58,7 +58,7 @@ function PurchasedOutside({ type_id, weight_unit, setSummary }) {
         data={data}
         style={{ width: "100%" }}
         measurement={`${purchased_from_market_sum} kgs`}
-        helper_text="Each bar represents how much crop is purchased from market"
+        helper_text="The amount of crop purchased from outside"
       />
     </Box>
   );

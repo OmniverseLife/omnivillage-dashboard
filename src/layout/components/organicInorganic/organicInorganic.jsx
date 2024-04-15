@@ -15,6 +15,7 @@ export default function OrganicInorganic({ category }) {
     queryFn: () =>
       getOrganicInOrganic(searchParams.getAll("village"), category),
   });
+  console.log(category, data);
 
   const pieDataFertilizer = [
     {
@@ -199,16 +200,18 @@ export default function OrganicInorganic({ category }) {
         data={pieDataFertilizer}
         header="Fertilizer Land Chart"
         style={{ margin: 0 }}
-        helper_text={`Each slice represents number of ${
-          category === "trees" ? "Trees" : "Land used"
-        }`}
+        helper_text={`
+        Each segment represents the amount of ${
+          category === "trees" ? "trees" : "land"
+        } under the specific category of fertilizer
+        `}
         measurement={`${fertilizer_pie_sum} km2`}
       />
       {/* </Box> */}
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataFertilizer}
-        header="Fertilizer Crop Chart(Organic Purchased)"
+        header="No. of farmers who purchased organic fertilizer"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${fertilizer_bar_sum1}`}
       />
@@ -216,7 +219,7 @@ export default function OrganicInorganic({ category }) {
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataFertilizer2}
-        header="Fertilizer Crop Chart(Organic Self Made)"
+        header="No. of farmers who use self-made organic fertilizer"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${fertilizer_bar_sum2}`}
       />
@@ -224,7 +227,7 @@ export default function OrganicInorganic({ category }) {
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataFertilizer3}
-        header="Fertilizer Crop Chart(Chemical Based)"
+        header="No. of farmers who purchased chemical based fertilizer"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${fertilizer_bar_sum3}`}
       />
@@ -232,7 +235,7 @@ export default function OrganicInorganic({ category }) {
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataFertilizer4}
-        header="Fertilizer Crop Chart(None)"
+        header="No. of farmers who don't use any fertilizer"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${fertilizer_bar_sum4}`}
       />
@@ -242,16 +245,16 @@ export default function OrganicInorganic({ category }) {
         data={pieDataPesticide}
         header="Pesticide Land Chart"
         style={{ margin: 0 }}
-        helper_text={`Each slice represents number of ${
-          category === "trees" ? "Trees" : "Land used"
-        }`}
+        helper_text={`Each segment represents the amount of ${
+          category === "trees" ? "trees" : "land"
+        } under the specific category of pesticide`}
         measurement={`${pesticide_pie_sum} km2`}
       />
       {/* </Box> */}
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataPesticide}
-        header="Pesticide Crop Chart(Organic Purchased)"
+        header="No. of farmers who purchased organic pesticide"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${pesticides_bar_sum1}`}
       />
@@ -259,7 +262,7 @@ export default function OrganicInorganic({ category }) {
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataPesticide2}
-        header="Pesticide Crop Chart(Organic Self Made)"
+        header="No. of farmers who use self-made organic pesticide"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${pesticides_bar_sum2}`}
       />
@@ -267,7 +270,7 @@ export default function OrganicInorganic({ category }) {
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataPesticide3}
-        header="Pesticide Crop Chart(Chemical Based)"
+        header="No. of farmers who purchased chemical based pesticide"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${pesticides_bar_sum3}`}
       />
@@ -275,7 +278,7 @@ export default function OrganicInorganic({ category }) {
       {/* <Box width="48%"> */}
       <CustomBarChart
         data={barDataPesticide4}
-        header="Pesticide Crop Chart(None)"
+        header="No. of farmers who don't use any pesticide"
         helper_text="Each bar represents number of farmers"
         measurement={`Total - ${pesticides_bar_sum4}`}
       />

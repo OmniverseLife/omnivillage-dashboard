@@ -404,7 +404,8 @@ function Production() {
             </FormControl>
           ) : null}
           {searchParams.get("option") === "output-utilisation" ||
-          searchParams.get("option") === "storage-facility" ? (
+          searchParams.get("option") === "storage-facility" ||
+          searchParams.get("option") === "harvested-products" ? (
             <FormControl size="small" style={{ marginLeft: "auto" }}>
               <InputLabel id="demo-simple-select-label">Weight</InputLabel>
               <Select
@@ -435,7 +436,10 @@ function Production() {
         ) : searchParams.get("option") === "processing-information" ? (
           <ProcessingInformation category={selectedCategory} />
         ) : searchParams.get("option") === "harvested-products" ? (
-          <HarvestedProducts category={selectedCategory} />
+          <HarvestedProducts
+            category={selectedCategory}
+            weight_unit={selectedWeight}
+          />
         ) : searchParams.get("option") === "organic-inorganic" ? (
           <OrganicInorganic category={selectedCategory} />
         ) : searchParams.get("option") === "soil-health" ? (

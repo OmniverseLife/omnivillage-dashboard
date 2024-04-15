@@ -74,9 +74,9 @@ function SoilHealth({ land_unit }) {
         measurement={`${soil_health_sum} ${land_unit}`}
       />
       <CustomAreaChart
-        header="Cultivation Crop wise Soil health"
+        header="Soil health based on cultivated crop"
         data={crop_area_chart}
-        helper_text="Each point represents land under crop baed on soil health"
+        helper_text="Each point represents land under cultivated crop"
         // style={{ width: "100%" }}
       />
     </Stack>

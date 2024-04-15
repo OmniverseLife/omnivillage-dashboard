@@ -9,21 +9,26 @@ import Loading from "../loading";
 
 function FoodBalanceAnalytics() {
   const [searchParams] = useSearchParams();
-  const [chartData, setChartData] = useState([]);
+  // const [chartData, setChartData] = useState([]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["Deficiet_chart", searchParams.getAll("village")],
+    queryKey: ["deficiet_chart", searchParams.getAll("village")],
     queryFn: () => fetchDeficietChart(searchParams.getAll("village")),
     initialData: [],
   });
 
-  useEffect(() => {
-    if (!isLoading) {
-      setChartData(
-        Object.entries(data).map((_data) => ({ name: _data[0], y: _data[1] }))
-      );
-    }
-  }, [data, isLoading]);
+  // useEffect(() => {
+  //   if (!isLoading) {
+  //     setChartData(
+  //       Object.entries(data).map((_data) => ({ name: _data[0], y: _data[1] }))
+  //     );
+  //   }
+  // }, [data, isLoading]);
+
+  const chart_data = Object.entries(data).map((_data) => ({
+    name: _data[0],
+    y: _data[1],
+  }));
 
   const deficit_sum = Object.values(data).reduce(
     (prev, current) => prev + current,
@@ -35,9 +40,9 @@ function FoodBalanceAnalytics() {
       <Loading isLoading={isLoading} />
       <CustomPieChart
         header="Deficit"
-        data={chartData}
+        data={chart_data}
         measurement={`${deficit_sum} kgs`}
-        helper_text="Each slice only contains data for tags that are in deficiency"
+        helper_text="Each segment contains the amount of deficit product"
       />
     </Stack>
   );

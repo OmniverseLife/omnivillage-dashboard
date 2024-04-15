@@ -27,6 +27,8 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
         getIdealConsumptionByLabelData(searchParams.getAll("village")),
     });
 
+  console.log(searchParams.toString(), ideal_consumption_bar);
+
   // const {
   //   data: ideal_consumption_expected = [],
   //   isIdealConsumptionCropLoading,
@@ -127,13 +129,13 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
         <CustomBarChart
           header="Ideal Quantity Consumption (Tag)"
           data={tagsData}
-          helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
+          helper_text="Each bar represent consumption quantity"
         />
       ) : (
         <CustomAreaChart
           header="Ideal Quantity Consumption (Tags)"
           data={tagsData}
-          helper_text="Each pair of bar represents difference in ideal consumption and active consumption"
+          helper_text="Each point of color represents ideal consumption and active consumption"
           // style={{ width: "100%" }}
         />
       )}
