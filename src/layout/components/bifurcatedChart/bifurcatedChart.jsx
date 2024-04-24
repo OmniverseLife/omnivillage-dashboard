@@ -14,6 +14,8 @@ import Loading from "../loading";
 import convert from "convert-units";
 import { useSearchParams } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
+import CustomLineChart from "../CustomLineChart/CustomLineChart";
+import moment from "moment";
 
 const weightConverter = (unit, value) => {
   return Math.round(convert(value).from("kg").to(unit));
@@ -381,6 +383,20 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
     },
   ];
 
+  const convert_date_data = (list, name) => {
+    return [
+      {
+        name: name,
+        data: list?.map((_item) => {
+          return (
+            [parseInt(moment(_item[0], "DD-MM-YYYY").format("x")), _item[1]] ||
+            []
+          );
+        }),
+      },
+    ];
+  };
+
   return (
     <Stack
       direction={"row"}
@@ -537,6 +553,24 @@ const BifurcatedChart = ({ weight_unit, crops }) => {
                 : "number of crop"
             }`}
           />
+          {Boolean(bifurcated_data_crop?.month_planted) && (
+            <CustomLineChart
+              data={convert_date_data(
+                Object.entries(bifurcated_data_crop?.month_planted),
+                "Total number of crops planted"
+              )}
+              header="Month planted"
+            />
+          )}
+          {Boolean(bifurcated_data_crop?.month_harvested) && (
+            <CustomLineChart
+              data={convert_date_data(
+                Object.entries(bifurcated_data_crop?.month_harvested),
+                "Total number of crops harvested"
+              )}
+              header="Month harvested"
+            />
+          )}
           {/* </Box> */}
           {/* {processing_methods?.length && (
             <div style={{ width: "100%" }}>
