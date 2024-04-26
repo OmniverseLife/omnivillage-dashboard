@@ -45,7 +45,7 @@ function Fishery() {
           entries: _data[1],
         });
       });
-      return { jsonData: [], fishery: arr };
+      return { jsonData: data, fishery: arr };
     },
   });
 
@@ -139,11 +139,121 @@ function Fishery() {
     },
   ];
 
+  const headers = [
+    {
+      name: "__id",
+      label: "ID",
+    },
+    {
+      name: "_fishery_type",
+      label: "Fishery Type",
+    },
+    {
+      name: "_user_id",
+      label: "User ID",
+    },
+    {
+      name: "_cropnameen",
+      label: "Fish Name",
+    },
+    {
+      name: "_userfirst_name",
+      label: "User First Name",
+    },
+    {
+      name: "_userlast_name",
+      label: "User Last Name",
+    },
+    {
+      name: "_usercountry",
+      label: "User Country",
+    },
+    {
+      name: "_important_informationnumber_of_fishes",
+      label: "Number of Fishes",
+    },
+    {
+      name: "_important_informationtype_of_feed",
+      label: "Type of Feed",
+    },
+    {
+      name: "_production_informationtotal_feed",
+      label: "Total Feed",
+    },
+    {
+      name: "_production_informationproduction_output",
+      label: "Production Output",
+    },
+    {
+      name: "_production_informationself_consumed",
+      label: "Self Consumed",
+    },
+    {
+      name: "_production_informationsold_to_neighbours",
+      label: "Sold to Neighbour",
+    },
+    {
+      name: "_production_informationsold_for_industrial_use",
+      label: "Sold for Industrial Use",
+    },
+    {
+      name: "_production_informationwastage",
+      label: "Wastage",
+    },
+    {
+      name: "_production_informationother",
+      label: "Other",
+    },
+    {
+      name: "_production_informationother_value",
+      label: "Other value",
+    },
+    {
+      name: "_usercurrency",
+      label: "User Currency",
+    },
+    {
+      name: "_production_informationincome_from_sale",
+      label: "Income from Sale",
+    },
+    {
+      name: "_production_informationexpenditure_on_inputs",
+      label: "Expenditure on Inputs",
+    },
+    {
+      name: "_processing_method",
+      label: "Processing Information",
+    },
+    {
+      name: "_production_informationyeild",
+      label: "Yeild",
+    },
+    {
+      name: "",
+      label: "",
+    },
+  ];
+
   return (
     <Wrapper>
       <CsvDownload
-        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
-        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        data={data?.jsonData?.map((_data) => {
+          const flatten_obj = deepFlattenToObject(_data, "_");
+          const obj = {};
+          headers.forEach((_header) => {
+            if (
+              _header.name === "_important_informationmonth_planted" ||
+              _header.name === "_important_informationmonth_harvested"
+            )
+              obj[_header.name] = moment(flatten_obj[_header.name]).format(
+                "DD MMMM, YYYY"
+              );
+            else obj[_header.name] = flatten_obj[_header.name];
+          });
+          return obj;
+        })}
+        // headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        headers={headers.map((_header) => _header.label)}
         delimiter=","
         filename="Fishery"
       />

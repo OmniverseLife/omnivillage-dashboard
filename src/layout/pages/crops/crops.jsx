@@ -189,7 +189,7 @@ function Crops({
   return (
     <Stack>
       <Stack direction="row">
-        <Typography variant="h5" sx={{ marginRight: "auto" }}>
+        <Typography variant="h5" sx={{ marginRight: "auto", color: "#333" }}>
           {sectionName}
         </Typography>
         <Button
