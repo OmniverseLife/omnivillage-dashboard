@@ -244,7 +244,7 @@ export default function Sidebar({ role }) {
             <i className="fa-solid fa-user-group"></i>
             <p>Users</p>
           </Link>
-          <a
+          {/* <a
             onClick={() => setcropsMenu(!cropsMenu)}
             className={paths.includes("crops") ? "link active" : "link"}
           >
@@ -257,8 +257,8 @@ export default function Sidebar({ role }) {
                 <i className="fa-solid fa-plus"></i>
               )}
             </span>
-          </a>
-          {cropsMenu && (
+          </a> */}
+          {/* {cropsMenu && (
             <div className="menu">
               <Link
                 to="/crops/cultivation"
@@ -295,7 +295,7 @@ export default function Sidebar({ role }) {
                 Hunting
               </Link>
             </div>
-          )}
+          )} */}
           <Link
             to="/settings"
             className={paths.includes("settings") ? "link active" : "link"}

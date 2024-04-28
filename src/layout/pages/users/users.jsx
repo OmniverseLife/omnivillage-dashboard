@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import "./users.css";
 import { DataGrid } from "@mui/x-data-grid";
-import { useQuery } from "@tanstack/react-query";
-import { fetchAllUsers } from "../../../functions/users";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { downloadUserData, fetchAllUsers } from "../../../functions/users";
 import Loading from "../../components/loading";
 import { Menu, MenuItem, Stack } from "@mui/material";
 import ViewDetails from "../../components/viewDetails/viewDetails";
 import Wrapper from "../../components/wrapper/wrapper";
 import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
+import ViewDetails2 from "../../components/viewDetails2/viewDetails2";
+import { Link } from "react-router-dom";
+import { endpoints } from "../../../axios/endpoints";
 
 function Users() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -19,28 +22,23 @@ function Users() {
     queryFn: fetchAllUsers,
   });
 
-  function deepFlattenToObject(obj, prefix = "#") {
-    return Object.keys(obj).reduce((acc, k) => {
-      const pre = prefix.length ? prefix : "";
-      if (typeof obj[k] === "object" && obj[k] !== null) {
-        Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
-      } else {
-        acc[pre + k] = obj[k];
-      }
-      return acc;
-    }, {});
-  }
+  const { mutate, isPending } = useMutation({
+    mutationFn: downloadUserData,
+  });
+
   const selectData = (data) => {
-    let obj = deepFlattenToObject(data);
-    delete obj["updatedAt"];
-    delete obj["__v"];
-    delete obj["_id"];
+    // let obj = deepFlattenToObject(data);
+    let obj = data;
+    // delete obj["members"];
+    // delete obj["__v"];
+    // delete obj["_id"];
 
     console.log(obj);
-    setmodalData({ ...obj });
+    setmodalData(obj);
   };
   const rows = users.map((_user, idx) => ({
     id: idx + 1,
+    user_id: _user._id,
     name: `${_user.first_name} ${_user.last_name}`,
     phone: `${_user.country_code} ${_user.phone}`,
     country: _user.country,
@@ -51,6 +49,7 @@ function Users() {
 
   const columns = [
     { field: "id", headerName: "S.NO", width: 100 },
+    { field: "user_id", headerName: "_id", width: 250 },
     { field: "name", headerName: "Name", width: 250 },
     { field: "phone", headerName: "Phone", width: 200 },
     { field: "country", headerName: "Country", width: 150 },
@@ -102,6 +101,27 @@ function Users() {
                   View Detail
                 </Stack>
               </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  setSelectedrow(null);
+                }}
+              >
+                <Link
+                  to={`${process.env.REACT_APP_BASE_URL}/api${
+                    endpoints.user.download
+                  }?user_id=${rows[selectedrow - 1]?.user_id}`}
+                  style={{ color: "#333" }}
+                >
+                  <Stack direction="row" alignItems="center">
+                    <i
+                      className="fa-solid fa-file-arrow-down"
+                      style={{ marginRight: 10 }}
+                    ></i>
+                    Download Data
+                  </Stack>
+                </Link>
+              </MenuItem>
               <MenuItem onClick={() => setAnchorEl(null)}>
                 <Stack
                   direction="row"
@@ -121,7 +141,7 @@ function Users() {
       },
     },
   ];
-  console.log(selectedrow);
+
   return (
     <Wrapper>
       <div className="users">
@@ -133,9 +153,9 @@ function Users() {
               paginationModel: { page: 0, pageSize: 10 },
             },
           }}
-          // columnVisibilityModel={{
-          //   totalLand: false,
-          // }}
+          columnVisibilityModel={{
+            user_id: false,
+          }}
           pageSizeOptions={[5, 10]}
           slots={{ toolbar: CustomToolbar }}
           slotProps={{
@@ -143,9 +163,9 @@ function Users() {
           }}
           loading={isLoading}
         />
-        <Loading isLoading={isLoading} />
+        <Loading isLoading={isLoading || isPending} />
         {selectedrow && (
-          <ViewDetails
+          <ViewDetails2
             open={modalOpen}
             setOpen={() => setmodalOpen(false)}
             data={modalData}

@@ -6,31 +6,31 @@ export const routes = [
     Component: lazy(() => import("../layout/pages/users/users")),
     role: "admin",
   },
-  {
-    path: "/crops/cultivation",
-    Component: lazy(() => import("../layout/pages/crops/cultivation")),
-    role: "admin",
-  },
-  {
-    path: "/crops/fishery",
-    Component: lazy(() => import("../layout/pages/crops/fishery")),
-    role: "admin",
-  },
-  {
-    path: "/crops/hunting",
-    Component: lazy(() => import("../layout/pages/crops/hunting")),
-    role: "admin",
-  },
-  {
-    path: "/crops/poultry",
-    Component: lazy(() => import("../layout/pages/crops/poultry")),
-    role: "admin",
-  },
-  {
-    path: "/crops/trees&shrubs",
-    Component: lazy(() => import("../layout/pages/crops/treesShrubs")),
-    role: "admin",
-  },
+  // {
+  //   path: "/crops/cultivation",
+  //   Component: lazy(() => import("../layout/pages/crops/cultivation")),
+  //   role: "admin",
+  // },
+  // {
+  //   path: "/crops/fishery",
+  //   Component: lazy(() => import("../layout/pages/crops/fishery")),
+  //   role: "admin",
+  // },
+  // {
+  //   path: "/crops/hunting",
+  //   Component: lazy(() => import("../layout/pages/crops/hunting")),
+  //   role: "admin",
+  // },
+  // {
+  //   path: "/crops/poultry",
+  //   Component: lazy(() => import("../layout/pages/crops/poultry")),
+  //   role: "admin",
+  // },
+  // {
+  //   path: "/crops/trees&shrubs",
+  //   Component: lazy(() => import("../layout/pages/crops/treesShrubs")),
+  //   role: "admin",
+  // },
   {
     path: "/production/cultivation",
     Component: lazy(() => import("../layout/pages/production/cultivation")),

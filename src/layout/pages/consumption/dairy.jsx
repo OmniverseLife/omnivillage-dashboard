@@ -135,11 +135,66 @@ function Dairy() {
       },
     },
   ];
+
+  const headers = [
+    {
+      label: "ID",
+      name: "__id",
+    },
+    {
+      label: "User ID",
+      name: "_user_id",
+    },
+    {
+      name: "_userfirst_name",
+      label: "User First Name",
+    },
+    {
+      name: "_userlast_name",
+      label: "User Last Name",
+    },
+    {
+      name: "_usercountry",
+      label: "User Country",
+    },
+    {
+      label: "Crop Name",
+      name: "_consumption_cropname",
+    },
+    {
+      label: "Weight Measurement",
+      name: "_weight_measurement",
+    },
+    {
+      label: "Total Quantity",
+      name: "_total_quantity",
+    },
+    {
+      label: "Purchased From Market",
+      name: "_purchased_from_market",
+    },
+    {
+      label: "Purchased From Neighbours",
+      name: "_purchased_from_neighbours",
+    },
+    {
+      label: "Self Grown",
+      name: "_self_grown",
+    },
+  ];
+
   return (
     <Wrapper>
       <CsvDownload
-        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
-        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        data={data?.jsonData?.map((_data) => {
+          const flatten_obj = deepFlattenToObject(_data, "_");
+          const obj = {};
+          headers.forEach((_header) => {
+            obj[_header.name] = flatten_obj[_header.name];
+          });
+          return obj;
+        })}
+        headers={headers.map((_header) => _header.label)}
         delimiter=","
         filename="Dairy"
       />

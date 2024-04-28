@@ -89,7 +89,7 @@ function SelfGrown({ type_id, weight_unit, setSummary }) {
         header="Self Grown"
         data={selfGrownData}
         measurement={`${self_grown_sum} kgs`}
-        helper_text="Each bar represents how much crop is self grown"
+        helper_text="the amount of crop self-grown"
       />
       {/* </Box> */}
       {/* <Box width="48%"> */}
@@ -97,7 +97,7 @@ function SelfGrown({ type_id, weight_unit, setSummary }) {
         header="Self Consumed"
         data={selfConsumedData}
         measurement={`${self_consumed_sum} kgs`}
-        helper_text="Each bar represents how much crop is self consumed"
+        helper_text="the amount of crop self-consumed"
       />
       {/* </Box> */}
     </Stack>

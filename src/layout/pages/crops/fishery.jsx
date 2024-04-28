@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Crops from "./crops";
 import {
   addFisheryCrops,
+  bulkUploadFisheryCrops,
   deleteFisheryCrops,
   editFisheryCrops,
   fetchFisheryCrops,
@@ -132,21 +133,23 @@ function Fishery() {
   ];
 
   return (
-    <Wrapper>
-      <Crops
-        rows={rows}
-        columns={columns}
-        isLoading={isLoading}
-        editItem={editItem}
-        setEdit={setEditItem}
-        editFn={editFisheryCrops}
-        refetch={refetch}
-        addFn={addFisheryCrops}
-        deleteFn={deleteFisheryCrops}
-        setDeleteId={setDeleteId}
-        deleteId={deleteId}
-      />
-    </Wrapper>
+    // <Wrapper>
+    <Crops
+      rows={rows}
+      columns={columns}
+      isLoading={isLoading}
+      editItem={editItem}
+      setEdit={setEditItem}
+      editFn={editFisheryCrops}
+      refetch={refetch}
+      addFn={addFisheryCrops}
+      deleteFn={deleteFisheryCrops}
+      setDeleteId={setDeleteId}
+      deleteId={deleteId}
+      sectionName="Fishery Crops"
+      bulkUploadFn={bulkUploadFisheryCrops}
+    />
+    // </Wrapper>
   );
 }
 

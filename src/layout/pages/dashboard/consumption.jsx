@@ -19,6 +19,7 @@ import Loading from "../../components/loading";
 import { fetchTagWiseCrops } from "../../../functions/consumption";
 import convert from "convert-units";
 import Wrapper from "../../components/wrapper/wrapper";
+import { useSearchParams } from "react-router-dom";
 
 function Consumption() {
   const [selectedOption, setselectedOption] = useState(
@@ -27,6 +28,7 @@ function Consumption() {
   const [selectedTag, setselectedTag] = useState("");
   const [selectedCrop, setselectedCrop] = useState("");
   const [selectedWeight, setselectedWeight] = useState("kg");
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { data: labels = [], isLoading } = useQuery({
     queryKey: ["labels"],
@@ -44,9 +46,17 @@ function Consumption() {
       Boolean(selectedTag) && selectedOption === "consumption-production",
   });
 
-  // useEffect(() => {
-  //   setselectedTag(labels[0]?._id ?? "");
-  // }, [labels]);
+  useEffect(() => {
+    if (selectedTag) {
+      searchParams.set(
+        "tag-name",
+        labels.find((_label) => _label._id === selectedTag).name
+      );
+    } else {
+      searchParams.delete("tag-name");
+    }
+    setSearchParams(searchParams);
+  }, [labels, selectedTag]);
 
   // useEffect(() => {
   //   setselectedCrop(crops[0]?._id ?? "");
@@ -172,7 +182,7 @@ function Consumption() {
               id="demo-simple-select"
               value={selectedWeight}
               style={{ width: 200 }}
-              label="Production Information"
+              label="Weight"
               onChange={(e) => setselectedWeight(e.target.value)}
             >
               {convert()

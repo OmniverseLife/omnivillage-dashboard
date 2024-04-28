@@ -129,7 +129,13 @@ function ConsumptionFromProduction({ crop_id, type_id, weight_unit }) {
             header="Summary"
             data={summary_chart}
             measurement={`${summary_data.self_consumed_sum} kgs`}
-            helper_text="Each slice represents consumption"
+            helper_text={`Each slice represents the amount ${
+              searchParams.get("tag-name")
+                ? `of ${searchParams.get("tag-name")} `
+                : ""
+            }procured from different sources${
+              searchParams.get("tag-name") ? "" : " (for consumption)"
+            }`}
           />
           <IdealQuantityDiet type_id={type_id} weight_unit={weight_unit} />
           <SelfGrown

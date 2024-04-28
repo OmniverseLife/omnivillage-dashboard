@@ -5,6 +5,7 @@ import { Menu, MenuItem, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import {
   addCultivationCrops,
+  bulkUploadCultivationCrops,
   deleteCultivationCrops,
   editCultivationCrops,
   fetchCultivationCrops,
@@ -124,21 +125,23 @@ function Cultivation() {
   ];
 
   return (
-    <Wrapper>
-      <Crops
-        rows={rows}
-        columns={columns}
-        isLoading={isLoading}
-        editItem={editItem}
-        setEdit={setEditItem}
-        editFn={editCultivationCrops}
-        refetch={refetch}
-        addFn={addCultivationCrops}
-        deleteFn={deleteCultivationCrops}
-        setDeleteId={setDeleteId}
-        deleteId={deleteId}
-      />
-    </Wrapper>
+    // <Wrapper>
+    <Crops
+      rows={rows}
+      columns={columns}
+      isLoading={isLoading}
+      editItem={editItem}
+      setEdit={setEditItem}
+      editFn={editCultivationCrops}
+      refetch={refetch}
+      addFn={addCultivationCrops}
+      deleteFn={deleteCultivationCrops}
+      setDeleteId={setDeleteId}
+      deleteId={deleteId}
+      sectionName="Cultivation Crops"
+      bulkUploadFn={bulkUploadCultivationCrops}
+    />
+    // </Wrapper>
   );
 }
 

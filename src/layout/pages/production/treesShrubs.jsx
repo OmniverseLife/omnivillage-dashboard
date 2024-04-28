@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Production from "./production";
 import {
   Dialog,
@@ -135,11 +135,163 @@ function TreesShrubs() {
     },
   ];
 
+  const convertProductToRecord = (obj, product) => {
+    return {
+      ...obj,
+      product_id: product._id,
+      product_name: product.name,
+      product_output: product.production_output,
+      product_self_consumed: product.self_consumed,
+      product_fed_to_livestock: product.fed_to_livestock,
+      product_sold_to_neighbours: product.sold_to_neighbours,
+      product_sold_for_industrial_use: product.sold_for_industrial_use,
+      product_wastage: product.wastage,
+      product_other: product.other,
+      product_other_value: product.other_value,
+      product_month_harvested: product.month_harvested,
+      product_processing_method: product.processing_method,
+    };
+  };
+
+  const converted_records = useMemo(
+    () =>
+      data?.jsonData
+        ?.map((_data) =>
+          _data.products.map((_product) => {
+            return convertProductToRecord(_data, _product);
+          })
+        )
+        .flat(),
+    [data?.jsonData]
+  );
+
+  const headers = [
+    {
+      name: "__id",
+      label: "ID",
+    },
+    {
+      name: "_user_id",
+      label: "User ID",
+    },
+    {
+      name: "_cropnameen",
+      label: "Tree Name",
+    },
+    {
+      name: "_userfirst_name",
+      label: "User First Name",
+    },
+    {
+      name: "_userlast_name",
+      label: "User Last Name",
+    },
+    {
+      name: "_usercountry",
+      label: "User Country",
+    },
+    {
+      name: "_number_of_trees",
+      label: "Number of Trees",
+    },
+    {
+      name: "_avg_age_of_trees",
+      label: "Average age of Trees",
+    },
+    {
+      name: "_product_id",
+      label: "Product ID",
+    },
+    {
+      name: "_product_name",
+      label: "Product Name",
+    },
+    {
+      name: "_product_output",
+      label: "Product Output",
+    },
+    {
+      name: "_product_self_consumed",
+      label: "Product Seld Consumed",
+    },
+    {
+      name: "_product_fed_to_livestock",
+      label: "Product Fed to Livestock",
+    },
+    {
+      name: "_product_sold_to_neighbours",
+      label: "Sold to Neighbour",
+    },
+    {
+      name: "_product_sold_for_industrial_use",
+      label: "Sold for Industrial Use",
+    },
+    {
+      name: "_product_wastage",
+      label: "Product Wastage",
+    },
+    {
+      name: "_product_other",
+      label: "Product Other",
+    },
+    {
+      name: "_product_other_value",
+      label: "Product Other Value",
+    },
+    {
+      name: "_product_month_harvested",
+      label: "Product Month Harvested",
+    },
+    {
+      name: "_product_processing_method",
+      label: "Product Processing Method",
+    },
+    {
+      name: "_soil_health",
+      label: "Soil Health",
+    },
+    {
+      name: "_decreasing_rate",
+      label: "Decreasing Rate",
+    },
+    {
+      name: "_type_of_fertilizer_used",
+      label: "Type of Fertilizer used",
+    },
+    {
+      name: "_type_of_pesticide_used",
+      label: "Type of Pesticide used",
+    },
+    {
+      name: "_usercurrency",
+      label: "User Currency",
+    },
+    {
+      name: "_income_from_sale",
+      label: "Income from Sale",
+    },
+    {
+      name: "_expenditure_on_inputs",
+      label: "Expenditure on Inputs",
+    },
+  ];
+
   return (
     <Wrapper>
       <CsvDownload
-        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
-        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        data={converted_records?.map((_data) => {
+          const flatten_obj = deepFlattenToObject(_data, "_");
+          const obj = {};
+          headers.forEach((_header) => {
+            if (_header.name === "_product_month_harvested")
+              obj[_header.name] = moment(flatten_obj[_header.name]).format(
+                "DD MMMM, YYYY"
+              );
+            else obj[_header.name] = flatten_obj[_header.name];
+          });
+          return obj;
+        })}
+        headers={headers.map((_header) => _header.label)}
         delimiter=","
         filename="Trees & Shrubs"
       />

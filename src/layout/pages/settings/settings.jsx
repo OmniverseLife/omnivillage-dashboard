@@ -37,6 +37,11 @@ import * as yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
+import Cultivation from "../crops/cultivation";
+import Fishery from "../crops/fishery";
+import Hunting from "../crops/hunting";
+import Poultry from "../crops/poultry";
+import TreesShrubs from "../crops/treesShrubs";
 
 const StyledSettings = styled(Box)`
   .header-row {
@@ -48,6 +53,9 @@ const StyledSettings = styled(Box)`
     h5 {
       color: #333;
     }
+  }
+  .gap {
+    height: 40px;
   }
 `;
 
@@ -240,8 +248,6 @@ export default function Settings() {
     ..._data,
   }));
 
-  console.log(watch(), selectedRow, edit_modal);
-
   const village_columns = [
     { field: "id", headerName: "S.NO", width: 150 },
     { field: "_id", headerName: "Village ID", width: 200 },
@@ -425,6 +431,15 @@ export default function Settings() {
     <Wrapper>
       <Loading isLoading={isLoading || isFeedLoading || isFishFeedLoading} />
       <StyledSettings>
+        <Cultivation />
+        <div className="gap"></div>
+        <Fishery />
+        <div className="gap"></div>
+        <Hunting />
+        <div className="gap"></div>
+        <Poultry />
+        <div className="gap"></div>
+        <TreesShrubs />
         <Stack
           direction="row"
           alignItems="center"
@@ -583,8 +598,8 @@ export default function Settings() {
                   <ToggleButton value="malaysia" style={{ outline: "none" }}>
                     Malaysia
                   </ToggleButton>
-                  <ToggleButton value="nepal" style={{ outline: "none" }}>
-                    Nepal
+                  <ToggleButton value="bhutan" style={{ outline: "none" }}>
+                    Bhutan
                   </ToggleButton>
                 </ToggleButtonGroup>
               )}
@@ -715,8 +730,8 @@ export default function Settings() {
                   <ToggleButton value="malaysia" style={{ outline: "none" }}>
                     Malaysia
                   </ToggleButton>
-                  <ToggleButton value="nepal" style={{ outline: "none" }}>
-                    Nepal
+                  <ToggleButton value="bhutan" style={{ outline: "none" }}>
+                    Bhutan
                   </ToggleButton>
                 </ToggleButtonGroup>
               )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 // import "./crops.css";
 import { DataGrid } from "@mui/x-data-grid";
 import {
@@ -24,6 +24,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { fetchLabels } from "../../../functions/others";
 import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
+import { Link } from "react-router-dom";
 
 const schema = yup.object().shape({
   name: yup.object().shape({
@@ -45,15 +46,18 @@ function Crops({
   deleteFn,
   deleteId,
   setDeleteId,
+  sectionName,
+  bulkUploadFn,
 }) {
   const [open, setopen] = useState(false);
   const [csvModal, setcsvModal] = useState(false);
-
+  const inputRef = useRef();
   const [country, setcountry] = useState(() => ["india"]);
   const [selectedLabel, setselectedLabel] = useState(null);
   const [additionalError, setAdditionalError] = useState({
     country: "",
   });
+  const [sheet, setSheet] = useState("");
 
   const { data: labels = [], isLoading: isLabelsLoading } = useQuery({
     queryKey: ["labels"],
@@ -82,6 +86,25 @@ function Crops({
     },
     onError: (err) => {
       toast.error(err.response.data.msg);
+    },
+  });
+
+  const {
+    mutate: bulkUpload,
+    isPending: bulkUploadPending,
+    error,
+    isError,
+    // reset: resetBulk,
+  } = useMutation({
+    mutationFn: bulkUploadFn,
+    onSuccess: () => {
+      toast.success("Crop added sucessfully");
+      refetch();
+      setEdit(null);
+      setcsvModal(false);
+    },
+    onError: () => {
+      toast.error("Bulk upload failed!");
     },
   });
 
@@ -165,7 +188,10 @@ function Crops({
 
   return (
     <Stack>
-      <Stack direction="row" justifyContent="flex-end">
+      <Stack direction="row">
+        <Typography variant="h5" sx={{ marginRight: "auto", color: "#333" }}>
+          {sectionName}
+        </Typography>
         <Button
           variant="contained"
           className="ModalOpeningButtton"
@@ -264,8 +290,8 @@ function Crops({
               <ToggleButton value="malaysia" style={{ outline: "none" }}>
                 Malaysia
               </ToggleButton>
-              <ToggleButton value="nepal" style={{ outline: "none" }}>
-                Nepal
+              <ToggleButton value="bhutan" style={{ outline: "none" }}>
+                Bhutan
               </ToggleButton>
             </ToggleButtonGroup>
             <Typography variant="caption">{additionalError.country}</Typography>
@@ -412,26 +438,57 @@ function Crops({
             borderBottom="1px solid #333"
             paddingBottom={1}
           >
-            <h3>Add Shhet</h3>
+            <h3>Add Sheet</h3>
             <i
               className="fa-solid fa-xmark actionIcon"
               style={{ fontSize: 25 }}
               onClick={() => {
                 setcsvModal(false);
+                inputRef.current.value = "";
               }}
             ></i>
           </Stack>
           <Typography variant="body1" marginTop={2} fontFamily="inherit">
             Upload Your Sheet As CSV File
           </Typography>
+          <Stack direction="row" spacing={1} sx={{ marginTop: "10px" }}>
+            <Link
+              download
+              to={`${process.env.REACT_APP_BASE_URL}/uploads/sample.csv`}
+            >
+              <Button variant="outlined" size="small">
+                Download Sample
+              </Button>
+            </Link>
+            <Link
+              download
+              to={`${process.env.REACT_APP_BASE_URL}/uploads/consumption_labels.csv`}
+            >
+              <Button variant="outlined" size="small">
+                Download Labels
+              </Button>
+            </Link>
+          </Stack>
           <label className="dropBox">
             <i
-              class="fa-solid fa-cloud-arrow-up"
+              className="fa-solid fa-cloud-arrow-up"
               style={{ marginRight: 5 }}
             ></i>
-            Upload File
-            <input type="file" hidden />
+            {sheet ? sheet.name : "Upload File"}
+            <input
+              type="file"
+              hidden
+              onChange={(e) => {
+                setSheet(e.target.files[0]);
+                // resetBulk();
+              }}
+              accept="text/csv"
+              ref={inputRef}
+            />
           </label>
+          {isError && (
+            <p className="error_text">{error.response.data.message}</p>
+          )}
 
           <Stack
             spacing={2}
@@ -445,6 +502,11 @@ function Crops({
               variant="outlined"
               color="warning"
               style={{ outline: "none" }}
+              onClick={() => {
+                setcsvModal(false);
+                inputRef.current.value = "";
+              }}
+              disabled={bulkUploadPending}
             >
               Close
             </Button>
@@ -453,6 +515,8 @@ function Crops({
               style={{ outline: "none" }}
               className="ModalOpeningButtton"
               sx={{ color: "#fff" }}
+              onClick={() => bulkUpload(sheet)}
+              disabled={bulkUploadPending || !sheet}
             >
               Add Sheet
             </Button>

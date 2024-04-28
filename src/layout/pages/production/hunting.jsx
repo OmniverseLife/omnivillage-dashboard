@@ -135,11 +135,113 @@ function Hunting() {
     },
   ];
 
+  const headers = [
+    {
+      name: "__id",
+      label: "ID",
+    },
+    {
+      name: "_user_id",
+      label: "User ID",
+    },
+    {
+      name: "_cropnameen",
+      label: "Animal Name",
+    },
+    {
+      name: "_userfirst_name",
+      label: "User First Name",
+    },
+    {
+      name: "_userlast_name",
+      label: "User Last Name",
+    },
+    {
+      name: "_usercountry",
+      label: "User Country",
+    },
+    {
+      name: "_number_hunted",
+      label: "Number of Animals Hunted",
+    },
+    {
+      name: "_meat",
+      label: "Meat Output",
+    },
+    // {
+    //   name: "_weight_measurement",
+    //   label: "Weight Measurement",
+    // },
+    {
+      name: "_self_consumed",
+      label: "Self Consumed",
+    },
+    // {
+    //   name: "_utilizationfed_to_livestock",
+    //   label: "Fed to Livestock",
+    // },
+    {
+      name: "_sold_to_neighbours",
+      label: "Sold to Neighbour",
+    },
+    {
+      name: "_sold_in_consumer_market",
+      label: "Sold in Consumer Market",
+    },
+    {
+      name: "_wastage",
+      label: "Wastage",
+    },
+    {
+      name: "_other",
+      label: "Other",
+    },
+    {
+      name: "_other_value",
+      label: "Other value",
+    },
+    {
+      name: "_usercurrency",
+      label: "User Currency",
+    },
+    {
+      name: "_income_from_sale",
+      label: "Income from Sale",
+    },
+    {
+      name: "_expenditure_on_inputs",
+      label: "Expenditure on Inputs",
+    },
+    {
+      name: "_yeild",
+      label: "Yeild",
+    },
+    {
+      name: "_processing_method",
+      label: "Processing Method",
+    },
+  ];
+
   return (
     <Wrapper>
       <CsvDownload
-        data={data?.jsonData?.map((_data) => deepFlattenToObject(_data, "_"))}
-        headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        data={data?.jsonData?.map((_data) => {
+          const flatten_obj = deepFlattenToObject(_data, "_");
+          const obj = {};
+          headers.forEach((_header) => {
+            if (
+              _header.name === "_important_informationmonth_planted" ||
+              _header.name === "_important_informationmonth_harvested"
+            )
+              obj[_header.name] = moment(flatten_obj[_header.name]).format(
+                "DD MMMM, YYYY"
+              );
+            else obj[_header.name] = flatten_obj[_header.name];
+          });
+          return obj;
+        })}
+        // headers={Object.keys(deepFlattenToObject(data?.jsonData[0] || {}, "_"))}
+        headers={headers.map((_header) => _header.label)}
         delimiter=","
         filename="Huntings"
       />

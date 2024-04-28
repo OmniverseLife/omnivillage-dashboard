@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Crops from "./crops";
 import {
   addHuntingCrops,
+  bulkUploadHuntingCrops,
   deleteHuntingCrops,
   editHuntingCrops,
   fetchHuntingCrops,
@@ -132,21 +133,23 @@ function Hunting() {
   ];
 
   return (
-    <Wrapper>
-      <Crops
-        rows={rows}
-        columns={columns}
-        isLoading={isLoading}
-        editItem={editItem}
-        setEdit={setEditItem}
-        editFn={editHuntingCrops}
-        refetch={refetch}
-        addFn={addHuntingCrops}
-        deleteFn={deleteHuntingCrops}
-        setDeleteId={setDeleteId}
-        deleteId={deleteId}
-      />
-    </Wrapper>
+    // <Wrapper>
+    <Crops
+      rows={rows}
+      columns={columns}
+      isLoading={isLoading}
+      editItem={editItem}
+      setEdit={setEditItem}
+      editFn={editHuntingCrops}
+      refetch={refetch}
+      addFn={addHuntingCrops}
+      deleteFn={deleteHuntingCrops}
+      setDeleteId={setDeleteId}
+      deleteId={deleteId}
+      sectionName="Hunting Crops"
+      bulkUploadFn={bulkUploadHuntingCrops}
+    />
+    // {/* </Wrapper> */}
   );
 }
 
