@@ -51,8 +51,8 @@ export default function Wrapper({ children }) {
     if (searchParams.getAll("village").length === 0 && !isLoading) {
       searchParams.set("country", data[0]?.country);
       searchParams.set("village", data[0]?.name);
-      setSearchParams(searchParams);
     }
+    setSearchParams(searchParams);
   }, [data, isLoading, searchParams, setSearchParams]);
 
   return (
