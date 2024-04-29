@@ -52,11 +52,12 @@ function Consumption() {
         "tag-name",
         labels.find((_label) => _label._id === selectedTag).name
       );
-    } else {
+      setSearchParams(searchParams);
+    } else if (selectedTag === "" && searchParams.get("tag-name")) {
       searchParams.delete("tag-name");
+      setSearchParams(searchParams);
     }
-    setSearchParams(searchParams);
-  }, [labels, selectedTag]);
+  }, [labels, searchParams, selectedTag, setSearchParams]);
 
   // useEffect(() => {
   //   setselectedCrop(crops[0]?._id ?? "");

@@ -27,8 +27,6 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
         getIdealConsumptionByLabelData(searchParams.getAll("village")),
     });
 
-  console.log(searchParams.toString(), ideal_consumption_bar);
-
   // const {
   //   data: ideal_consumption_expected = [],
   //   isIdealConsumptionCropLoading,
