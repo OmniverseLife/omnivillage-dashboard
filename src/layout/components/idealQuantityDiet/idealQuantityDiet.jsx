@@ -50,7 +50,7 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
               weightConverter(
                 weight_unit,
                 ideal_consumption_bar.find((_item) => _item._id === type_id)
-                  .ideal_consumption
+                  ?.ideal_consumption
               ),
             ]
           : ideal_consumption_bar.map((_item) =>
@@ -65,7 +65,7 @@ function IdealQuantityDiet({ type_id, weight_unit }) {
               weightConverter(
                 weight_unit,
                 ideal_consumption_bar.find((_item) => _item._id === type_id)
-                  .total_consumed
+                  ?.total_consumed
               ),
             ]
           : ideal_consumption_bar.map((_item) =>

@@ -179,6 +179,10 @@ function TreesShrubs() {
       label: "Tree Name",
     },
     {
+      name: "_label_name",
+      label: "Label",
+    },
+    {
       name: "_userfirst_name",
       label: "User First Name",
     },

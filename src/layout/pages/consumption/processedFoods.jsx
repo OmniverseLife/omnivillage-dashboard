@@ -165,6 +165,10 @@ function ProcessedFoods() {
       name: "_consumption_cropname",
     },
     {
+      name: "_consumption_type_name",
+      label: "Label",
+    },
+    {
       label: "Weight Measurement",
       name: "_weight_measurement",
     },
