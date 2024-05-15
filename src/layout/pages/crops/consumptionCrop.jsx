@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 
 import Crops from "./crops";
-import {
-  addHuntingCrops,
-  bulkUploadHuntingCrops,
-  deleteHuntingCrops,
-  editHuntingCrops,
-  fetchHuntingCrops,
-} from "../../../functions/crops";
-import { useQuery } from "@tanstack/react-query";
 import { Menu, MenuItem, Stack, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import {
+  addConsumptionCrops,
+  addCultivationCrops,
+  bulkUploadConsumptionCrops,
+  bulkUploadCultivationCrops,
+  deleteConsumptionCrops,
+  deleteCultivationCrops,
+  editConsumptionCrops,
+  editCultivationCrops,
+  fetchConsumptionCrops,
+  fetchCultivationCrops,
+} from "../../../functions/crops";
 import Wrapper from "../../components/wrapper/wrapper";
 
-function Hunting() {
+function ConsumptionCrop() {
   const [selectedrow, setSelectedrow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [editItem, setEditItem] = useState(null);
@@ -23,17 +28,9 @@ function Hunting() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["hunting_crop"],
-    queryFn: fetchHuntingCrops,
+    queryKey: ["consumption_crop"],
+    queryFn: fetchConsumptionCrops,
   });
-
-  // {
-  //   id: 1,
-  //   Engname: "Gobi Flower",
-  //   Malyname: "Gabi Flawera",
-  //   country: "India",
-  //   label: "Vegetables",
-  // },
 
   const rows = crops.map((_crop, index) => ({
     id: index + 1,
@@ -59,7 +56,7 @@ function Hunting() {
       width: 200,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-          {params.row.label?.name?.en}
+          {params.row.label?.name.en}
         </Typography>
       ),
     },
@@ -142,17 +139,17 @@ function Hunting() {
       isLoading={isLoading}
       editItem={editItem}
       setEdit={setEditItem}
-      editFn={editHuntingCrops}
+      editFn={editConsumptionCrops}
       refetch={refetch}
-      addFn={addHuntingCrops}
-      deleteFn={deleteHuntingCrops}
+      addFn={addConsumptionCrops}
+      deleteFn={deleteConsumptionCrops}
       setDeleteId={setDeleteId}
       deleteId={deleteId}
-      sectionName="Hunting Crops"
-      bulkUploadFn={bulkUploadHuntingCrops}
+      sectionName="Other Crops"
+      bulkUploadFn={bulkUploadConsumptionCrops}
     />
-    // {/* </Wrapper> */}
+    // </Wrapper>
   );
 }
 
-export default Hunting;
+export default ConsumptionCrop;

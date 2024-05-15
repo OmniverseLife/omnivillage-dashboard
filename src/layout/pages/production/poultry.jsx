@@ -178,6 +178,10 @@ function Poultry() {
       label: "Poultry Name",
     },
     {
+      name: "_label_name",
+      label: "Label",
+    },
+    {
       name: "_userfirst_name",
       label: "User First Name",
     },

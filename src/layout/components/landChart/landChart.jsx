@@ -53,6 +53,8 @@ function LandChart({ land_unit }) {
   //     },
   //   ],
   // };
+
+  console.log(land_used);
   const data = [
     {
       name: "Cultivation",
@@ -60,7 +62,7 @@ function LandChart({ land_unit }) {
     },
     {
       name: "Fishery",
-      y: landConverter(land_unit, land_used?.fishery ?? 0),
+      y: landConverter(land_unit, land_allocation?.fishery ?? 0),
     },
     {
       name: "Poultry",

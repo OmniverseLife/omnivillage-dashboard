@@ -29,7 +29,8 @@ import { Link } from "react-router-dom";
 const schema = yup.object().shape({
   name: yup.object().shape({
     en: yup.string().required("Name in english is required!"),
-    ms: yup.string().required("Name in malay is required!"),
+    ms: yup.string(),
+    dz: yup.string(),
   }),
   status: yup.number(),
 });
@@ -85,7 +86,7 @@ function Crops({
       setopen(false);
     },
     onError: (err) => {
-      toast.error(err.response.data.msg);
+      toast.error(Object.entries(err.response.data)[0][1]);
     },
   });
 
@@ -117,7 +118,7 @@ function Crops({
       setopen(false);
     },
     onError: (err) => {
-      toast.error(err.response.data.msg);
+      toast.error(Object.entries(err.response.data)[0][1]);
     },
   });
 
@@ -129,7 +130,7 @@ function Crops({
       setDeleteId(null);
     },
     onError: (err) => {
-      toast.error(err.response.data.msg);
+      toast.error(Object.entries(err.response.data)[0][1]);
     },
   });
 
@@ -143,6 +144,7 @@ function Crops({
         name: {
           en: editItem.Engname,
           ms: editItem.Malayname,
+          dz: editItem.Dzname,
         },
         status: 1,
       });
@@ -259,7 +261,7 @@ function Crops({
                   {...register("name.en")}
                   fullWidth
                   error={Boolean(errors.name?.en)}
-                  helperText={errors.name?.en}
+                  helperText={errors.name?.en?.message}
                 />
               </Grid>
               <Grid item lg={6}>
@@ -271,7 +273,19 @@ function Crops({
                   {...register("name.ms")}
                   fullWidth
                   error={Boolean(errors.name?.ms)}
-                  helperText={errors.name?.ms}
+                  helperText={errors.name?.ms?.message}
+                />
+              </Grid>
+              <Grid item lg={6}>
+                <TextField
+                  id="outlined-basic"
+                  label="Name In Dzongkha"
+                  size="small"
+                  variant="outlined"
+                  {...register("name.dz")}
+                  fullWidth
+                  error={Boolean(errors.name?.dz)}
+                  helperText={errors.name?.dz?.message}
                 />
               </Grid>
             </Grid>

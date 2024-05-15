@@ -38,7 +38,7 @@ export default function HarvestedProducts({ category, weight_unit }) {
     },
     {
       name: "Sold for Industrial Use",
-      y: weightConverter(weight_unit, data?.sold_to_industrial_use),
+      y: weightConverter(weight_unit, data?.sold_for_industrial_use),
     },
     {
       name: "Wastage",

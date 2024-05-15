@@ -40,6 +40,7 @@ function TreesShrubs() {
     crop_id: _crop._id,
     Engname: _crop.name.en,
     Malayname: _crop.name.ms,
+    Dzname: _crop.name.dz,
     country: _crop.country.join(", "),
     label: _crop.label,
     status: _crop.status ? "Approved" : "Pending",
@@ -50,6 +51,7 @@ function TreesShrubs() {
     { field: "crop_id", headerName: "Crop ID", width: 120 },
     { field: "Engname", headerName: "English Name", width: 200 },
     { field: "Malayname", headerName: "Malay Name", width: 200 },
+    { field: "Dzname", headerName: "Dzongkha Name", width: 200 },
     { field: "country", headerName: "Country", width: 200 },
     {
       field: "label",
