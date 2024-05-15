@@ -69,7 +69,8 @@ const villageSchema = yup.object().shape({
 const schema = yup.object().shape({
   name: yup.object().shape({
     en: yup.string().required("Please Enter Name in English"),
-    ms: yup.string().required("Please Enter Name in Malay"),
+    ms: yup.string(),
+    dz: yup.string(),
   }),
   country: yup
     .array()
@@ -334,6 +335,7 @@ export default function Settings() {
     { field: "type", headerName: "Type", width: 100 },
     { field: "name_en", headerName: "Enlish Name", width: 250 },
     { field: "name_ms", headerName: "Malay Name", width: 250 },
+    { field: "name_dz", headerName: "Dzongkha Name", width: 250 },
     { field: "country", headerName: "Country", width: 250 },
     {
       field: "actions",
@@ -371,6 +373,7 @@ export default function Settings() {
                     name: {
                       en: selectedRow.name_en,
                       ms: selectedRow.name_ms,
+                      dz: selectedRow.name.dz,
                     },
                     country: selectedRow.country,
                     feed_id: selectedRow._id,
@@ -417,6 +420,7 @@ export default function Settings() {
     id: index + 1,
     name_en: _data.name.en,
     name_ms: _data.name.ms,
+    name_dz: _data.name.dz,
     type: "feed",
     ..._data,
   }));
@@ -425,6 +429,7 @@ export default function Settings() {
     id: index + 1,
     name_en: _data.name.en,
     name_ms: _data.name.ms,
+    name_dz: _data.name.dz,
     type: "fish_feed",
     ..._data,
   }));
@@ -712,6 +717,18 @@ export default function Settings() {
                   fullWidth
                   error={Boolean(feedErrors.name?.ms)}
                   helperText={feedErrors.name?.ms?.message}
+                />
+              </Grid>
+              <Grid item lg={6}>
+                <TextField
+                  id="outlined-basic"
+                  label="Name In Dzongkha"
+                  size="small"
+                  variant="outlined"
+                  {...feedsRegister("name.dz")}
+                  fullWidth
+                  error={Boolean(feedErrors.name?.dz)}
+                  helperText={feedErrors.name?.dz?.message}
                 />
               </Grid>
             </Grid>
