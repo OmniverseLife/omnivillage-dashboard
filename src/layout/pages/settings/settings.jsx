@@ -42,6 +42,8 @@ import Fishery from "../crops/fishery";
 import Hunting from "../crops/hunting";
 import Poultry from "../crops/poultry";
 import TreesShrubs from "../crops/treesShrubs";
+import Crops from "../crops/crops";
+import ConsumptionCrop from "../crops/consumptionCrop";
 
 const StyledSettings = styled(Box)`
   .header-row {
@@ -440,6 +442,8 @@ export default function Settings() {
         <Poultry />
         <div className="gap"></div>
         <TreesShrubs />
+        <div className="gap"></div>
+        <ConsumptionCrop />
         <Stack
           direction="row"
           alignItems="center"

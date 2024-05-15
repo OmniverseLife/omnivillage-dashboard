@@ -59,6 +59,11 @@ export const endpoints = {
 
   consumption: {
     dashboard: "/consumption_crop/dashboard",
+    crops: "/consumption_crop/get_all",
+    add_crop: "/consumption_crop/add_crop",
+    bulk_upload: "/consumption_crop/bulk-upload",
+    edit_crop: "/consumption_crop/edit_crop",
+    delete_crop: "/consumption_crop",
   },
   grains: {
     get_all:

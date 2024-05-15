@@ -26,6 +26,11 @@ export const fetchHuntingCrops = async () => {
   return res.data;
 };
 
+export const fetchConsumptionCrops = async () => {
+  const res = await axiosInstance.get(endpoints.consumption.crops);
+  return res.data;
+};
+
 export const addCultivationCrops = async (body) => {
   const res = await axiosInstance.post(endpoints.cultivation.add_crop, body);
   return res.data;
@@ -48,6 +53,11 @@ export const addFisheryCrops = async (body) => {
 
 export const addHuntingCrops = async (body) => {
   const res = await axiosInstance.post(endpoints.hunting.add_crop, body);
+  return res.data;
+};
+
+export const addConsumptionCrops = async (body) => {
+  const res = await axiosInstance.post(endpoints.consumption.add_crop, body);
   return res.data;
 };
 
@@ -89,6 +99,16 @@ export const bulkUploadHuntingCrops = async (body) => {
   return res.data;
 };
 
+export const bulkUploadConsumptionCrops = async (body) => {
+  const formData = new FormData();
+  formData.append("sheet", body);
+  const res = await axiosInstance.post(
+    endpoints.consumption.bulk_upload,
+    formData
+  );
+  return res.data;
+};
+
 export const editCultivationCrops = async (body) => {
   const res = await axiosInstance.post(endpoints.cultivation.edit_crop, body);
   return res.data;
@@ -111,6 +131,11 @@ export const editFisheryCrops = async (body) => {
 
 export const editHuntingCrops = async (body) => {
   const res = await axiosInstance.post(endpoints.hunting.edit_crop, body);
+  return res.data;
+};
+
+export const editConsumptionCrops = async (body) => {
+  const res = await axiosInstance.post(endpoints.consumption.edit_crop, body);
   return res.data;
 };
 
@@ -145,6 +170,13 @@ export const deleteFisheryCrops = async (id) => {
 export const deleteHuntingCrops = async (id) => {
   const res = await axiosInstance.delete(
     `${endpoints.hunting.delete_crop}/${id}`
+  );
+  return res.data;
+};
+
+export const deleteConsumptionCrops = async (id) => {
+  const res = await axiosInstance.delete(
+    `${endpoints.consumption.delete_crop}/${id}`
   );
   return res.data;
 };

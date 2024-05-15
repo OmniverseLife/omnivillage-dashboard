@@ -320,7 +320,7 @@ function DeficitCrops({ parentLoading, tag }) {
           <MenuItem value="$">USD ($)</MenuItem>
           <MenuItem value="₹">INR (₹)</MenuItem>
           <MenuItem value="RM">MYR (RM)</MenuItem>
-          <MenuItem value="रु">NPR (रु)</MenuItem>
+          <MenuItem value="Nu">BTN (Nu)</MenuItem>
         </Select>
       </FormControl>
       <Loading isLoading={parentLoading || isLoading || isFetching} />
