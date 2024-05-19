@@ -91,6 +91,7 @@ export default function Wrapper({ children }) {
                 style={{ width: 200 }}
                 onChange={(e) => {
                   searchParams.set("country", e.target.value);
+                  searchParams.set("village", villages[e.target.value][0].name);
                   setSearchParams(searchParams);
                 }}
                 sx={{ textTransform: "capitalize" }}
