@@ -5,25 +5,31 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import {
     Box,
     Button,
-    Chip,
     CircularProgress,
+    FormControl,
+    FormHelperText,
     Grid,
+    InputLabel,
+    MenuItem,
     Modal,
+    Select,
     Stack,
     TextField,
-    ToggleButton,
-    ToggleButtonGroup,
     Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { Controller, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import * as yup from "yup";
-import { fetchLabels } from "../../../functions/others";
 import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 import Loading from "../../components/loading";
+import {
+    addDropdownValues,
+    deleteDropdownValues,
+    editDropdownValues,
+} from "../../../functions/dropdown";
 
 const schema = yup.object().shape({
     name: yup.object().shape({
@@ -31,61 +37,53 @@ const schema = yup.object().shape({
         ms: yup.string(),
         dz: yup.string(),
     }),
-    status: yup.number(),
+    type: yup.string().required(),
+    dropdown_type: yup.string(),
 });
 
-function Crops({
+function Dropdown({
     rows,
     columns,
+    dropdown_type,
+    types,
     isLoading,
     editItem,
     setEdit,
-    editFn,
     refetch,
-    addFn,
-    deleteFn,
     deleteId,
     setDeleteId,
     sectionName,
     bulkUploadFn,
 }) {
-    const [open, setopen] = useState(false);
-    const [csvModal, setcsvModal] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [csvModal, setCsvModal] = useState(false);
     const inputRef = useRef();
-    const [country, setcountry] = useState(() => ["india"]);
-    const [selectedLabel, setselectedLabel] = useState(null);
-    const [additionalError, setAdditionalError] = useState({
-        country: "",
-    });
     const [sheet, setSheet] = useState("");
-
-    const { data: labels = [], isLoading: isLabelsLoading } = useQuery({
-        queryKey: ["labels"],
-        queryFn: fetchLabels,
-    });
 
     const {
         handleSubmit,
         register,
         formState: { errors },
+        control,
         reset,
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             status: 1,
+            dropdown_type,
         },
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: addFn,
+        mutationFn: addDropdownValues,
         onSuccess: () => {
-            toast.success("Crop added sucessfully");
+            toast.success("Dropdown value added successfully");
             refetch();
             setEdit(null);
-            setopen(false);
+            setOpen(false);
         },
         onError: (err) => {
-            toast.error(Object.entries(err.response.data)[0][1]);
+            toast.error(err.message);
         },
     });
 
@@ -98,10 +96,10 @@ function Crops({
     } = useMutation({
         mutationFn: bulkUploadFn,
         onSuccess: () => {
-            toast.success("Crop added sucessfully");
+            toast.success("Dropdown values added successfully");
             refetch();
             setEdit(null);
-            setcsvModal(false);
+            setCsvModal(false);
         },
         onError: () => {
             toast.error("Bulk upload failed!");
@@ -109,86 +107,64 @@ function Crops({
     });
 
     const { mutate: editMutate, isPending: isEditPending } = useMutation({
-        mutationFn: editFn,
+        mutationFn: editDropdownValues,
         onSuccess: () => {
-            toast.success("Crop edited sucessfully");
+            toast.success("Dropdown value edited successfully");
             refetch();
             setEdit(null);
-            setopen(false);
+            setOpen(false);
         },
         onError: (err) => {
-            toast.error(Object.entries(err.response.data)[0][1]);
+            toast.error(Object.entries(err.message));
         },
     });
 
     const { mutate: deleteMutate, isPending: isDeletePending } = useMutation({
-        mutationFn: deleteFn,
+        mutationFn: deleteDropdownValues,
         onSuccess: () => {
-            toast.success("Crop deleted sucessfully");
+            toast.success("Dropdown value deleted successfully");
             refetch();
             setDeleteId(null);
         },
         onError: (err) => {
-            toast.error(Object.entries(err.response.data)[0][1]);
+            toast.error(Object.entries(err.message));
         },
     });
-
-    const handleChange = (event, newcountry) => {
-        setcountry(newcountry);
-    };
 
     useEffect(() => {
         if (editItem) {
             reset({
                 name: {
-                    en: editItem.Engname,
-                    ms: editItem.Malayname,
-                    dz: editItem.Dzname,
+                    en: editItem.eng_name,
+                    ms: editItem.malay_name,
+                    dz: editItem.dz_name,
                 },
+                type: editItem.type,
                 status: 1,
+                dropdown_type,
             });
-            setselectedLabel(editItem.label?._id);
-            setcountry(() => editItem.country?.split(", "));
         } else {
             reset({
                 name: {
                     en: "",
                     ms: "",
                 },
+                type: "",
                 status: 1,
+                dropdown_type,
             });
-            setselectedLabel(null);
-            setcountry(() => []);
         }
     }, [editItem]);
 
     const onEditSubmit = (data) => {
-        if (country.length === 0) {
-            setAdditionalError({
-                country: "Please select atleast one country!",
-            });
-            return;
-        }
         editMutate({
             ...data,
-            country,
-            label: selectedLabel,
-            crop_id: editItem.crop_id,
+            dropdown_id: editItem._id,
         });
     };
 
     const onAddSubmit = (data) => {
-        if (country.length === 0) {
-            setAdditionalError({
-                country: "Please select atleast one country!",
-            });
-            return;
-        }
-        mutate({
-            ...data,
-            country,
-            label: selectedLabel,
-        });
+        mutate(data);
     };
 
     return (
@@ -203,14 +179,14 @@ function Crops({
                 <Button
                     variant="contained"
                     className="ModalOpeningButtton"
-                    onClick={() => setopen(true)}
+                    onClick={() => setOpen(true)}
                 >
-                    Add Crop
+                    Add Dropdown
                 </Button>
                 <Button
                     variant="contained"
                     className="ModalOpeningButtton"
-                    onClick={() => setcsvModal(true)}
+                    onClick={() => setCsvModal(true)}
                 >
                     Add Sheet
                 </Button>
@@ -219,7 +195,8 @@ function Crops({
                 rows={rows}
                 columns={columns}
                 columnVisibilityModel={{
-                    crop_id: false,
+                    dropdown_id: false,
+                    status: false,
                 }}
                 initialState={{
                     pagination: {
@@ -245,12 +222,12 @@ function Crops({
                         borderBottom={"1px solid #333"}
                         paddingBottom={1}
                     >
-                        <h3>Add Crop</h3>
+                        <h3>Add Dropdown</h3>
                         <i
                             className="fa-solid fa-xmark actionIcon"
                             style={{ fontSize: 25 }}
                             onClick={() => {
-                                setopen(false);
+                                setOpen(false);
                                 setEdit && setEdit(null);
                             }}
                         ></i>
@@ -297,70 +274,44 @@ function Crops({
                         </Grid>
                     </Stack>
                     <Stack marginTop={2}>
-                        <h3 style={{ margin: "10px 0" }}>Select Country :</h3>
-                        <ToggleButtonGroup
-                            color="info"
-                            value={country}
-                            onChange={handleChange}
-                            aria-label="Platform"
-                        >
-                            <ToggleButton
-                                value="india"
-                                style={{ outline: "none" }}
-                            >
-                                India
-                            </ToggleButton>
-                            <ToggleButton
-                                value="malaysia"
-                                style={{ outline: "none" }}
-                            >
-                                Malaysia
-                            </ToggleButton>
-                            <ToggleButton
-                                value="bhutan"
-                                style={{ outline: "none" }}
-                            >
-                                Bhutan
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                        <Typography variant="caption">
-                            {additionalError.country}
-                        </Typography>
-                    </Stack>
-                    <Stack marginTop={2}>
-                        <h3 style={{ margin: "10px 0" }}>Select label :</h3>
-                        <Stack
-                            direction="row"
-                            flexWrap="wrap"
-                            justifyContent="flex-start"
-                            spacing={2}
-                        >
-                            {labels.map((_label) => (
-                                <Chip
-                                    style={{
-                                        margin: "5px 10px 5px 0",
-                                        background:
-                                            _label._id === selectedLabel &&
-                                            "#0080ff",
-                                        color:
-                                            _label._id === selectedLabel &&
-                                            "#fff",
-                                        textTransform: "capitalize",
-                                    }}
-                                    key={_label._id}
-                                    label={_label.name}
-                                    variant="contained"
-                                    onClick={() =>
-                                        setselectedLabel((prev) =>
-                                            prev === _label._id
-                                                ? null
-                                                : _label._id
-                                        )
-                                    }
-                                />
-                            ))}
-                        </Stack>
-                        {/* <Typography variant="caption">{additionalError.label}</Typography> */}
+                        <Controller
+                            name="type"
+                            control={control}
+                            render={({ field, fieldState }) => {
+                                return (
+                                    <FormControl size="small">
+                                        <InputLabel>Select Type</InputLabel>
+                                        <Select
+                                            variant="outlined"
+                                            label="Select Type"
+                                            fullWidth
+                                            {...field}
+                                        >
+                                            {Object.entries(types).map(
+                                                (_type) => {
+                                                    return (
+                                                        <MenuItem
+                                                            value={_type[0]}
+                                                            key={_type[0]}
+                                                        >
+                                                            {_type[1]}
+                                                        </MenuItem>
+                                                    );
+                                                }
+                                            )}
+                                        </Select>
+                                        {fieldState.invalid && (
+                                            <FormHelperText
+                                                variant="caption"
+                                                error
+                                            >
+                                                {fieldState.error.message}
+                                            </FormHelperText>
+                                        )}
+                                    </FormControl>
+                                );
+                            }}
+                        />
                     </Stack>
                     <Stack
                         spacing={2}
@@ -373,7 +324,7 @@ function Crops({
                             color="warning"
                             style={{ outline: "none" }}
                             onClick={() => {
-                                setopen(false);
+                                setOpen(false);
                                 setEdit && setEdit(null);
                             }}
                         >
@@ -416,7 +367,7 @@ function Crops({
                         borderBottom="1px solid #333"
                         paddingBottom={1}
                     >
-                        <h3>Delete Corp</h3>
+                        <h3>Delete Dropdown value</h3>
                         <i
                             className="fa-solid fa-xmark actionIcon"
                             style={{ fontSize: 25 }}
@@ -426,7 +377,7 @@ function Crops({
                         ></i>
                     </Stack>
                     <Typography variant="body1" marginTop={2}>
-                        Are you sure, you want to delete this corp?
+                        Are you sure, you want to delete this dropdown value?
                     </Typography>
                     <Stack
                         spacing={2}
@@ -450,7 +401,9 @@ function Crops({
                             variant="contained"
                             style={{ outline: "none" }}
                             className="ModalOpeningButtton"
-                            onClick={() => deleteMutate(deleteId)}
+                            onClick={() =>
+                                deleteMutate({ dropdown_type, id: deleteId })
+                            }
                             disabled={isDeletePending}
                             sx={{ color: "#fff" }}
                         >
@@ -461,7 +414,7 @@ function Crops({
                                     sx={{ marginRight: "5px" }}
                                 />
                             )}
-                            Delete Corp
+                            Delete Dropdown Value
                         </Button>
                     </Stack>
                 </Box>
@@ -487,7 +440,7 @@ function Crops({
                             className="fa-solid fa-xmark actionIcon"
                             style={{ fontSize: 25 }}
                             onClick={() => {
-                                setcsvModal(false);
+                                setCsvModal(false);
                                 inputRef.current.value = "";
                             }}
                         ></i>
@@ -510,14 +463,6 @@ function Crops({
                         >
                             <Button variant="outlined" size="small">
                                 Download Sample
-                            </Button>
-                        </Link>
-                        <Link
-                            download
-                            to={`${process.env.REACT_APP_BASE_URL}/uploads/consumption_labels.csv`}
-                        >
-                            <Button variant="outlined" size="small">
-                                Download Labels
                             </Button>
                         </Link>
                     </Stack>
@@ -557,7 +502,7 @@ function Crops({
                             color="warning"
                             style={{ outline: "none" }}
                             onClick={() => {
-                                setcsvModal(false);
+                                setCsvModal(false);
                                 inputRef.current.value = "";
                             }}
                             disabled={bulkUploadPending}
@@ -581,4 +526,4 @@ function Crops({
     );
 }
 
-export default Crops;
+export default Dropdown;
