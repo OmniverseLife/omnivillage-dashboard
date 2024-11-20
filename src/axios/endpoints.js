@@ -217,5 +217,23 @@ export const endpoints = {
             edit: "/water-dropdown/edit-water-dropdown",
             delete: "/water-dropdown/delete-water-dropdown",
         },
+        forestry: {
+            get: "/forestry-dropdown/get-all",
+            add: "/forestry-dropdown/add-forestry-dropdown",
+            edit: "/forestry-dropdown/edit-forestry-dropdown",
+            delete: "/forestry-dropdown/delete-forestry-dropdown",
+        },
+        other_personal_household_items_dropdown: {
+            get: "/other-personal-household-items-dropdown/get-all",
+            add: "/other-personal-household-items-dropdown/add-personal-household-dropdown",
+            edit: "/other-personal-household-items-dropdown/edit-personal-household-dropdown",
+            delete: "/other-personal-household-items-dropdown/delete-personal-household-dropdown",
+        },
+        business: {
+            get: "/business-dropdown/get-all",
+            add: "/business-dropdown/add-business-dropdown",
+            edit: "/business-dropdown/edit-business-dropdown",
+            delete: "/business-dropdown/delete-business-dropdown",
+        },
     },
 };

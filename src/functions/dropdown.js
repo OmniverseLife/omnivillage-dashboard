@@ -14,7 +14,7 @@ export const addDropdownValues = async (body) => {
     return res.data;
 };
 
-export const editDropdownValues = async (type, body) => {
+export const editDropdownValues = async (body) => {
     const res = await axiosInstance.put(
         endpoints.dropdowns[body.dropdown_type].edit,
         body
@@ -24,7 +24,7 @@ export const editDropdownValues = async (type, body) => {
 
 export const deleteDropdownValues = async (body) => {
     const res = await axiosInstance.delete(
-        endpoints.dropdowns[body.dropdown_type].edit,
+        endpoints.dropdowns[body.dropdown_type].delete,
         {
             params: { id: body.id },
         }

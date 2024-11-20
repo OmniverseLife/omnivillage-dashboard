@@ -6,6 +6,9 @@ import HousingDropdown from "../components/Dropdowns/housing";
 import WaterDropdown from "../components/Dropdowns/water";
 import EnergyDropdown from "../components/Dropdowns/energy";
 import MobilityDropdown from "../components/Dropdowns/mobility";
+import ForestryDropdown from "../components/Dropdowns/forestry";
+import PersonalHouseholdDropdown from "../components/Dropdowns/personal-household";
+import BusinessDropdown from "../components/Dropdowns/business";
 import { Stack } from "@mui/material";
 
 export default function Dropdowns() {
@@ -18,6 +21,9 @@ export default function Dropdowns() {
                 <WaterDropdown />
                 <EnergyDropdown />
                 <MobilityDropdown />
+                <ForestryDropdown />
+                <PersonalHouseholdDropdown />
+                <BusinessDropdown />
             </Stack>
         </Wrapper>
     );

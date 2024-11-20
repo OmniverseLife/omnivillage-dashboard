@@ -92,3 +92,37 @@ export const water_types = {
     water_recycling: "Wastewater: Water recycling",
     severity: "Water Scarcity: Severity",
 };
+
+export const forestry_types = {
+    other_produce_from_forest: "Other produce from forest",
+    general_purpose: "General purpose",
+    timber_needs_purpose: "Purpose: Timber needs",
+    timber_needs_urgency: "Urgency: Timber needs",
+    other_needs_purpose: "Purpose: Other needs",
+    other_needs_urgency: "Urgency: Other needs",
+    other_needs_type: "Type of other needs",
+};
+
+export const personal_household_types = {
+    personal_care: "Personal care",
+    personal_care_produce: "Produce: Personal care",
+    cleaning_products: "Cleaning products",
+    cleaning_products_produce: "Produce: Cleaning products",
+    office_supplies: "Office supplies",
+    office_supplies_produce: "Produce: Office supplies",
+    medicine: "Medicine",
+    medicine_produce: "Produce: Medicine",
+    kitchen_items: "Kitchen items",
+    kitchen_items_produce: "Produce: Kitchen items",
+    other_items: "Other items",
+    other_items_produce: "Produce: Other items",
+};
+
+export const business_types = {
+    type_of_business: "Type of business",
+    segment_served: "Segment served",
+    legal_structure: "Legal structure",
+    raw_materials: "Raw materials",
+    fuel_sources: "Fuel sources",
+    type_of_infrastructure: "Type of infrastructure",
+};

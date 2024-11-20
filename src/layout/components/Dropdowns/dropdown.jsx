@@ -30,6 +30,7 @@ import {
     deleteDropdownValues,
     editDropdownValues,
 } from "../../../functions/dropdown";
+import ReactSelect from "react-select";
 
 const schema = yup.object().shape({
     name: yup.object().shape({
@@ -37,7 +38,12 @@ const schema = yup.object().shape({
         ms: yup.string(),
         dz: yup.string(),
     }),
-    type: yup.string().required(),
+    type: yup
+        .object()
+        .shape({
+            label: yup.string().required(),
+            value: yup.string().required(),
+        }),
     dropdown_type: yup.string(),
 });
 
@@ -74,6 +80,8 @@ function Dropdown({
         },
     });
 
+    console.log(errors);
+
     const { mutate, isPending } = useMutation({
         mutationFn: addDropdownValues,
         onSuccess: () => {
@@ -83,7 +91,7 @@ function Dropdown({
             setOpen(false);
         },
         onError: (err) => {
-            toast.error(err.message);
+            toast.error(err.response.data.message);
         },
     });
 
@@ -115,7 +123,7 @@ function Dropdown({
             setOpen(false);
         },
         onError: (err) => {
-            toast.error(Object.entries(err.message));
+            toast.error(err.response.data.message);
         },
     });
 
@@ -127,7 +135,7 @@ function Dropdown({
             setDeleteId(null);
         },
         onError: (err) => {
-            toast.error(Object.entries(err.message));
+            toast.error(err.response.data.message);
         },
     });
 
@@ -139,7 +147,7 @@ function Dropdown({
                     ms: editItem.malay_name,
                     dz: editItem.dz_name,
                 },
-                type: editItem.type,
+                type: { label: types[editItem.type], value: editItem.type },
                 status: 1,
                 dropdown_type,
             });
@@ -149,7 +157,7 @@ function Dropdown({
                     en: "",
                     ms: "",
                 },
-                type: "",
+                type: null,
                 status: 1,
                 dropdown_type,
             });
@@ -159,12 +167,13 @@ function Dropdown({
     const onEditSubmit = (data) => {
         editMutate({
             ...data,
-            dropdown_id: editItem._id,
+            type: data.type.value,
+            dropdown_id: editItem.dropdown_id,
         });
     };
 
     const onAddSubmit = (data) => {
-        mutate(data);
+        mutate({ ...data, type: data.type.value });
     };
 
     return (
@@ -183,13 +192,13 @@ function Dropdown({
                 >
                     Add Dropdown
                 </Button>
-                <Button
+                {/* <Button
                     variant="contained"
                     className="ModalOpeningButtton"
                     onClick={() => setCsvModal(true)}
                 >
                     Add Sheet
-                </Button>
+                </Button> */}
             </Stack>
             <DataGrid
                 rows={rows}
@@ -279,27 +288,19 @@ function Dropdown({
                             control={control}
                             render={({ field, fieldState }) => {
                                 return (
-                                    <FormControl size="small">
-                                        <InputLabel>Select Type</InputLabel>
-                                        <Select
-                                            variant="outlined"
-                                            label="Select Type"
-                                            fullWidth
+                                    <Box>
+                                        <InputLabel sx={{ marginBottom: 1 }}>
+                                            Select Type
+                                        </InputLabel>
+                                        <ReactSelect
                                             {...field}
-                                        >
-                                            {Object.entries(types).map(
-                                                (_type) => {
-                                                    return (
-                                                        <MenuItem
-                                                            value={_type[0]}
-                                                            key={_type[0]}
-                                                        >
-                                                            {_type[1]}
-                                                        </MenuItem>
-                                                    );
-                                                }
+                                            options={Object.entries(types).map(
+                                                (_type) => ({
+                                                    label: _type[1],
+                                                    value: _type[0],
+                                                })
                                             )}
-                                        </Select>
+                                        />
                                         {fieldState.invalid && (
                                             <FormHelperText
                                                 variant="caption"
@@ -308,7 +309,7 @@ function Dropdown({
                                                 {fieldState.error.message}
                                             </FormHelperText>
                                         )}
-                                    </FormControl>
+                                    </Box>
                                 );
                             }}
                         />
