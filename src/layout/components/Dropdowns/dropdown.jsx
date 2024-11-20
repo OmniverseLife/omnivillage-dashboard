@@ -38,12 +38,10 @@ const schema = yup.object().shape({
         ms: yup.string(),
         dz: yup.string(),
     }),
-    type: yup
-        .object()
-        .shape({
-            label: yup.string().required(),
-            value: yup.string().required(),
-        }),
+    type: yup.object().shape({
+        label: yup.string().required(),
+        value: yup.string().required(),
+    }),
     dropdown_type: yup.string(),
 });
 
@@ -80,13 +78,12 @@ function Dropdown({
         },
     });
 
-    console.log(errors);
-
     const { mutate, isPending } = useMutation({
         mutationFn: addDropdownValues,
         onSuccess: () => {
             toast.success("Dropdown value added successfully");
             refetch();
+            reset();
             setEdit(null);
             setOpen(false);
         },
@@ -106,6 +103,7 @@ function Dropdown({
         onSuccess: () => {
             toast.success("Dropdown values added successfully");
             refetch();
+            reset();
             setEdit(null);
             setCsvModal(false);
         },
@@ -119,6 +117,7 @@ function Dropdown({
         onSuccess: () => {
             toast.success("Dropdown value edited successfully");
             refetch();
+            reset();
             setEdit(null);
             setOpen(false);
         },
