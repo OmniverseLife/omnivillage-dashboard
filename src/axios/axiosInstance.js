@@ -6,7 +6,7 @@ export const mediaURL = `${process.env.REACT_APP_BASE_URL}/`;
 // export const mediaURL = `${process.env.REACT_APP_TEST_URL}/uploads`;
 
 const axiosInstance = axios.create({
-  baseURL,
+    baseURL,
 });
 
 export default axiosInstance;

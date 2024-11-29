@@ -1,60 +1,52 @@
 import { Menu, MenuItem, Stack } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { endpoints } from "../../../axios/endpoints";
-import { downloadUserData, fetchAllUsers } from "../../../functions/users";
+import { getAllModerators } from "../../../functions/moderator";
 import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 import Loading from "../../components/loading";
-import ViewDetails2 from "../../components/viewDetails2/viewDetails2";
+import ViewModeratorDetails from "../../components/viewModeratorDetails/viewModeratorDetails";
 import Wrapper from "../../components/wrapper/wrapper";
-import "./users.css";
+import "./moderator.css";
+import { useEffect } from "react";
 
-function Users() {
+function Moderators() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedrow, setSelectedrow] = useState(null);
     const [modalOpen, setmodalOpen] = useState(false);
     const [modalData, setmodalData] = useState({});
-    const { data: users = [], isLoading } = useQuery({
-        queryKey: ["users"],
-        queryFn: fetchAllUsers,
-    });
-
-    const { mutate, isPending } = useMutation({
-        mutationFn: downloadUserData,
+    const { data: moderators = [], isLoading } = useQuery({
+        queryKey: ["moderator"],
+        queryFn: getAllModerators,
     });
 
     const selectData = (data) => {
-        // let obj = deepFlattenToObject(data);
-        let obj = data;
-        // delete obj["members"];
-        // delete obj["__v"];
-        // delete obj["_id"];
-
-        console.log(obj);
-        setmodalData(obj);
+        setmodalData(data);
     };
-    const rows = users.map((_user, idx) => ({
+
+    const rows = moderators.map((_moderator, idx) => ({
         id: idx + 1,
-        user_id: _user._id,
-        name: `${_user.first_name} ${_user.last_name}`,
-        phone: `${_user.country_code} ${_user.phone}`,
-        country: _user.country,
-        totalLand: `${_user.total_land} ${(
-            _user.land_measurement_symbol || _user.land_measurement
-        ).replace("-", "")}`,
+        moderator_id: _moderator._id,
+        name: `${_moderator.first_name} ${_moderator.last_name}`,
+        phone: `${_moderator.country_code} ${_moderator.phone}`,
+        country: _moderator.country,
+        status:
+            _moderator.status === 0
+                ? "Pending"
+                : _moderator.status === 1
+                ? "Approved"
+                : "Rejected",
     }));
 
     const columns = [
         { field: "id", headerName: "S.NO", width: 100 },
-        { field: "user_id", headerName: "_id", width: 250 },
+        { field: "moderator_id", headerName: "_id", width: 250 },
         { field: "name", headerName: "Name", width: 250 },
         { field: "phone", headerName: "Phone", width: 200 },
         { field: "country", headerName: "Country", width: 150 },
         {
-            field: "totalLand",
-            headerName: "Total Land",
+            field: "status",
+            headerName: "Status",
             width: 180,
         },
         {
@@ -77,7 +69,7 @@ function Users() {
                                 setSelectedrow(params.row.id);
                                 setAnchorEl(e.currentTarget);
 
-                                selectData(users[params.row.id - 1]);
+                                selectData(moderators[params.row.id - 1]);
                             }}
                             id={params.row.id}
                         ></i>
@@ -107,7 +99,7 @@ function Users() {
                                     View Detail
                                 </Stack>
                             </MenuItem>
-                            <MenuItem
+                            {/* <MenuItem
                                 onClick={() => {
                                     setAnchorEl(null);
                                     setSelectedrow(null);
@@ -116,8 +108,8 @@ function Users() {
                                 <Link
                                     to={`${process.env.REACT_APP_BASE_URL}/api${
                                         endpoints.user.download
-                                    }?user_id=${
-                                        rows[selectedrow - 1]?.user_id
+                                    }?moderator_id=${
+                                        rows[selectedrow - 1]?.moderator_id
                                     }`}
                                     style={{ color: "#333" }}
                                 >
@@ -142,7 +134,7 @@ function Users() {
                                     ></i>{" "}
                                     Delete
                                 </Stack>
-                            </MenuItem>
+                            </MenuItem> */}
                         </Menu>
                     </div>
                 );
@@ -162,7 +154,7 @@ function Users() {
                         },
                     }}
                     columnVisibilityModel={{
-                        user_id: false,
+                        moderator_id: false,
                     }}
                     pageSizeOptions={[5, 10]}
                     slots={{ toolbar: CustomToolbar }}
@@ -173,13 +165,13 @@ function Users() {
                     }}
                     loading={isLoading}
                 />
-                <Loading isLoading={isLoading || isPending} />
+                <Loading isLoading={isLoading} />
                 {selectedrow && (
-                    <ViewDetails2
+                    <ViewModeratorDetails
                         open={modalOpen}
                         setOpen={() => setmodalOpen(false)}
                         data={modalData}
-                        heading="User"
+                        heading="Moderator"
                     />
                 )}
             </div>
@@ -187,4 +179,4 @@ function Users() {
     );
 }
 
-export default Users;
+export default Moderators;

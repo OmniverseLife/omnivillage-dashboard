@@ -308,58 +308,28 @@ export default function Sidebar({ role }) {
                         <i className="fa-solid fa-user-group"></i>
                         <p>Users</p>
                     </Link>
-                    {/* <a
-            onClick={() => setcropsMenu(!cropsMenu)}
-            className={paths.includes("crops") ? "link active" : "link"}
-          >
-            <i className="fa-solid fa-utensils"></i>
-            <p>Crops</p>
-            <span>
-              {cropsMenu ? (
-                <i className="fa-solid fa-minus"></i>
-              ) : (
-                <i className="fa-solid fa-plus"></i>
-              )}
-            </span>
-          </a> */}
-                    {/* {cropsMenu && (
-            <div className="menu">
-              <Link
-                to="/crops/cultivation"
-                className={
-                  paths.includes("cultivation") ? "link active" : "link"
-                }
-              >
-                Cultivation
-              </Link>
-              <Link
-                to="/crops/trees&shrubs"
-                className={
-                  paths.includes("trees&shrubs") ? "link active" : "link"
-                }
-              >
-                Trees/Shrubs
-              </Link>
-              <Link
-                to="/crops/poultry"
-                className={paths.includes("poultry") ? "link active" : "link"}
-              >
-                Poultry
-              </Link>
-              <Link
-                to="/crops/fishery"
-                className={paths.includes("fishery") ? "link active" : "link"}
-              >
-                Fishery
-              </Link>
-              <Link
-                to="/crops/hunting"
-                className={paths.includes("hunting") ? "link active" : "link"}
-              >
-                Hunting
-              </Link>
-            </div>
-          )} */}
+                    <Link
+                        to="/moderators"
+                        className={
+                            paths.includes("moderators")
+                                ? "link active"
+                                : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-gear"></i>
+                        <p>Moderators</p>
+                    </Link>
+                    <Link
+                        to="/assign-moderator-to-village"
+                        className={
+                            paths.includes("assign-moderator-to-village")
+                                ? "link active"
+                                : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-gear"></i>
+                        <p>Assign</p>
+                    </Link>
                     <Link
                         to="/settings"
                         className={

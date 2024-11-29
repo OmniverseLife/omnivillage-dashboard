@@ -159,4 +159,16 @@ export const routes = [
         Component: lazy(() => import("../layout/pages/Dropdowns")),
         role: "admin",
     },
+    {
+        path: "/moderators",
+        Component: lazy(() => import("../layout/pages/moderator/moderator")),
+        role: "admin",
+    },
+    {
+        path: "/assign-moderator-to-village",
+        Component: lazy(() =>
+            import("../layout/pages/assign-moderator-to-villages")
+        ),
+        role: "admin",
+    },
 ];

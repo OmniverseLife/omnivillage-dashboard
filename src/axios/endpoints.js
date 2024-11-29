@@ -180,6 +180,16 @@ export const endpoints = {
         get_all_crops: "/dashboard/all-crops",
     },
 
+    moderator: {
+        list_all: "/moderator/list-all",
+        list_all_approved: "/moderator/list-all-approved",
+        change_status: "/moderator/change-status",
+    },
+
+    village: {
+        add_moderator_to_village: "/villages/add-moderator-to-village",
+    },
+
     dropdowns: {
         demographic: {
             get: "/demographic_dropdown/get-all",
