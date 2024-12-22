@@ -160,6 +160,11 @@ export const routes = [
         role: "admin",
     },
     {
+        path: "/moderator-dropdowns",
+        Component: lazy(() => import("../layout/pages/ModeratorDropdown")),
+        role: "admin",
+    },
+    {
         path: "/moderators",
         Component: lazy(() => import("../layout/pages/moderator/moderator")),
         role: "admin",

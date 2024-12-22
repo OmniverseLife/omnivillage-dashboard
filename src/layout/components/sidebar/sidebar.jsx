@@ -348,6 +348,15 @@ export default function Sidebar({ role }) {
                         <i className="fa-solid fa-gear"></i>
                         <p>Dropdowns</p>
                     </Link>
+                    <Link
+                        to="/moderator-dropdowns"
+                        className={
+                            paths.includes("dropdowns") ? "link active" : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-gear"></i>
+                        <p>Moderator Dropdowns</p>
+                    </Link>
                 </>
             )}
             <Link

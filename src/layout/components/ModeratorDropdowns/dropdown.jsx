@@ -22,12 +22,12 @@ import ReactSelect from "react-select";
 import { toast } from "sonner";
 import * as yup from "yup";
 import {
-    addDropdownValues,
-    deleteDropdownValues,
-    editDropdownValues,
-} from "../../../functions/dropdown";
-import CustomToolbar from "../CustomToolbar/CustomToolbar";
-import Loading from "../loading";
+    addModeratorDropdownValues,
+    deleteModeratorDropdownValues,
+    editModeratorDropdownValues,
+} from "../../../functions/moderator-dropdown";
+import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
+import Loading from "../../components/loading";
 
 const schema = yup.object().shape({
     name: yup.object().shape({
@@ -76,7 +76,7 @@ function Dropdown({
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: addDropdownValues,
+        mutationFn: addModeratorDropdownValues,
         onSuccess: () => {
             toast.success("Dropdown value added successfully");
             refetch();
@@ -110,7 +110,7 @@ function Dropdown({
     });
 
     const { mutate: editMutate, isPending: isEditPending } = useMutation({
-        mutationFn: editDropdownValues,
+        mutationFn: editModeratorDropdownValues,
         onSuccess: () => {
             toast.success("Dropdown value edited successfully");
             refetch();
@@ -124,7 +124,7 @@ function Dropdown({
     });
 
     const { mutate: deleteMutate, isPending: isDeletePending } = useMutation({
-        mutationFn: deleteDropdownValues,
+        mutationFn: deleteModeratorDropdownValues,
         onSuccess: () => {
             toast.success("Dropdown value deleted successfully");
             refetch();

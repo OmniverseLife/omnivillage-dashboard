@@ -3,11 +3,11 @@ import { useState } from "react";
 import { Menu, MenuItem, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import Dropdown from "./dropdown";
-import { getDropdownValues } from "../../../functions/dropdown";
+import { getModeratorDropdownValues } from "../../../functions/moderator-dropdown";
 import { bulkUploadCultivationCrops } from "../../../functions/crops";
-import { water_types } from "../../../helper/constants";
+import { demographic_officer_types } from "../../../helper/constants";
 
-function WaterDropdown() {
+function DemographicModeratorDropdown() {
     const [selectedRow, setSelectedRow] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [editItem, setEditItem] = useState(null);
@@ -18,8 +18,8 @@ function WaterDropdown() {
         isLoading,
         refetch,
     } = useQuery({
-        queryKey: ["water__officer_dropdowns"],
-        queryFn: () => getDropdownValues("water"),
+        queryKey: ["demographic_officer_dropdowns"],
+        queryFn: () => getModeratorDropdownValues("demographic"),
     });
 
     const rows = dropdown.map((_dropdown, index) => ({
@@ -47,7 +47,7 @@ function WaterDropdown() {
                     variant="body2"
                     sx={{ textTransform: "capitalize" }}
                 >
-                    {water_types[params.row.type]}
+                    {demographic_officer_types[params.row.type]}
                 </Typography>
             ),
         },
@@ -132,21 +132,21 @@ function WaterDropdown() {
     return (
         // <Wrapper>
         <Dropdown
-            dropdown_type="water"
+            dropdown_type="demographic"
             rows={rows}
             columns={columns}
-            types={water_types}
+            types={demographic_officer_types}
             isLoading={isLoading}
             editItem={editItem}
             setEdit={setEditItem}
             refetch={refetch}
             setDeleteId={setDeleteId}
             deleteId={deleteId}
-            sectionName="Water Dropdown"
+            sectionName="Demographic Officer Dropdown"
             bulkUploadFn={bulkUploadCultivationCrops}
         />
         // </Wrapper>
     );
 }
 
-export default WaterDropdown;
+export default DemographicModeratorDropdown;

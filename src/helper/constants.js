@@ -52,6 +52,10 @@ export const demographic_types = {
     spiritual_aspiration: "Aspirations: Spiritual Aspiration",
 };
 
+export const demographic_officer_types = {
+    issues_determine_villagers_vote: "Issues that determine villagers vote",
+};
+
 export const energy_types = {
     microgrid_type: "Micro grid type",
     purpose_petrol: "Purpose petrol used for",
@@ -60,6 +64,12 @@ export const energy_types = {
     type_others: "Others: Type",
     purpose_others: "Others: Purpose",
     extent: "General: Extent",
+};
+
+export const energy_officer_types = {
+    type_of_energy_sources: "Type of energy sources",
+    distribution_method: "Distribution method",
+    distance_of_fuel_pumps: "Distance of Fuel pumps",
 };
 
 export const housing_types = {
@@ -78,9 +88,18 @@ export const landholding_types = {
     urgency_requirement: "Requirement: Urgency",
 };
 
+export const landholding_officer_types = {};
+
 export const mobility_types = {
     methods_of_mobility: "Methods of mobility",
     type_of_vehicles: "Type of vehicles",
+};
+
+export const mobility_officer_types = {
+    mobility_requirements: "Mobility requirement",
+    frequency_of_road_damage: "Frequency of road damage",
+    connectivity_to_healthcare_facilities:
+        "Connectivity to healthcare facilities",
 };
 
 export const water_types = {
@@ -93,6 +112,15 @@ export const water_types = {
     severity: "Water Scarcity: Severity",
 };
 
+export const water_officer_types = {
+    water_source: "Water source",
+    condition: "Condition",
+    tapped_into: "Tapped into",
+    distribution_method: "Distribution method",
+    storage_method: "Storage method",
+    treated_water_discharged: "Treated water discharged",
+};
+
 export const forestry_types = {
     other_produce_from_forest: "Other produce from forest",
     general_purpose: "General purpose",
@@ -101,6 +129,12 @@ export const forestry_types = {
     other_needs_purpose: "Purpose: Other needs",
     other_needs_urgency: "Urgency: Other needs",
     other_needs_type: "Type of other needs",
+};
+
+export const forestry_officer_types = {
+    type_of_forest_accessible: "Type of forest accessible",
+    condition_of_forest_accessible: "Condition of forest accessible",
+    incident_of_forest_fire: "Incident of forest fire",
 };
 
 export const personal_household_types = {
@@ -125,4 +159,49 @@ export const business_types = {
     raw_materials: "Raw materials",
     fuel_sources: "Fuel sources",
     type_of_infrastructure: "Type of infrastructure",
+};
+
+export const business_officer_types = {
+    loan_lending_organizations: "Loan lending organizations",
+    main_use_of_loans: "Main use of loans",
+};
+
+export const community_officer_types = {
+    no_of_townhall: "Number of townhall",
+    no_of_market: "Number of market",
+    no_of_bank: "Number of bank",
+    distance_of_bank: "Distance of bank",
+    no_of_healthcare: "Number of healthcare",
+    distance_of_healthcare: "Distance of healthcare",
+    no_of_library: "Number of library",
+    no_of_museum: "Number of museum",
+    kind_of_sports: "Kind of sports",
+    frequency_of_spiritual_retreats: "Frequency of spiritual retreats",
+    no_of_spiritual_sanctums: "Number of spiritual sanctums",
+    no_of_post_office: "Number of post office",
+    post_office_distance: "Post office distance",
+    no_of_sewage_treatment_facility: "Number of sewage treatment facility",
+    types_of_sewage_treatment_facility: "Type of sewage treatment facility",
+    no_of_composting_facility: "Number of composting facility",
+    types_of_composting_facility: "Type of composting facility",
+    types_of_recycling_facility: "Type of recycling facility",
+    level_of_waste_segregation: "Level of waste segregation",
+    type_of_street_lights: "Type of street lights",
+    no_of_broadband_providers: "Number of broadband providers",
+    method_of_broadband: "Method of broadband",
+    bandwidth_of_broadband: "Bandwidth of broadband",
+    stability_of_broadband: "Stability of broadband",
+    distance_of_burial_cremation: "Distance of burial cremation",
+    distance_of_animal_shelters: "Distance of animal shelters",
+    type_of_animal_shelters: "Type of animal shelters",
+    capacity_of_parking: "Capacity of parking",
+    type_of_children_playground: "Type of children playground",
+    type_of_senile_center: "Type of senile center",
+    type_of_mobility: "Type of mobility",
+    capacity_of_water_storage: "Capacity of water storage",
+    type_of_cold_storage: "Type of cold storage",
+    capacity_of_cold_storage: "Capacity of cold storage",
+    type_of_energy_and_battery_house: "Type of energy and battery house",
+    capacity_of_energy_and_battery_house:
+        "Capacity of energy and battery house",
 };

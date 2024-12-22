@@ -246,4 +246,15 @@ export const endpoints = {
             delete: "/business-dropdown/delete-business-dropdown",
         },
     },
+
+    moderator_dropdown: {
+        business: "/business-officer-dropdown",
+        community: "/community-officer-dropdown",
+        demographic: "/demographic-officer-dropdown",
+        energy: "/energy-officer-dropdown",
+        forestry: "/forestry-officer-dropdown",
+        landholding: "/landholding-officer-dropdown",
+        mobility: "/mobility-officer-dropdown",
+        water: "/water-officer-dropdown",
+    },
 };
