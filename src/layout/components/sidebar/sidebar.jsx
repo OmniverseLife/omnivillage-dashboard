@@ -29,7 +29,7 @@ export default function Sidebar({ role }) {
         <div className="sidebar">
             <div className="logo">
                 <img src={logo} alt="" />
-                <h1>OMNI VIlLAGE</h1>
+                <h1>OMNI VILLAGE</h1>
             </div>
             <Link
                 // to="/dashboard"

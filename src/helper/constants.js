@@ -61,9 +61,11 @@ export const energy_types = {
     purpose_petrol: "Purpose petrol used for",
     purpose_diesel: "Purpose diesel used for",
     purpose_natural_gas: "Purpose natural gas used for",
+    source_of_fuels_used: "Source of Fuel used",
     type_others: "Others: Type",
     purpose_others: "Others: Purpose",
     extent: "General: Extent",
+    dropdown: "Unit Dropdown",
 };
 
 export const energy_officer_types = {
@@ -129,6 +131,7 @@ export const forestry_types = {
     other_needs_purpose: "Purpose: Other needs",
     other_needs_urgency: "Urgency: Other needs",
     other_needs_type: "Type of other needs",
+    dropdown: "Unit Dropdown",
 };
 
 export const forestry_officer_types = {
@@ -150,6 +153,7 @@ export const personal_household_types = {
     kitchen_items_produce: "Produce: Kitchen items",
     other_items: "Other items",
     other_items_produce: "Produce: Other items",
+    dropdown: "Unit Dropdown",
 };
 
 export const business_types = {
@@ -159,6 +163,8 @@ export const business_types = {
     raw_materials: "Raw materials",
     fuel_sources: "Fuel sources",
     type_of_infrastructure: "Type of infrastructure",
+    raw_consumption_unit: "Raw Consumption Unit",
+    fuel_source_unit: "Fuel Source Unit",
 };
 
 export const business_officer_types = {
