@@ -62,6 +62,7 @@ export const energy_types = {
     purpose_diesel: "Purpose diesel used for",
     purpose_natural_gas: "Purpose natural gas used for",
     source_of_fuels_used: "Source of Fuel used",
+    sufficient: "Sufficient",
     type_others: "Others: Type",
     purpose_others: "Others: Purpose",
     extent: "General: Extent",
