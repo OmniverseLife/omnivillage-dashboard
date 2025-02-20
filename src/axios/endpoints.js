@@ -7,6 +7,7 @@ export const endpoints = {
     user: {
         list_all: "/user/list-all",
         download: "/user/download-pdf",
+        delete_user: "/user/delete_individual_user",
     },
     labels: {
         get_all: "/consumption_type",

@@ -4,35 +4,42 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { endpoints } from "../../../axios/endpoints";
-import { downloadUserData, fetchAllUsers } from "../../../functions/users";
+import {
+    deleteUser,
+    downloadUserData,
+    fetchAllUsers,
+} from "../../../functions/users";
 import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 import Loading from "../../components/loading";
 import ViewDetails2 from "../../components/viewDetails2/viewDetails2";
 import Wrapper from "../../components/wrapper/wrapper";
 import "./users.css";
+import DeleteModal from "../../components/deleteModal/deleteModal";
 
 function Users() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedrow, setSelectedrow] = useState(null);
     const [modalOpen, setmodalOpen] = useState(false);
     const [modalData, setmodalData] = useState({});
-    const { data: users = [], isLoading } = useQuery({
+    const [deleteModal, setDeleteModal] = useState(false);
+    const {
+        data: users = [],
+        isLoading,
+        refetch,
+    } = useQuery({
         queryKey: ["users"],
         queryFn: fetchAllUsers,
     });
 
     const { mutate, isPending } = useMutation({
-        mutationFn: downloadUserData,
+        mutationFn: deleteUser,
+        onSuccess: () => {
+            refetch();
+        },
     });
 
     const selectData = (data) => {
-        // let obj = deepFlattenToObject(data);
         let obj = data;
-        // delete obj["members"];
-        // delete obj["__v"];
-        // delete obj["_id"];
-
-        console.log(obj);
         setmodalData(obj);
     };
     const rows = users.map((_user, idx) => ({
@@ -130,7 +137,12 @@ function Users() {
                                     </Stack>
                                 </Link>
                             </MenuItem>
-                            <MenuItem onClick={() => setAnchorEl(null)}>
+                            <MenuItem
+                                onClick={() => {
+                                    setAnchorEl(null);
+                                    setDeleteModal(true);
+                                }}
+                            >
                                 <Stack
                                     direction="row"
                                     alignItems="center"
@@ -175,12 +187,23 @@ function Users() {
                 />
                 <Loading isLoading={isLoading || isPending} />
                 {selectedrow && (
-                    <ViewDetails2
-                        open={modalOpen}
-                        setOpen={() => setmodalOpen(false)}
-                        data={modalData}
-                        heading="User"
-                    />
+                    <>
+                        <ViewDetails2
+                            open={modalOpen}
+                            setOpen={() => setmodalOpen(false)}
+                            data={modalData}
+                            heading="User"
+                        />
+                        <DeleteModal
+                            open={deleteModal}
+                            onAgree={() => {
+                                mutate(modalData._id);
+                                setDeleteModal(false);
+                                setmodalData({});
+                            }}
+                            setOpen={() => setDeleteModal(false)}
+                        />
+                    </>
                 )}
             </div>
         </Wrapper>

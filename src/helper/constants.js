@@ -166,6 +166,7 @@ export const business_types = {
     type_of_infrastructure: "Type of infrastructure",
     raw_consumption_unit: "Raw Consumption Unit",
     fuel_source_unit: "Fuel Source Unit",
+    urgency: "Urgency for Skills, Manpower & Equipment",
 };
 
 export const business_officer_types = {
