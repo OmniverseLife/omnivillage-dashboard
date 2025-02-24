@@ -32,9 +32,6 @@ export default function Wrapper({ children }) {
     const { data = [], isLoading } = useQuery({
         queryKey: ["villages"],
         queryFn: fetchVillages,
-        refetchOnMount: true,
-        refetchOnWindowFocus: true,
-        staleTime: 300000,
     });
 
     useEffect(() => {
@@ -175,7 +172,7 @@ export default function Wrapper({ children }) {
                         </FormControl>
                     </Stack>
                 )}
-                {!isLoading && children}
+                {!isLoading ? children : null}
             </div>
         </Box>
     );
