@@ -19,9 +19,18 @@ const landConverter = (unit, value) => {
 function LandChart({ land_unit }) {
     const [searchParams] = useSearchParams();
 
+    console.log(
+        searchParams.get("village") ||
+            searchParams.get("village") !== "undefined",
+        "lala"
+    );
+
     const { data: land_allocation = {}, isLandAllocationLoading } = useQuery({
         queryKey: ["land_allocation", searchParams.getAll("village")],
         queryFn: () => getLandAllocationData(searchParams.getAll("village")),
+        enabled:
+            Boolean(searchParams.get("village")) &&
+            searchParams.get("village") !== "undefined",
     });
 
     // const { data: land_used = {}, isLandUsedLoading } = useQuery({
@@ -31,9 +40,11 @@ function LandChart({ land_unit }) {
     const { data: land_used = {}, isLandUsedLoading } = useQuery({
         queryKey: ["land_used", searchParams.getAll("village")],
         queryFn: () => getLandUsedCultivation(searchParams.getAll("village")),
+        enabled:
+            Boolean(searchParams.get("village")) &&
+            searchParams.get("village") !== "undefined",
     });
 
-    console.log(land_used, land_allocation);
     const data = [
         {
             name: "Cultivation",
