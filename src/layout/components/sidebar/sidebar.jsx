@@ -78,6 +78,16 @@ export default function Sidebar({ role }) {
                     >
                         Food Balance
                     </Link>
+                    <Link
+                        to={`/dashboard/demographics`}
+                        className={
+                            paths.includes("demographics")
+                                ? "link active"
+                                : "link"
+                        }
+                    >
+                        Demographics
+                    </Link>
                 </div>
             )}
             {role === "admin" && (

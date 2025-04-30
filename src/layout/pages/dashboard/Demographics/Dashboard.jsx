@@ -1,0 +1,21 @@
+import Wrapper from "../../../components/wrapper/wrapper";
+import DietShareChart from "./components/DietShare";
+import MaritalStatusChart from "./components/MaritalStatus";
+import PopulationSnapshot from "./components/PopulationSnapshot";
+import { Grid } from "@mui/material";
+
+export default function DemographicDashboard() {
+  return (
+    <Wrapper>
+      <PopulationSnapshot />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <MaritalStatusChart />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <DietShareChart />
+        </Grid>
+      </Grid>
+    </Wrapper>
+  );
+}
