@@ -15,6 +15,14 @@ export const endpoints = {
     populationSnapshot: "/demographic-dashboard/population-snapshot",
     languageHeatmap: "/demographic-dashboard/language-heatmap",
   },
+  landholding: {
+    parcelData: "/landholding-dashboard/parcel-data",
+    parcelSize: "/landholding-dashboard/parcel-size",
+    locationSplit: "/landholding-dashboard/location-split",
+    utilisationSplit: "/landholding-dashboard/utilisation-split",
+    usagePurpose: "/landholding-dashboard/usage-purpose",
+    landIdleSankey: "/landholding-dashboard/land-idle-sankey",
+  },
   user: {
     list_all: "/user/list-all",
     download: "/user/download-pdf",
