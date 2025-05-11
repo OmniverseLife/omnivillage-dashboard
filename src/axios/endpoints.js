@@ -18,7 +18,6 @@ export const endpoints = {
     savingsAndInvestments: "/demographic-dashboard/savings-investments",
     habitData: "/demographic-dashboard/habits-data",
     educationAspirations: "/demographic-dashboard/education-aspirations",
-
   },
   landholding: {
     parcelData: "/landholding-dashboard/parcel-data",
@@ -27,6 +26,8 @@ export const endpoints = {
     utilisationSplit: "/landholding-dashboard/utilisation-split",
     usagePurpose: "/landholding-dashboard/usage-purpose",
     landIdleSankey: "/landholding-dashboard/land-idle-sankey",
+    purchaseTimeline: "/landholding-dashboard/purchase-timeline",
+    declarationVsUse: "/landholding-dashboard/landholding-declaration-vs-use",
   },
   user: {
     list_all: "/user/list-all",

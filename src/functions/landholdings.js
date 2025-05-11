@@ -37,3 +37,12 @@ export const getUsagePurposeTreeMap = async (village, country) => {
 export const getIdleLandReasonSankey = async (village, country) => {
   return fetchData(endpoints.landholding.landIdleSankey, {village, country});
 };
+
+export const getPurchaseTimeline = async (village, country) => {
+  return fetchData(endpoints.landholding.purchaseTimeline, {village, country});
+};
+
+export const getDeclarationVsUse = async (village, country) => {
+  return fetchData(endpoints.landholding.declarationVsUse, {village, country});
+};
+

@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useSearchParams } from "react-router-dom";
-import { getIdleLandReasonSankey } from "../../../../../functions/landholdings"; // Adjust path as needed
+import { getDeclarationVsUse } from "../../../../../functions/landholdings"; // Adjust path as needed
 
 // Styled card
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -25,35 +25,39 @@ const StyledCard = styled(Card)(({ theme }) => ({
   backgroundColor: "#fff",
 }));
 
-const IdleLandReasonChart = () => {
+const DeclarationVsUseScatterChart = () => {
   const [chartOptions, setChartOptions] = useState({});
   const [searchParams] = useSearchParams();
   const villageName = searchParams.get("village");
   const countryName = searchParams.get("country");
 
   const {
-    data: idleLandData,
+    data: declarationVsUseData,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["idle-land-reasons", villageName],
-    queryFn: () => getIdleLandReasonSankey(villageName, countryName),
+    queryKey: ["declaration-vs-use", villageName],
+    queryFn: () => getDeclarationVsUse(villageName, countryName),
     enabled: !!villageName,
   });
 
   useEffect(() => {
-    if (idleLandData?.result && Array.isArray(idleLandData.result)) {
-      const reasons = idleLandData.result.map((item) => item.idle_purpose_name.en);
-      const landAreas = idleLandData.result.map((item) => item.totalLandArea);
+    if (declarationVsUseData?.result && Array.isArray(declarationVsUseData.result)) {
+      const scatterData = declarationVsUseData.result.map((item) => ({
+        x: item.totalLandDeclared,
+        y: item.totalLandUsed,
+        geotag: item.geotag, // Include geotag for tooltip
+      }));
 
       setChartOptions({
         chart: {
-          type: "column",
+          type: "scatter",
+          zoomType: "xy",
           backgroundColor: "transparent",
         },
         title: {
-          text: `Idle Land Area by Reason in ${villageName}`,
+          text: `Declared vs. Used Land in ${villageName}`,
           style: {
             fontSize: "18px",
             fontWeight: "bold",
@@ -61,20 +65,18 @@ const IdleLandReasonChart = () => {
           },
         },
         xAxis: {
-          categories: reasons,
+          title: {
+            text: "Total Land Declared (sq. ft.)",
+          },
           labels: {
             style: {
-              fontSize: "12px",
               color: "#666",
             },
-          },
-          title: {
-            text: "Reason for Idle Land",
           },
         },
         yAxis: {
           title: {
-            text: "Total Land Area (sq. ft.)",
+            text: "Total Land Used (sq. ft.)",
           },
           labels: {
             style: {
@@ -83,30 +85,33 @@ const IdleLandReasonChart = () => {
           },
         },
         tooltip: {
-          valueSuffix: " sq. ft.",
+          pointFormat:
+            "Declared: <b>{point.x} sq. ft.</b><br/>" +
+            "Used: <b>{point.y} sq. ft.</b><br/>" +
+            "Geotag: {point.geotag}",
         },
         series: [
           {
-            name: "Land Area",
-            data: landAreas,
-            color: "#8085e9",
+            name: "Land Parcels",
+            data: scatterData,
+            marker: {
+              radius: 5,
+            },
           },
         ],
         credits: {
-          enabled: false,
-        },
-        legend: {
           enabled: false,
         },
       });
     } else {
       setChartOptions({
         chart: {
-          type: "column",
+          type: "scatter",
+          zoomType: "xy",
           backgroundColor: "transparent",
         },
         title: {
-          text: `Idle Land Area by Reason in ${villageName}`,
+          text: `Declared vs. Used Land in ${villageName}`,
           style: {
             fontSize: "18px",
             fontWeight: "bold",
@@ -114,14 +119,13 @@ const IdleLandReasonChart = () => {
           },
         },
         xAxis: {
-          categories: [],
           title: {
-            text: "Reason for Idle Land",
+            text: "Total Land Declared (sq. ft.)",
           },
         },
         yAxis: {
           title: {
-            text: "Total Land Area (sq. ft.)",
+            text: "Total Land Used (sq. ft.)",
           },
         },
         series: [],
@@ -129,11 +133,11 @@ const IdleLandReasonChart = () => {
           enabled: false,
         },
         noData: {
-          text: "No idle land reason data available.",
+          text: "No declared vs. used land data available.",
         },
       });
     }
-  }, [idleLandData, villageName]);
+  }, [declarationVsUseData, villageName]);
 
   if (isLoading) {
     return (
@@ -146,15 +150,15 @@ const IdleLandReasonChart = () => {
   if (isError) {
     return (
       <div style={{ color: "red", padding: 16 }}>
-        Error: {error?.message || "Failed to load idle land reasons data."}
+        Error: {error?.message || "Failed to load declared vs. used land data."}
       </div>
     );
   }
 
-  if (!idleLandData?.result || idleLandData.result.length === 0) {
+  if (!declarationVsUseData?.result || declarationVsUseData.result.length === 0) {
     return (
       <div style={{ padding: 24, textAlign: "center" }}>
-        No idle land reasons data available.
+        No declared vs. used land data available.
       </div>
     );
   }
@@ -169,11 +173,12 @@ const IdleLandReasonChart = () => {
           align="center"
           sx={{ marginTop: 2 }}
         >
-          Total idle land area by reason in <strong>{villageName}</strong>
+          Comparison of declared vs. used land area for parcels in{" "}
+          <strong>{villageName}</strong>
         </Typography>
       </CardContent>
     </StyledCard>
   );
 };
 
-export default IdleLandReasonChart;
+export default DeclarationVsUseScatterChart;
