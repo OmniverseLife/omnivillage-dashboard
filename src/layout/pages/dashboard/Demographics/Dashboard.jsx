@@ -5,8 +5,12 @@ import DietShareChart from "./components/DietShare";
 import IncomeRangeChart from "./components/IncomeRanges";
 import MaritalStatusChart from "./components/MaritalStatus";
 import MotorDisabilityPrevalenceChart from "./components/MotorDisability";
+import OccupationTreeMap from "./components/OccupationTree";
 import PopulationSnapshot from "./components/PopulationSnapshot";
 import { Grid } from "@mui/material";
+import SavingsAndInvestmentsChart from "./components/SavingsAndInvestments";
+import HabitsChart from "./components/HabitsCloud";
+import EducationAspirationsChart from "./components/EducationAspirations";
 
 export default function DemographicDashboard() {
   return (
@@ -21,9 +25,13 @@ export default function DemographicDashboard() {
         </Grid>
       </Grid>
       <IncomeRangeChart />
-      <BMIDistributionChart/>
+      <BMIDistributionChart />
       <MotorDisabilityPrevalenceChart />
       <ChronicDiseasePrevalenceChart />
+      <OccupationTreeMap />
+      <SavingsAndInvestmentsChart />
+      <HabitsChart/>
+      <EducationAspirationsChart/>
     </Wrapper>
   );
 }

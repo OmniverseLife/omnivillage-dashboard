@@ -14,6 +14,11 @@ export const endpoints = {
     motorDisability: "/demographic-dashboard/motor-disability",
     populationSnapshot: "/demographic-dashboard/population-snapshot",
     languageHeatmap: "/demographic-dashboard/language-heatmap",
+    occupationTreeMap: "/demographic-dashboard/occupation-tree",
+    savingsAndInvestments: "/demographic-dashboard/savings-investments",
+    habitData: "/demographic-dashboard/habits-data",
+    educationAspirations: "/demographic-dashboard/education-aspirations",
+
   },
   landholding: {
     parcelData: "/landholding-dashboard/parcel-data",

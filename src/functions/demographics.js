@@ -48,3 +48,19 @@ export const getVillagePopulationSnapshot = async (village) => {
 export const getLanguageProficiencyHeatMap = async (village) => {
   return fetchData(endpoints.demographic.languageHeatmap, { village });
 };
+
+export const getOccupationTreeMap = async (village) => {
+  return fetchData(endpoints.demographic.occupationTreeMap, { village });
+};
+
+export const getSavingsAndInvestments = async (village) => {
+  return fetchData(endpoints.demographic.savingsAndInvestments, { village });
+};
+
+export const getHabitsData = async (village) => {
+  return fetchData(endpoints.demographic.habitData, { village });
+};
+
+export const getEducationAndAspirations = async (village) => {
+  return fetchData(endpoints.demographic.educationAspirations, { village });
+};
