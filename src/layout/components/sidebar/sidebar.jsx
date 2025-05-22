@@ -90,6 +90,36 @@ export default function Sidebar({ role }) {
           >
             Housing
           </Link>
+          <Link
+            to={`/dashboard/energy`}
+            className={paths.includes("energy") ? "link active" : "link"}
+          >
+            Energy & Fuel
+          </Link>
+          <Link
+            to={`/dashboard/forestry`}
+            className={paths.includes("forestry") ? "link active" : "link"}
+          >
+            Forestry and Timber
+          </Link>
+          <Link
+            to={`/dashboard/mobility`}
+            className={paths.includes("mobility") ? "link active" : "link"}
+          >
+            Mobility
+          </Link>
+          <Link
+            to={`/dashboard/personal`}
+            className={paths.includes("personal") ? "link active" : "link"}
+          >
+            Other Personal & Household items
+          </Link>
+          <Link
+            to={`/dashboard/business`}
+            className={paths.includes("business") ? "link active" : "link"}
+          >
+            Other Personal & Household items
+          </Link>
         </div>
       )}
       {role === "admin" && (
