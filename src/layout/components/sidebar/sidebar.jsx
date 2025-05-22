@@ -118,7 +118,7 @@ export default function Sidebar({ role }) {
             to={`/dashboard/business`}
             className={paths.includes("business") ? "link active" : "link"}
           >
-            Other Personal & Household items
+            Business & Commercial Establishments/ Organizations
           </Link>
         </div>
       )}
