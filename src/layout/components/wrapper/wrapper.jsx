@@ -46,8 +46,8 @@ export default function Wrapper({ children }) {
 
   useEffect(() => {
     if (searchParams.getAll("village").length === 0 && !isLoading) {
-      searchParams.set("country", data[0]?.country);
-      searchParams.set("village", data[0]?.name);
+      searchParams.set("country", "bhutan");
+      searchParams.set("village", "rukha");
       setSearchParams(searchParams);
     }
   }, [data, isLoading, searchParams, setSearchParams]);
