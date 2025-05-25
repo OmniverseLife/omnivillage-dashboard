@@ -74,21 +74,18 @@ export const getLocalProduceShare = (country, village) =>
 
 // ========== COMMERCIAL ==========
 export const getBusinessTypeDistribution = (country, village) =>
-  fetchData(endpoints.commercial.businessTypeDistribution, {
-    country,
-    village,
-  });
+  fetchData(endpoints.commercial.businessTypeDistribution);
 export const getBusinessStarted = (country, village) =>
-  fetchData(endpoints.commercial.businessStarted, { country, village });
+  fetchData(endpoints.commercial.businessStarted);
 export const getLegalStructure = (country, village) =>
-  fetchData(endpoints.commercial.legalStructure, { country, village });
+  fetchData(endpoints.commercial.legalStructure);
 export const getInvestmentIncome = (country, village) =>
-  fetchData(endpoints.commercial.investmentIncome, { country, village });
+  fetchData(endpoints.commercial.investmentIncome);
 export const getManpowerSource = (country, village) =>
-  fetchData(endpoints.commercial.manpowerSource, { country, village });
+  fetchData(endpoints.commercial.manpowerSource);
 export const getResourceConsumption = (country, village) =>
-  fetchData(endpoints.commercial.resourceConsumption, { country, village });
+  fetchData(endpoints.commercial.resourceConsumption);
 export const getSupportNeed = (country, village) =>
-  fetchData(endpoints.commercial.supportNeed, { country, village });
+  fetchData(endpoints.commercial.supportNeed);
 export const getBusinessDetails = (country, village) =>
-  fetchData(endpoints.commercial.businessDetails, { country, village });
+  fetchData(endpoints.commercial.businessDetails);
