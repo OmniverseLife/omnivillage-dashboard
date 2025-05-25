@@ -222,8 +222,8 @@ const VehiclesPerUserChart = () => {
 
   if (!hasValidDataForDisplay) {
     const currentVillageDisplay = (villageName
-      ? vehiclePerHouseholdResponse.data.find(v => v.villageName === villageName)?.villageName
-      : vehiclePerHouseholdResponse.data[0]?.villageName) || villageName || "the selected region";
+      ? vehiclePerHouseholdResponse?.data.find(v => v.villageName === villageName)?.villageName
+      : vehiclePerHouseholdResponse?.data[0]?.villageName) || villageName || "the selected region";
     return (
       <StyledCard sx={{ marginTop: 4, paddingY: "72px" }}>
         <div style={{ padding: 24, textAlign: "center" }}>

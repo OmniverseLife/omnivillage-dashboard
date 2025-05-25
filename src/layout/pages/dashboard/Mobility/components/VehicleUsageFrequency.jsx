@@ -209,8 +209,8 @@ const VehicleUsageFrequencyChart = () => {
 
   if (!hasValidDataForDisplay) {
     const currentVillageDisplay = (villageName
-      ? usageFrequencyResponse.data.find(v => v.village === villageName)?.village
-      : usageFrequencyResponse.data[0]?.village) || villageName || "the selected region";
+      ? usageFrequencyResponse?.data.find(v => v.village === villageName)?.village
+      : usageFrequencyResponse?.data[0]?.village) || villageName || "the selected region";
     return (
       <StyledCard sx={{ marginTop: 4, paddingY: "72px" }}>
         <div style={{ padding: 24, textAlign: "center" }}>
@@ -221,8 +221,8 @@ const VehicleUsageFrequencyChart = () => {
   }
 
   const currentVillageForFooter = (villageName
-    ? usageFrequencyResponse.data.find(item => item.village === villageName)
-    : usageFrequencyResponse.data[0])?.village || villageName;
+    ? usageFrequencyResponse?.data.find(item => item.village === villageName)
+    : usageFrequencyResponse?.data[0])?.village || villageName;
 
   return (
     <StyledCard sx={{ marginTop: 4, paddingTop: "72px" }}>

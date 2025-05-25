@@ -233,8 +233,8 @@ const VehicleUrgencyDivergingChart = () => {
 
   if (!hasValidDataForDisplay) {
     const currentVillageDisplay = (villageName
-      ? vehicleUrgencyResponse.data.find(v => v.village === villageName)?.village
-      : vehicleUrgencyResponse.data[0]?.village) || villageName || "the selected region";
+      ? vehicleUrgencyResponse?.data.find(v => v.village === villageName)?.village
+      : vehicleUrgencyResponse?.data[0]?.village) || villageName || "the selected region";
     return (
       <StyledCard sx={{ marginTop: 4, paddingY: "72px" }}>
         <div style={{ padding: 24, textAlign: "center" }}>
@@ -245,8 +245,8 @@ const VehicleUrgencyDivergingChart = () => {
   }
 
   const currentVillageForFooter = (villageName
-    ? vehicleUrgencyResponse.data.find(item => item.village === villageName)
-    : vehicleUrgencyResponse.data[0])?.village || villageName;
+    ? vehicleUrgencyResponse?.data?.find(item => item.village === villageName)
+    : vehicleUrgencyResponse?.data[0])?.village || villageName;
 
   return (
     <StyledCard sx={{ marginTop: 4, paddingTop: "72px" }}>

@@ -208,8 +208,8 @@ const VehicleRequirementChart = () => {
 
   if (!hasValidDataForDisplay) {
     const currentVillageDisplay = (villageName
-      ? vehicleRequirementResponse.data.find(v => v.village === villageName)?.village
-      : vehicleRequirementResponse.data[0]?.village) || villageName || "the selected region";
+      ? vehicleRequirementResponse?.data.find(v => v.village === villageName)?.village
+      : vehicleRequirementResponse?.data[0]?.village) || villageName || "the selected region";
     return (
       <StyledCard sx={{ marginTop: 4, paddingY: "72px" }}>
         <div style={{ padding: 24, textAlign: "center" }}>
@@ -220,8 +220,8 @@ const VehicleRequirementChart = () => {
   }
 
   const currentVillageForFooter = (villageName
-    ? vehicleRequirementResponse.data.find(item => item.village === villageName)
-    : vehicleRequirementResponse.data[0])?.village || villageName;
+    ? vehicleRequirementResponse?.data.find(item => item.village === villageName)
+    : vehicleRequirementResponse?.data[0])?.village || villageName;
 
   return (
     <StyledCard sx={{ marginTop: 4, paddingTop: "72px" }}>
