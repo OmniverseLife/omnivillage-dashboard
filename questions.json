@@ -1,0 +1,198 @@
+[
+  {
+    "category": "Energy Report Questions",
+    "question": "Provide a comprehensive report on the energy profile of Rukha village, including grid access, types of energy sources used, their respective counts and percentages, total energy consumption, and renewable energy usage in Rukha village."
+  },
+  {
+    "category": "Energy Report Questions",
+    "question": "Summarize the key aspects of energy consumption and generation in Rukha village, highlighting any areas of concern or potential for improvement based on the provided data for Rukha village."
+  },
+  {
+    "category": "Energy Questions",
+    "question": "What are the different types of energy sources used in Rukha village?"
+  },
+  {
+    "category": "Energy Questions",
+    "question": "Which energy source has the highest count of users in Rukha village?"
+  },
+  {
+    "category": "Energy Questions",
+    "question": "What percentage of energy consumption in Rukha village comes from electricity?"
+  },
+  {
+    "category": "Energy Questions",
+    "question": "How much total energy is consumed in Rukha village?"
+  },
+  {
+    "category": "Energy Questions",
+    "question": "Is any renewable energy consumed in Rukha village, and if so, what is its percentage?"
+  },
+  {
+    "category": "Energy Questions",
+    "question": "What is the count of households in Rukha village using diesel as an energy source?"
+  },
+  {
+    "category": "Transportation Report Questions",
+    "question": "Generate a detailed report on transportation in Rukha village, covering existing vehicle types and counts, distances travelled (within and outside Rukha village), primary travel purposes, total village travel distance, and identified vehicle requirements in Rukha village."
+  },
+  {
+    "category": "Transportation Report Questions",
+    "question": "Analyze the transportation habits and needs of Rukha village's residents, discussing the predominant vehicle types, travel patterns, and any discrepancies between current vehicle availability and stated requirements in Rukha village."
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "What types of vehicles are currently present in Rukha village and their counts?"
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "What is the total distance travelled within Rukha village in kilometers?"
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "How much distance is travelled outside Rukha village in kilometers?"
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "What are the main purposes for which residents in Rukha village travel?"
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "What is the total overall distance travelled in Rukha village?"
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "What are the identified vehicle requirements for Rukha village, and what are their respective counts?"
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "Which travel purpose in Rukha village accounts for the majority of distance travelled?"
+  },
+  {
+    "category": "Transportation Questions",
+    "question": "Are there more campers or SUVs required in Rukha village?"
+  },
+  {
+    "category": "Demographics & Health Report Questions",
+    "question": "Provide a comprehensive report on the demographic and health status of Rukha village, detailing marital status distribution, dietary habits (by gender), and prevalence of chronic diseases, including specific disease counts and percentages in Rukha village."
+  },
+  {
+    "category": "Demographics & Health Report Questions",
+    "question": "Based on the provided data, describe the overall health and social well-being of the Rukha village population, identifying any prominent trends or areas that might require attention in Rukha village."
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "How many individuals in Rukha village are married?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "What is the count of single individuals in Rukha village?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "How many individuals in Rukha village are divorced or separated?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "What are the different diet types observed among females in Rukha village, and their respective counts and shares?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "What are the different diet types observed among males in Rukha village, and their respective counts and shares?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "Which diet type is most prevalent among females in Rukha village?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "Which diet type is most prevalent among males in Rukha village?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "What chronic diseases are prevalent in Rukha village, and what are their counts and prevalence percentages?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "How many members in Rukha village have a chronic disease?"
+  },
+  {
+    "category": "Demographics & Health Questions",
+    "question": "What is the prevalence of hypertension in Rukha village?"
+  },
+  {
+    "category": "Socio-Economic & Disability Report Questions",
+    "question": "Generate a report on the socio-economic conditions and disability prevalence in Rukha village, detailing income distribution by gender, and the prevalence of motor disabilities among males and females, including specific disability types and their counts and shares in Rukha village."
+  },
+  {
+    "category": "Socio-Economic & Disability Report Questions",
+    "question": "Analyze the financial stability and physical health aspects of Rukha village's population, highlighting income disparities and the extent of motor disabilities within the community of Rukha village."
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "What are the different income ranges for females in Rukha village, and how many fall into each range?"
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "What are the different income ranges for males in Rukha village, and how many fall into each range?"
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "How many females in Rukha village report having no income?"
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "How many males in Rukha village report an income above Nu. 20,00,000?"
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "What are the motor disabilities prevalent among females in Rukha village, along with their counts and shares?"
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "What are the motor disabilities prevalent among males in Rukha village, along with their counts and shares?"
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "What is the total number of female members surveyed for motor disability in Rukha village?"
+  },
+  {
+    "category": "Socio-Economic & Disability Questions",
+    "question": "What is the total number of male members surveyed for motor disability in Rukha village?"
+  },
+  {
+    "category": "Occupation & Financial Report Questions",
+    "question": "Provide a report on the occupational landscape and financial status of Rukha village, including the distribution of different occupations and key financial indicators such as bank account penetration, savings percentage, and average savings amount in Rukha village."
+  },
+  {
+    "category": "Occupation & Financial Report Questions",
+    "question": "Summarize the economic activities and financial behaviors of Rukha village's residents, identifying the dominant occupations and the overall financial health of Rukha village based on the provided metrics."
+  },
+  {
+    "category": "Occupation & Financial Questions",
+    "question": "What are the primary occupations in Rukha village, and what are their respective counts?"
+  },
+  {
+    "category": "Occupation & Financial Questions",
+    "question": "How many people in Rukha village are farmers?"
+  },
+  {
+    "category": "Occupation & Financial Questions",
+    "question": "What percentage of households in Rukha village have a bank account?"
+  },
+  {
+    "category": "Occupation & Financial Questions",
+    "question": "What percentage of households in Rukha village have savings?"
+  },
+  {
+    "category": "Occupation & Financial Questions",
+    "question": "What is the average savings amount in Rukha village?"
+  },
+  {
+    "category": "Occupation & Financial Questions",
+    "question": "How many residents in Rukha village report having no occupation?"
+  },
+  {
+    "category": "General Village Overview",
+    "question": "What is the grid access percentage in Rukha village?"
+  }
+]

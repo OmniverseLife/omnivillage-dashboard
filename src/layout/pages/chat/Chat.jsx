@@ -1,15 +1,24 @@
 import React, { useState, useEffect, useRef } from "react";
+import questions from "../../../../questions.json";
 import Wrapper from "../../components/wrapper/wrapper";
+
+const getRandomQuestions = () => {
+  const shuffled = [...questions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, 3);
+};
 
 function App() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false);
+  const [sampleQuestions, setSampleQuestions] = useState(getRandomQuestions());
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const messagesEndRef = useRef(null);
+
+  console.log("Sample Questions:", sampleQuestions);
 
   // Effect to scroll to the bottom of the chat window whenever messages update
   useEffect(() => {
@@ -30,11 +39,14 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch("https://dashboard-ai-3dd20e22d0c6.herokuapp.com/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: userMessage.text }),
-      });
+      const response = await fetch(
+        "https://dashboard-ai-3dd20e22d0c6.herokuapp.com/chat",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: userMessage.text }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -47,7 +59,7 @@ function App() {
 
       const result = await response.json();
 
-      if (result.text) {
+      if (result.answer) {
         const aiResponseText = result.answer;
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -113,9 +125,52 @@ function App() {
                   fontSize: "1.05rem",
                 }}
               >
-                Start a conversation with your AI assistant!
+                <p>Start a conversation with your AI assistant!</p>
+                <div style={{ marginTop: "1rem", fontSize: "0.95rem" }}>
+                  <strong>You can ask things like:</strong>
+                <div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: "0.5rem",
+    marginTop: "1rem",
+  }}
+>
+  {sampleQuestions.map((q, idx) => (
+    <button
+      key={idx}
+      onClick={() => {
+        setInputMessage(q.question);
+        handleSendMessage();
+      }}
+      style={{
+        padding: "0.6rem 1rem",
+        borderRadius: "1.5rem",
+        border: "1px solid #90caf9",
+        backgroundColor: "#e3f2fd",
+        color: "#1976d2",
+        cursor: "pointer",
+        fontSize: "0.9rem",
+        transition: "all 0.2s ease-in-out",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = "#bbdefb";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = "#e3f2fd";
+      }}
+    >
+      {q.question}
+    </button>
+  ))}
+</div>
+
+                </div>
               </div>
             )}
+
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -165,11 +220,12 @@ function App() {
                     backgroundColor: "#f0f4f7",
                     animation:
                       "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-                    height: "1rem",
                     borderBottomLeftRadius: "0.4rem",
                     boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
                   }}
-                ></div>
+                >
+                  Gathering Information
+                </div>
               </div>
             )}
             {error && (
