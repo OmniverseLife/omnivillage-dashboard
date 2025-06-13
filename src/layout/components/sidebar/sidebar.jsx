@@ -32,6 +32,14 @@ export default function Sidebar({ role }) {
         <h1>OMNI VILLAGE</h1>
       </div>
       <Link
+        to="/chat"
+        className={paths.includes("chat") ? "link active" : "link"}
+      >
+        <i className="fa-solid fa-robot"></i>
+        <p>Omni Bot</p>
+       
+      </Link>
+      <Link
         // to="/dashboard"
         onClick={() => setdashboardMenu(!dashboardMenu)}
         className={paths.includes("dashboard") ? "link active" : "link"}
