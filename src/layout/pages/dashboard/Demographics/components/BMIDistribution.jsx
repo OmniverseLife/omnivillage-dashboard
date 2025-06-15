@@ -9,6 +9,7 @@ import {
   styled,
   Card,
   CardContent,
+  Box,
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 
@@ -25,6 +26,18 @@ const StyledCard = styled(Card)(({ theme }) => ({
   border: "1px solid #e0e0e0",
   backgroundColor: "#fff",
 }));
+
+// Define BMI categories with their colors
+const bmiCategories = [
+  { range: "< 16", category: "Severe Thinness", color: "#FF8A65" },
+  { range: "16 - 17", category: "Moderate Thinness", color: "#FDD835" },
+  { range: "17 - 18.5", category: "Mild Thinness", color: "#AED581" },
+  { range: "18.5 - 25", category: "Normal", color: "#4CAF50" },
+  { range: "25 - 30", category: "Overweight", color: "#FFB300" },
+  { range: "30 - 35", category: "Obese Class I", color: "#F4511E" },
+  { range: "35 - 40", category: "Obese Class II", color: "#E64A19" },
+  { range: "≥ 40", category: "Obese Class III", color: "#BF360C" },
+];
 
 const BMIDistributionChartComponent = () => {
   const [chartOptions, setChartOptions] = useState({});
@@ -226,6 +239,46 @@ const BMIDistributionChartComponent = () => {
         </div>
       )}
       <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+
+ {/* New section for BMI information */}
+<Box sx={{ mt: 3, p: 2, border: "1px dashed #ccc", borderRadius: 2 }}>
+  <Typography variant="h6" component="h3" gutterBottom align="center">
+    BMI Information
+  </Typography>
+  <Typography variant="body1" align="center" sx={{ mb: 2 }}>
+    An <strong>ideal BMI</strong> is generally considered to be between <strong>18.5 and 24.9</strong>.
+  </Typography>
+
+  <Box
+    sx={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 1.5,
+      justifyContent: "center",
+    }}
+  >
+    {bmiCategories.map((cat, index) => (
+      <Box
+        key={index}
+        sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: "20%" }}
+      >
+        <Box
+          sx={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: cat.color,
+            // flexShrink: 0,
+          }}
+        />
+        <Typography variant="body2">
+          <strong>{cat.range}:</strong> {cat.category}
+        </Typography>
+      </Box>
+    ))}
+  </Box>
+</Box>
+
       {bmiData?.data?.village && (
         <Typography
           variant="body2"

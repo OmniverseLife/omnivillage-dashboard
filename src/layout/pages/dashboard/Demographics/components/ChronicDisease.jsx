@@ -43,15 +43,19 @@ const ChronicDiseasePrevalenceChartComponent = () => {
 
   useEffect(() => {
     if (chronicDiseaseData?.data?.chronicDiseasePrevalence?.[villageName]) {
+       const filteredDiseaseItems =
+        chronicDiseaseData.data.chronicDiseasePrevalence[villageName]?.diseases?.filter(
+          (item) => item.diseaseNames.en?.trim().toLowerCase() !== 'none'
+        ) || [];
+
       const diseaseData =
-        chronicDiseaseData.data.chronicDiseasePrevalence[villageName]?.diseases?.map((item) => ({
+        filteredDiseaseItems.map((item) => ({
           name: item.diseaseNames.en,
           y: item.count,
-        })) || [];
+        }))
 
-      const totalMembersWithDisease =
-        chronicDiseaseData.data.chronicDiseasePrevalence[villageName]
-          ?.totalMembersWithDisease || 0;
+        console.log(filteredDiseaseItems);
+        
 
       const options = {
         chart: {
@@ -60,7 +64,7 @@ const ChronicDiseasePrevalenceChartComponent = () => {
           style: { fontFamily: '"Arial", sans-serif' },
         },
         title: {
-          text: `Chronic Disease Prevalence (Total Cases: ${totalMembersWithDisease})`,
+          text: `Chronic Disease Prevalence`,
           align: "center",
           style: { color: "#333", fontSize: "18px", fontWeight: "bold" },
         },

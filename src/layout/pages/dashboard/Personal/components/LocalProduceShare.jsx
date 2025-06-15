@@ -203,12 +203,10 @@ const LocalProduceShareChart = () => {
             zIndex: 1, // Ensure it's above the chart
           }}
         >
-          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#333' }}>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: '#333', position:"relative", bottom:"25px" }}>
             {percentageProducing.toFixed(1)}%
           </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Producing Households
-          </Typography>
+         
         </Box>
         <Typography
           variant="body2"

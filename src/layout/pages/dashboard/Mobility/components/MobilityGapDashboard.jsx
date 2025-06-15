@@ -89,7 +89,7 @@ const MobilityGapDashboard = () => {
             text: null // No title for embedded chart
           },
           xAxis: {
-            categories: ['Total Vehicles', 'Total Population'],
+            categories: ['Total Vehicles', 'Households'],
             title: { text: null },
             labels: {
               style: { fontSize: '10px' }
@@ -198,7 +198,7 @@ const MobilityGapDashboard = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <KpiCard>
-              <Typography variant="subtitle1" color="textSecondary">Total Population</Typography>
+              <Typography variant="subtitle1" color="textSecondary">Households with vehicles</Typography>
               <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#f44336' }}>
                 {mobilityData.totalPopulation}
               </Typography>
@@ -231,7 +231,7 @@ const MobilityGapDashboard = () => {
         <Grid container justifyContent="center" sx={{ marginTop: 4 }}>
             <Grid item xs={12} md={6}>
                 <Typography variant="subtitle1" align="center" gutterBottom>
-                    Vehicles vs. Population
+                    Vehicles vs. Households
                 </Typography>
                 <HighchartsReact highcharts={Highcharts} options={chartOptions} />
             </Grid>

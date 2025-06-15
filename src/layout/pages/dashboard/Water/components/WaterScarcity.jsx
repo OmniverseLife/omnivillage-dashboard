@@ -86,7 +86,7 @@ import React, { useEffect, useState } from "react";
       height:600,
      },
      title: {
-      text: `Waste Scarcity in ${villageName} by Severity`,
+      text: `Water Scarcity in ${villageName} by Severity`,
       style: {
        fontSize: "18px",
        fontWeight: "bold",

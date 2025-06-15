@@ -15,7 +15,7 @@ export default function Dashboard() {
       <BusinessStartedChart />
       <LegalStructureDistributionChart />
       <InvestmentIncomeChart />
-      <ManpowerSourceChart />
+      {/* <ManpowerSourceChart /> */}
       <ResourceConsumptionChart/>
       <SupportNeedChart/>
       <BusinessDetailsCharts/>

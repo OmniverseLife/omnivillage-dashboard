@@ -291,20 +291,11 @@ const BusinessDetailsCharts = () => {
   return (
     <StyledCard sx={{ marginTop: 4, paddingTop: "72px" }}>
       <CardContent>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <HighchartsReact
-              highcharts={Highcharts}
-              options={businessTypeOptions}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <HighchartsReact
-              highcharts={Highcharts}
-              options={infrastructureOptions}
-            />
-          </Grid>
-        </Grid>
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={businessTypeOptions}
+        />
+
         <Typography
           variant="body2"
           color="textSecondary"

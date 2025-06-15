@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import questions from "../../../../questions.json";
-import Wrapper from "../../components/wrapper/wrapper";
+import questions from "../../../../questions.json"; // Ensure this path is correct
+import Wrapper from "../../components/wrapper/wrapper"; // Ensure this path is correct
 
 const getRandomQuestions = () => {
   const shuffled = [...questions].sort(() => 0.5 - Math.random());
@@ -14,7 +14,8 @@ function App() {
   const [sampleQuestions, setSampleQuestions] = useState(getRandomQuestions());
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // No need for 'error' state if we're sending bot messages instead of displaying an error component
+  // const [error, setError] = useState(null);
 
   const messagesEndRef = useRef(null);
 
@@ -36,7 +37,7 @@ function App() {
     if (!hasSentFirstMessage) setHasSentFirstMessage(true);
 
     setIsLoading(true);
-    setError(null);
+    // setError(null); // No longer setting error state
 
     try {
       const response = await fetch(
@@ -49,11 +50,11 @@ function App() {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
+        // Handle HTTP errors (e.g., 400, 500 status codes)
+        // const errorData = await response.json(); // You might still log this for debugging
+        // console.error("API response error data:", errorData);
         throw new Error(
-          `API error: ${response.status} ${response.statusText} - ${
-            errorData.error || "Unknown error"
-          }`
+          `Failed to fetch response. Status: ${response.status}`
         );
       }
 
@@ -66,11 +67,25 @@ function App() {
           { role: "model", text: aiResponseText },
         ]);
       } else {
-        setError("Received an empty or malformed response from the AI.");
+        // Handle cases where the API call was successful but the 'answer' field is missing or empty
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            role: "model",
+            text: "Looks like I can't answer that right now. I'm still learning! You can try asking something else.",
+          },
+        ]);
       }
     } catch (err) {
       console.error("Error fetching AI response:", err);
-      setError(`Failed to get response: ${err.message}`);
+      // Send a user-friendly message to the chat instead of setting an error state
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          role: "model",
+          text: "Oops! I'm having trouble connecting right now. Please try again in a moment.",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +98,7 @@ function App() {
           display: "flex",
           flexDirection: "column",
           height: "81vh",
-          fontFamily: "Inter, sans-serif" /* Using Inter font */,
+          fontFamily: "Inter, sans-serif",
           WebkitFontSmoothing: "antialiased",
           MozOsxFontSmoothing: "grayscale",
           boxSizing: "border-box",
@@ -97,9 +112,8 @@ function App() {
             margin: "0 auto",
             width: "100%",
             backgroundColor: "#ffffff",
-            borderRadius: "1.25rem" /* More rounded corners for the main box */,
-            boxShadow:
-              "0 8px 30px rgba(0, 0, 0, 0.08)" /* Softer, larger shadow */,
+            borderRadius: "1.25rem",
+            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.08)",
             overflow: "hidden",
           }}
         >
@@ -107,11 +121,11 @@ function App() {
           <div
             style={{
               flexGrow: 1,
-              padding: "1.5rem" /* Consistent padding */,
+              padding: "1.5rem",
               overflowY: "auto",
               display: "flex",
               flexDirection: "column",
-              gap: "0.8rem" /* Slightly larger gap between messages */,
+              gap: "0.8rem",
               backgroundColor: "#ffffff",
             }}
           >
@@ -128,45 +142,44 @@ function App() {
                 <p>Start a conversation with your AI assistant!</p>
                 <div style={{ marginTop: "1rem", fontSize: "0.95rem" }}>
                   <strong>You can ask things like:</strong>
-                <div
-  style={{
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "0.5rem",
-    marginTop: "1rem",
-  }}
->
-  {sampleQuestions.map((q, idx) => (
-    <button
-      key={idx}
-      onClick={() => {
-        setInputMessage(q.question);
-        handleSendMessage();
-      }}
-      style={{
-        padding: "0.6rem 1rem",
-        borderRadius: "1.5rem",
-        border: "1px solid #90caf9",
-        backgroundColor: "#e3f2fd",
-        color: "#1976d2",
-        cursor: "pointer",
-        fontSize: "0.9rem",
-        transition: "all 0.2s ease-in-out",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = "#bbdefb";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = "#e3f2fd";
-      }}
-    >
-      {q.question}
-    </button>
-  ))}
-</div>
-
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      marginTop: "1rem",
+                    }}
+                  >
+                    {sampleQuestions.map((q, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setInputMessage(q.question);
+                          handleSendMessage(); // Trigger send immediately after setting input
+                        }}
+                        style={{
+                          padding: "0.6rem 1rem",
+                          borderRadius: "1.5rem",
+                          border: "1px solid #90caf9",
+                          backgroundColor: "#e3f2fd",
+                          color: "#1976d2",
+                          cursor: "pointer",
+                          fontSize: "0.9rem",
+                          transition: "all 0.2s ease-in-out",
+                          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#bbdefb";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#e3f2fd";
+                        }}
+                      >
+                        {q.question}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -182,28 +195,20 @@ function App() {
               >
                 <div
                   style={{
-                    maxWidth:
-                      "70%" /* Slightly less wide for better line length */,
+                    maxWidth: "70%",
                     padding: "0.9rem 1.2rem",
-                    borderRadius: "1.2rem" /* More rounded message bubbles */,
+                    borderRadius: "1.2rem",
                     backgroundColor:
-                      msg.role === "user"
-                        ? "#bbdefb"
-                        : "#f0f4f7" /* Softer blues */,
-                    color: "#212121" /* Darker text for both */,
+                      msg.role === "user" ? "#bbdefb" : "#f0f4f7",
+                    color: "#212121",
                     borderBottomRightRadius:
-                      msg.role === "user"
-                        ? "0.4rem"
-                        : "1.2rem" /* Asymmetrical corners */,
+                      msg.role === "user" ? "0.4rem" : "1.2rem",
                     borderBottomLeftRadius:
-                      msg.role === "user"
-                        ? "1.2rem"
-                        : "0.4rem" /* Asymmetrical corners */,
+                      msg.role === "user" ? "1.2rem" : "0.4rem",
                     fontSize: "0.95rem",
                     wordBreak: "break-word",
                     whiteSpace: "pre-wrap",
-                    boxShadow:
-                      "0 1px 3px rgba(0, 0, 0, 0.05)" /* Very subtle shadow */,
+                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
                   }}
                 >
                   {msg.text}
@@ -214,7 +219,7 @@ function App() {
               <div style={{ display: "flex", justifyContent: "flex-start" }}>
                 <div
                   style={{
-                    maxWidth: "30%" /* Adjust width for visual appeal */,
+                    maxWidth: "30%",
                     padding: "0.9rem 1.2rem",
                     borderRadius: "1.2rem",
                     backgroundColor: "#f0f4f7",
@@ -228,38 +233,22 @@ function App() {
                 </div>
               </div>
             )}
-            {error && (
-              <div
-                style={{
-                  color: "#d32f2f" /* More subtle error red */,
-                  textAlign: "center",
-                  padding: "0.8rem",
-                  borderRadius: "0.6rem",
-                  backgroundColor: "#ffebee" /* Very light error background */,
-                  border: "1px solid #ef9a9a",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {error}
-              </div>
-            )}
+            {/* Removed the error display div here */}
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area with Integrated Send Button */}
           <div
             style={{
-              padding: "1rem 1.5rem" /* Consistent padding */,
+              padding: "1rem 1.5rem",
               backgroundColor: "#ffffff",
-              borderTop: "none" /* No border on top, rely on shadow */,
+              borderTop: "none",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              position:
-                "relative" /* Needed for absolute positioning of the button */,
-              boxShadow:
-                "0 -8px 30px rgba(0, 0, 0, 0.05)" /* Shadow for the input area itself */,
-              borderRadius: "0 0 1.25rem 1.25rem" /* Rounded bottom corners */,
+              position: "relative",
+              boxShadow: "0 -8px 30px rgba(0, 0, 0, 0.05)",
+              borderRadius: "0 0 1.25rem 1.25rem",
             }}
           >
             <input
@@ -272,14 +261,12 @@ function App() {
               placeholder="Message AI Assistant..."
               style={{
                 flexGrow: 1,
-                padding:
-                  "0.8rem 4.5rem 0.8rem 1.2rem" /* Padding adjusted for send button */,
-                border: "1px solid #ddd" /* No border */,
-                backgroundColor: "#fff" /* Light gray background for input */,
-                borderRadius: "2rem" /* Fully rounded pill shape */,
+                padding: "0.8rem 4.5rem 0.8rem 1.2rem",
+                border: "1px solid #ddd",
+                backgroundColor: "#fff",
+                borderRadius: "2rem",
                 outline: "none",
-                boxShadow:
-                  "inset 0 1px 3px rgba(0,0,0,0.08)" /* Inner shadow for depth */,
+                boxShadow: "inset 0 1px 3px rgba(0,0,0,0.08)",
                 transition:
                   "box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out",
                 color: "#212121",
@@ -290,7 +277,7 @@ function App() {
               onFocus={(e) =>
                 (e.target.style.boxShadow =
                   "inset 0 1px 3px rgba(0,0,0,0.1), 0 0 0 2px #90caf9")
-              } /* Light blue focus ring */
+              }
               onBlur={(e) =>
                 (e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.08)")
               }
@@ -300,18 +287,17 @@ function App() {
               onClick={handleSendMessage}
               style={{
                 position: "absolute",
-                right: "2rem" /* Position relative to input area padding */,
-                padding: "0.6rem" /* Adjusted padding for a balanced look */,
+                right: "2rem",
+                padding: "0.6rem",
                 paddingRight: "0.8rem",
                 background:
-                  "linear-gradient(135deg, #42a5f5 0%, #1976d2 100%)" /* Blue gradient */,
+                  "linear-gradient(135deg, #42a5f5 0%, #1976d2 100%)",
                 color: "#ffffff",
-                borderRadius: "2rem" /* Matches input field rounding */,
+                borderRadius: "2rem",
                 cursor: "pointer",
                 outline: "none",
                 border: "none",
-                boxShadow:
-                  "0 2px 8px rgba(0, 0, 0, 0.15)" /* More prominent shadow */,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
                 transition:
                   "background 0.3s ease, transform 0.2s ease, opacity 0.2s ease",
                 fontWeight: "500",
@@ -319,13 +305,9 @@ function App() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                zIndex: 1 /* Ensure button is above input field */,
-                opacity:
-                  isLoading || !inputMessage.trim()
-                    ? "0.4"
-                    : "1" /* Smoother disabled state */,
-                pointerEvents:
-                  isLoading || !inputMessage.trim() ? "none" : "auto",
+                zIndex: 1,
+                opacity: isLoading || !inputMessage.trim() ? "0.4" : "1",
+                pointerEvents: isLoading || !inputMessage.trim() ? "none" : "auto",
               }}
               onMouseEnter={(e) => {
                 if (!(isLoading || !inputMessage.trim())) {
@@ -356,15 +338,15 @@ function App() {
         {/* Define CSS keyframe animation for the pulse effect */}
         <style>
           {`
-                @keyframes pulse {
-                    0%, 100% {
-                        opacity: 1;
-                    }
-                    50% {
-                        opacity: .5;
-                    }
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
                 }
-                `}
+                50% {
+                    opacity: .5;
+                }
+            }
+            `}
         </style>
       </div>
     </Wrapper>

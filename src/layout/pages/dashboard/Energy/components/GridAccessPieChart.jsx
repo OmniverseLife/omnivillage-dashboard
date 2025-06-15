@@ -48,7 +48,7 @@ const GridAccessPieChart = () => {
           backgroundColor: "transparent",
         },
         title: {
-          text: `Grid Access in ${village}`,
+          text: `Decentralized Grid Access in ${village}`,
           style: {
             fontSize: "18px",
             fontWeight: "bold",
