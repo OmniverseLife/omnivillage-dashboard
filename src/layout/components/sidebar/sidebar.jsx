@@ -32,19 +32,19 @@ export default function Sidebar({ role }) {
         <h1>OMNI VILLAGE</h1>
       </div>
       <Link
-        to="/overview"
-        className={paths.includes("overview") ? "link active" : "link"}
-      >
-        <i className="fa-solid fa-tachometer-alt"></i>
-        <p>Overview</p>
-      </Link>
-      <Link
         to="/chat"
         className={paths.includes("chat") ? "link active" : "link"}
       >
         <i className="fa-solid fa-robot"></i>
         <p>Omni Bot</p>
       </Link>
+      {/* <Link
+        to="/overview"
+        className={paths.includes("overview") ? "link active" : "link"}
+      >
+        <i className="fa-solid fa-tachometer-alt"></i>
+        <p>Overview</p>
+      </Link> */}
       <Link
         // to="/dashboard"
         onClick={() => setdashboardMenu(!dashboardMenu)}
@@ -63,23 +63,29 @@ export default function Sidebar({ role }) {
       {dashboardMenu && (
         <div className="menu">
           <Link
+            to="/overview"
+            className={paths.includes("overview") ? "link active" : "link"}
+          >
+            <p>Overview</p>
+          </Link>
+          <Link
             to={`/dashboard/production`}
             className={paths.includes("production") ? "link active" : "link"}
           >
-            Production
+           Food (Production)
           </Link>
           <Link
             to={`/dashboard/consumption`}
             className={paths.includes("consumption") ? "link active" : "link"}
           >
-            Consumption
+            Food (Consumption)
           </Link>
-          <Link
+          {/* <Link
             to={`/dashboard/food-balance`}
             className={paths.includes("food-balance") ? "link active" : "link"}
           >
             Food Balance
-          </Link>
+          </Link> */}
           <Link
             to={`/dashboard/demographics`}
             className={paths.includes("demographics") ? "link active" : "link"}
@@ -138,7 +144,7 @@ export default function Sidebar({ role }) {
       )}
       {role === "admin" && (
         <>
-          <Link
+          {/* <Link
             className={
               paths.includes("production") && !paths.includes("dashboard")
                 ? "link active"
@@ -156,7 +162,7 @@ export default function Sidebar({ role }) {
                 <i className="fa-solid fa-plus"></i>
               )}
             </span>
-          </Link>
+          </Link> */}
           {productionMenu && (
             <div className="menu">
               <Link
@@ -209,7 +215,7 @@ export default function Sidebar({ role }) {
           </Link> */}
             </div>
           )}
-          <Link
+          {/* <Link
             onClick={() => setconsumtionMenu(!consumtionMenu)}
             className={
               paths.includes("consumption") && !paths.includes("dashboard")
@@ -226,7 +232,7 @@ export default function Sidebar({ role }) {
                 <i className="fa-solid fa-plus"></i>
               )}
             </span>
-          </Link>
+          </Link> */}
           {consumtionMenu && (
             <div className="menu">
               <Link
@@ -305,13 +311,13 @@ export default function Sidebar({ role }) {
               </Link>
             </div>
           )}
-          <Link
+          {/* <Link
             to="/users"
             className={paths.includes("users") ? "link active" : "link"}
           >
             <i className="fa-solid fa-user-group"></i>
             <p>Users</p>
-          </Link>
+          </Link> */}
           <Link
             to="/moderators"
             className={paths.includes("moderators") ? "link active" : "link"}

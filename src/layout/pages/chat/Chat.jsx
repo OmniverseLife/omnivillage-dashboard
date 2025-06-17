@@ -2,24 +2,47 @@ import React, { useState, useEffect, useRef } from "react";
 import questions from "../../../../questions.json"; // Ensure this path is correct
 import Wrapper from "../../components/wrapper/wrapper"; // Ensure this path is correct
 
-const getRandomQuestions = () => {
-  const shuffled = [...questions].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, 3);
+// Helper function to get random unique questions from the *remaining* pool
+const getUniqueRandomQuestions = (
+  allAvailableQuestions, // Pass the full list of questions
+  currentUsedQuestionTexts // Pass the Set of all questions ever used/suggested
+) => {
+  const availablePool = allAvailableQuestions.filter(
+    (q) => !currentUsedQuestionTexts.has(q.question)
+  );
+
+  const shuffledPool = [...availablePool].sort(() => 0.5 - Math.random());
+  return shuffledPool.slice(0, 3);
 };
 
 function App() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false);
-  const [sampleQuestions, setSampleQuestions] = useState(getRandomQuestions());
+  const [sampleQuestions, setSampleQuestions] = useState([]);
+
+  // This Set will now hold ALL questions ever shown or asked in the session
+  const [allUsedQuestionTexts, setAllUsedQuestionTexts] = useState(new Set());
 
   const [isLoading, setIsLoading] = useState(false);
-  // No need for 'error' state if we're sending bot messages instead of displaying an error component
-  // const [error, setError] = useState(null);
 
   const messagesEndRef = useRef(null);
 
-  console.log("Sample Questions:", sampleQuestions);
+  // Initialize sample questions on mount and populate allUsedQuestionTexts
+  useEffect(() => {
+    const initialSamples = getUniqueRandomQuestions(
+      questions,
+      allUsedQuestionTexts
+    );
+    setSampleQuestions(initialSamples);
+
+    // Add initial samples to the allUsedQuestionTexts set
+    setAllUsedQuestionTexts((prev) => {
+      const newSet = new Set(prev);
+      initialSamples.forEach((q) => newSet.add(q.question));
+      return newSet;
+    });
+  }, []); // Run only once on component mount
 
   // Effect to scroll to the bottom of the chat window whenever messages update
   useEffect(() => {
@@ -28,16 +51,22 @@ function App() {
     }
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const handleSendMessage = async (questionToSend = inputMessage) => {
+    if (!questionToSend.trim() || isLoading) return;
 
-    const userMessage = { role: "user", text: inputMessage };
+    const userMessage = { role: "user", text: questionToSend };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInputMessage("");
     if (!hasSentFirstMessage) setHasSentFirstMessage(true);
 
     setIsLoading(true);
-    // setError(null); // No longer setting error state
+
+    // Add the question that the user just sent to the allUsedQuestionTexts set
+    setAllUsedQuestionTexts((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(questionToSend);
+      return newSet;
+    });
 
     try {
       const response = await fetch(
@@ -50,12 +79,7 @@ function App() {
       );
 
       if (!response.ok) {
-        // Handle HTTP errors (e.g., 400, 500 status codes)
-        // const errorData = await response.json(); // You might still log this for debugging
-        // console.error("API response error data:", errorData);
-        throw new Error(
-          `Failed to fetch response. Status: ${response.status}`
-        );
+        throw new Error(`Failed to fetch response. Status: ${response.status}`);
       }
 
       const result = await response.json();
@@ -66,8 +90,21 @@ function App() {
           ...prevMessages,
           { role: "model", text: aiResponseText },
         ]);
+        // After receiving a successful response, generate NEW sample questions
+        // ensuring they haven't been used yet.
+        const newSamples = getUniqueRandomQuestions(
+          questions,
+          allUsedQuestionTexts
+        );
+        setSampleQuestions(newSamples);
+
+        // Add these newly generated samples to the allUsedQuestionTexts set
+        setAllUsedQuestionTexts((prev) => {
+          const updatedSet = new Set(prev);
+          newSamples.forEach((q) => updatedSet.add(q.question));
+          return updatedSet;
+        });
       } else {
-        // Handle cases where the API call was successful but the 'answer' field is missing or empty
         setMessages((prevMessages) => [
           ...prevMessages,
           {
@@ -75,10 +112,21 @@ function App() {
             text: "Looks like I can't answer that right now. I'm still learning! You can try asking something else.",
           },
         ]);
+        // Still generate new sample questions even if AI response is missing,
+        // to keep the flow going and provide new options.
+        const newSamples = getUniqueRandomQuestions(
+          questions,
+          allUsedQuestionTexts
+        );
+        setSampleQuestions(newSamples);
+        setAllUsedQuestionTexts((prev) => {
+          const updatedSet = new Set(prev);
+          newSamples.forEach((q) => updatedSet.add(q.question));
+          return updatedSet;
+        });
       }
     } catch (err) {
       console.error("Error fetching AI response:", err);
-      // Send a user-friendly message to the chat instead of setting an error state
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -86,9 +134,24 @@ function App() {
           text: "Oops! I'm having trouble connecting right now. Please try again in a moment.",
         },
       ]);
+      // On error, also refresh sample questions, so the user can try new ones
+      const newSamples = getUniqueRandomQuestions(
+        questions,
+        allUsedQuestionTexts
+      );
+      setSampleQuestions(newSamples);
+      setAllUsedQuestionTexts((prev) => {
+        const updatedSet = new Set(prev);
+        newSamples.forEach((q) => updatedSet.add(q.question));
+        return updatedSet;
+      });
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Always set loading to false
     }
+  };
+
+  const handleSampleQuestionClick = (question) => {
+    handleSendMessage(question);
   };
 
   return (
@@ -129,61 +192,6 @@ function App() {
               backgroundColor: "#ffffff",
             }}
           >
-            {messages.length === 0 && (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "#757575",
-                  paddingTop: "3rem",
-                  paddingBottom: "3rem",
-                  fontSize: "1.05rem",
-                }}
-              >
-                <p>Start a conversation with your AI assistant!</p>
-                <div style={{ marginTop: "1rem", fontSize: "0.95rem" }}>
-                  <strong>You can ask things like:</strong>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                      marginTop: "1rem",
-                    }}
-                  >
-                    {sampleQuestions.map((q, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          setInputMessage(q.question);
-                          handleSendMessage(); // Trigger send immediately after setting input
-                        }}
-                        style={{
-                          padding: "0.6rem 1rem",
-                          borderRadius: "1.5rem",
-                          border: "1px solid #90caf9",
-                          backgroundColor: "#e3f2fd",
-                          color: "#1976d2",
-                          cursor: "pointer",
-                          fontSize: "0.9rem",
-                          transition: "all 0.2s ease-in-out",
-                          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#bbdefb";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "#e3f2fd";
-                        }}
-                      >
-                        {q.question}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -233,9 +241,61 @@ function App() {
                 </div>
               </div>
             )}
-            {/* Removed the error display div here */}
             <div ref={messagesEndRef} />
           </div>
+
+          {/* Conditional rendering for sample questions */}
+          {!isLoading && (
+            <div
+              style={{
+                textAlign: "center",
+                color: "#757575",
+                paddingTop: "1rem",
+                paddingBottom: "1rem",
+                fontSize: "1.05rem",
+                backgroundColor: "#ffffff",
+              }}
+            >
+              <strong>You can ask things like:</strong>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  marginTop: "1rem",
+                  padding: "0 1.5rem",
+                }}
+              >
+                {sampleQuestions.map((q, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSampleQuestionClick(q.question)}
+                    style={{
+                      padding: "0.6rem 1rem",
+                      borderRadius: "1.5rem",
+                      border: "1px solid #90caf9",
+                      backgroundColor: "#e3f2fd",
+                      color: "#1976d2",
+                      cursor: "pointer",
+                      fontSize: "0.9rem",
+                      transition: "all 0.2s ease-in-out",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#bbdefb";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#e3f2fd";
+                    }}
+                    disabled={isLoading}
+                  >
+                    {q.question}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Input Area with Integrated Send Button */}
           <div
@@ -284,7 +344,7 @@ function App() {
               disabled={isLoading}
             />
             <button
-              onClick={handleSendMessage}
+              onClick={() => handleSendMessage()}
               style={{
                 position: "absolute",
                 right: "2rem",
