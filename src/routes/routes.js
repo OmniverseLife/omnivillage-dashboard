@@ -181,6 +181,13 @@ export const routes = [
     role: "viewer,admin",
   },
   {
+    path: "/overview",
+    Component: lazy(() =>
+      import("../layout/pages/OverviewPage")
+    ),
+    role: "viewer,admin",
+  },
+  {
     path: "/dashboard/mobility",
     Component: lazy(() =>
       import("../layout/pages/dashboard/Mobility/Dashboard")

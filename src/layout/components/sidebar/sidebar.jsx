@@ -32,12 +32,18 @@ export default function Sidebar({ role }) {
         <h1>OMNI VILLAGE</h1>
       </div>
       <Link
+        to="/overview"
+        className={paths.includes("overview") ? "link active" : "link"}
+      >
+        <i className="fa-solid fa-tachometer-alt"></i>
+        <p>Overview</p>
+      </Link>
+      <Link
         to="/chat"
         className={paths.includes("chat") ? "link active" : "link"}
       >
         <i className="fa-solid fa-robot"></i>
         <p>Omni Bot</p>
-       
       </Link>
       <Link
         // to="/dashboard"
