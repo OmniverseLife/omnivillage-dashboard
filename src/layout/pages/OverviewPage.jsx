@@ -326,15 +326,15 @@ const GNHAlignedIndicators = () => {
   ];
 
   // Define an array of distinct, vibrant colors for the points and now labels
-  const pointColors = [
-    "#FF9900", // Living Coral - Often associated with warmth, energy. Good for Emotional/Physical.
-    "#6B5B95", // Amethyst - Associated with intuition, wisdom. Good for Spiritual/Intellectual.
-    "#88B04B", // Asparagus - Natural, fresh. Good for Environmental.
-    "#0000FF", // Rose Quartz - Soft, compassionate. Good for Social/Emotional.
-    "#00FFFF", // Serenity - Calm, peaceful. Good for Physical/Emotional.
-    "#009B77", // Emerald - Prosperity, growth. Good for Financial.
-    "#FF00FF", // Poppy - Bold, active. Good for Intellectual.
-  ];
+const pointColors = [
+  "#CC7A00", // Darker orange (was "#FF9900")
+  "#CCCC00", // Deeper yellow (was "#ffff00")
+  "#009900", // Dark green (was "#00ff00")
+  "#0000CC", // Darker blue (was "#0000FF")
+  "#0099CC", // Deeper cyan (was "#00FFFF")
+  "#CC0000", // Dark red (was "#ff0000")
+  "#990099", // Dark magenta (was "#ff00ff")
+];
 
   // Custom Dot component to render individual colored points on the radar chart.
   // This component receives properties from Recharts, such as `cx` (x-coordinate),
@@ -381,6 +381,7 @@ const GNHAlignedIndicators = () => {
             fill={fillColor} // Apply the dynamic fill color
             fontSize="14px" // Font size for the labels
             fontWeight={600} // Font weight for the labels
+            dominantBaseline="middle"
           >
             {line}
           </text>
