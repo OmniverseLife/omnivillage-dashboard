@@ -65,7 +65,7 @@ export default function Wrapper({ children }) {
       <Sidebar role={role} />
       <div className="rightSide">
         <Navbar />
-        {location.pathname.includes("dashboard") && (
+        {location.pathname.includes("dashboard") && !location.pathname.includes("overview") && (
           <Stack
             direction="row"
             alignItems="center"

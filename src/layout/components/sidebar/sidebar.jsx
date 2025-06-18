@@ -63,7 +63,7 @@ export default function Sidebar({ role }) {
       {dashboardMenu && (
         <div className="menu">
           <Link
-            to="/overview"
+            to="/dashboard/overview"
             className={paths.includes("overview") ? "link active" : "link"}
           >
             <p>Overview</p>

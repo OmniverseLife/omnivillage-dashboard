@@ -139,8 +139,8 @@ const App = () => {
         <Container>
           <GNHAlignedIndicators />
           <InsightsForAction />
-          <WellbeingGNHIndicators />
           <CoreCapitalIndicators />
+          <WellbeingGNHIndicators />
         </Container>
       </AppContainer>
     </Wrapper>
@@ -260,8 +260,8 @@ const WellbeingGNHIndicators = () => {
 
   return (
     <Section>
-      <SectionTitle>Wellbeing & GNH Indicators</SectionTitle>
-      <h3
+      <SectionTitle>Community GNH Indicators</SectionTitle>
+      {/* <h3
         style={{
           fontSize: "20px",
           fontWeight: "500",
@@ -270,7 +270,7 @@ const WellbeingGNHIndicators = () => {
         }}
       >
         Seven Spheres of Wellbeing
-      </h3>
+      </h3> */}
       <div style={{ height: "320px", width: "100%" }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -317,62 +317,153 @@ const WellbeingGNHIndicators = () => {
 const GNHAlignedIndicators = () => {
   const data = [
     { name: "PHYSICAL", score: 0.39, fullMark: 1 },
-    { name: "FINANCIAL/OCCUPATIONAL", score: 0.15, fullMark: 1 },
+    { name: "FINANCIAL OR OCCUPATIONAL", score: 0.15, fullMark: 1 },
     { name: "EMOTIONAL", score: 0.81, fullMark: 1 },
-    { name: "INTELLECTUAL/MENTAL", score: 0.26, fullMark: 1 },
+    { name: "INTELLECTUAL OR MENTAL", score: 0.26, fullMark: 1 },
     { name: "SOCIAL", score: 0.51, fullMark: 1 },
     { name: "ENVIRONMENTAL", score: 0.72, fullMark: 1 },
     { name: "SPIRITUAL", score: 0.67, fullMark: 1 },
   ];
 
+  // Define an array of distinct, vibrant colors for the points and now labels
+  const pointColors = [
+    "#FF9900", // Living Coral - Often associated with warmth, energy. Good for Emotional/Physical.
+    "#6B5B95", // Amethyst - Associated with intuition, wisdom. Good for Spiritual/Intellectual.
+    "#88B04B", // Asparagus - Natural, fresh. Good for Environmental.
+    "#0000FF", // Rose Quartz - Soft, compassionate. Good for Social/Emotional.
+    "#00FFFF", // Serenity - Calm, peaceful. Good for Physical/Emotional.
+    "#009B77", // Emerald - Prosperity, growth. Good for Financial.
+    "#FF00FF", // Poppy - Bold, active. Good for Intellectual.
+  ];
+
+  // Custom Dot component to render individual colored points on the radar chart.
+  // This component receives properties from Recharts, such as `cx` (x-coordinate),
+  // `cy` (y-coordinate), `index` (the data point's index), etc.
+  const CustomDot = (props) => {
+    const { cx, cy, stroke, payload, index } = props;
+    // Get the color for the current point based on its index in the data array.
+    // Use the modulo operator (%) to cycle through the `pointColors` array
+    // if there are more data points than defined colors, ensuring all points get a color.
+    const fillColor = pointColors[index % pointColors.length];
+
+    return (
+      <circle
+        cx={cx} // X-coordinate of the center of the circle
+        cy={cy} // Y-coordinate of the center of the circle
+        r={5} // Radius of the circle (determines the size of the dot)
+        fill={fillColor} // Fill color of the circle, dynamically set
+        stroke="#FFFFFF" // White stroke for better visibility and contrast against the radar fill
+        strokeWidth={2} // Stroke width for the circle
+        className="transition-all duration-200 ease-in-out hover:scale-125" // Tailwind CSS classes for a smooth scaling effect on hover
+      />
+    );
+  };
+
+  // Custom Label component to render individual colored labels on the PolarAngleAxis.
+  // This component receives properties from Recharts, such as `x`, `y`, `payload`, `index`.
+  const CustomLabel = (props) => {
+    const { x, y, payload, index } = props;
+    const name = payload.value; // The label text (e.g., "PHYSICAL")
+    const fillColor = pointColors[index % pointColors.length]; // Get color from pointColors array
+
+    // Split the name by '/' to handle multi-line labels like "FINANCIAL/OCCUPATIONAL"
+    const lines = name.replace("/", "\n").split("\n");
+
+    return (
+      <g transform={`translate(${x},${y})`}>
+        {lines.map((line, i) => (
+          <text
+            key={i} // Unique key for each text line
+            x={0} // X position relative to the translated group
+            y={i * 18} // Y position for each line, offset by 18px for spacing
+            dy={i === 0 ? -12 : 6} // Vertical adjustment for first line vs subsequent lines
+            textAnchor={index < 4 ? "start":"end"} // Center the text horizontally
+            fill={fillColor} // Apply the dynamic fill color
+            fontSize="14px" // Font size for the labels
+            fontWeight={600} // Font weight for the labels
+          >
+            {line}
+          </text>
+        ))}
+      </g>
+    );
+  };
+
   return (
     <Section>
-      <SectionTitle>GNH-Aligned Indicators (Spatial View)</SectionTitle>
+      <SectionTitle>Well Being Score</SectionTitle>
       <div
         style={{
-          height: "450px",
           width: "100%",
-          padding: "20px",
-          borderRadius: "8px",
+          height: "500px",
+          padding: "1.5rem", // Tailwind p-6
+          backgroundColor: "white",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-            <PolarGrid stroke="#d0d0d0" />{" "}
-            {/* Changed grid line color to a lighter gray */}
+            {/* PolarGrid creates the radial and concentric lines, forming the "spider web" effect */}
+            <PolarGrid
+              stroke="#D1D5DB" // A light gray color for the grid lines
+              strokeDasharray="4 4" // Creates dashed lines, giving a softer, more modern grid look
+            />
+            {/* PolarAngleAxis displays the labels for each data point (e.g., PHYSICAL, EMOTIONAL) */}
             <PolarAngleAxis
-              dataKey="name"
-              tickFormatter={(name) => name.replace("/", "\n")} // Adjusted for new labels
-              style={{ fontSize: "13px", fill: "#555" }}
+              dataKey="name" // Specifies which data key to use for the labels
+              tick={<CustomLabel />} // Use the CustomLabel component for colored labels
+              tickLine={false} // Hides the small lines extending from the axis to the labels for a cleaner look
             />
+            {/* PolarRadiusAxis displays the radial scale (e.g., from 0 to 1) */}
             <PolarRadiusAxis
-              angle={90}
-              domain={[0, 1]} // Domain adjusted for scores between 0 and 1
-              tickCount={6} // Still 6 ticks for clarity (0, 0.2, 0.4, 0.6, 0.8, 1.0)
-              tickFormatter={(value) => value.toFixed(1)} // Format radius axis ticks to one decimal
-              style={{ fontSize: "12px", fill: "#777" }}
+              angle={90} // The angle at which the radius axis labels are displayed (top of the chart)
+              domain={[0, 1]} // Sets the minimum and maximum values for the radial axis (scores are between 0 and 1)
+              tickCount={6} // Number of ticks on the radius axis (0, 0.2, 0.4, 0.6, 0.8, 1.0)
+              tickFormatter={(value) => value.toFixed(1)} // Formats the tick values to one decimal place
+              style={{ fontSize: "12px", fill: "#6B7280" }} // Custom styling for the tick values: font size, medium gray color
+              axisLine={false} // Hides the main axis line for the radius
             />
+            {/* Tooltip displays information when hovering over data points */}
             <Tooltip
-              formatter={(value) => [`Score: ${value.toFixed(2)}`, ""]} // Format tooltip to show "Score: X.XX"
-              contentStyle={{
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
+              formatter={(value, name, props) => {
+                const dataEntryName = props.payload.name; // Get the name of the data entry from the payload
+                return [
+                  `${dataEntryName}: ${value.toFixed(2)}`,
+                  "Wellbeing Score",
+                ]; // Format tooltip to show "Indicator Name: Score" and "Wellbeing Score" as series name
               }}
-              labelStyle={{ fontWeight: "bold", color: "#333" }}
+              contentStyle={{
+                backgroundColor: "rgba(255, 255, 255, 0.98)", // Almost opaque white background for the tooltip box
+                border: "1px solid #E5E7EB", // Light gray border
+                borderRadius: "10px", // More rounded corners for the tooltip box
+                boxShadow: "0 4px 20px rgba(0,0,0,0.15)", // Stronger shadow for better visual separation
+                padding: "10px 15px", // Padding inside the tooltip box
+              }}
+              labelStyle={{
+                fontWeight: "bold",
+                color: "#333",
+                marginBottom: "5px",
+              }} // Styling for the label within the tooltip
+              itemStyle={{ color: "#4A5568", fontSize: "14px" }} // Styling for the item value within the tooltip
             />
+            {/* Radar component draws the main radar shape based on the scores */}
             <Radar
-              name="GNH Score"
-              dataKey="score"
-              stroke="#8884d8"
-              fill="#8884d8"
-              fillOpacity={0.6}
-              strokeWidth={2}
+              name="Wellbeing Score" // Name displayed in the tooltip
+              dataKey="score" // Specifies which data key to use for plotting the radar shape
+              stroke="#8B5CF6" // A vibrant purple color for the radar outline
+              fill="#8B5CF6" // Same vibrant purple for the fill area of the radar
+              fillOpacity={0.35} // Slightly reduced opacity for a lighter, more translucent fill
+              strokeWidth={3} // Thicker stroke for prominence
+              dot={<CustomDot />} // Integrates the CustomDot component to render uniquely colored dots at each data point
             />
           </RadarChart>
         </ResponsiveContainer>
       </div>
-      <div style={{fontWeight:500}}>Scores closer to 1 indicate higher wellbeing in that aspect.</div>
+      <div className="font-semibold text-lg text-gray-700 mt-6 text-center">
+        Scores closer to 1 indicate higher wellbeing in that aspect.
+      </div>
     </Section>
   );
 };

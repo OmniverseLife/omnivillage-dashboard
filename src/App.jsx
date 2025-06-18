@@ -46,7 +46,7 @@ function App() {
               path="/"
               element={
                 <AuthProvider role="admin,viewer" route="/">
-                  <Navigate to="/dashboard/production" replace={true} />
+                  <Navigate to="/dashboard/overview" replace={true} />
                 </AuthProvider>
               }
             />
