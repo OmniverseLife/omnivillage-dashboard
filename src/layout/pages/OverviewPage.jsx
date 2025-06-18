@@ -392,7 +392,8 @@ const pointColors = [
 
   return (
     <Section>
-      <SectionTitle>Well Being Score</SectionTitle>
+      <SectionTitle>Wellbeing Score</SectionTitle>
+      <h3>7 Spheres of Wellbeing</h3>
       <div
         style={{
           width: "100%",
