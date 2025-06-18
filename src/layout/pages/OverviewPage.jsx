@@ -328,10 +328,18 @@ const GNHAlignedIndicators = () => {
   return (
     <Section>
       <SectionTitle>GNH-Aligned Indicators (Spatial View)</SectionTitle>
-      <div style={{ height: "450px", width: "100%", padding: "20px", borderRadius: "8px" }}>
+      <div
+        style={{
+          height: "450px",
+          width: "100%",
+          padding: "20px",
+          borderRadius: "8px",
+        }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-            <PolarGrid stroke="#d0d0d0" /> {/* Changed grid line color to a lighter gray */}
+            <PolarGrid stroke="#d0d0d0" />{" "}
+            {/* Changed grid line color to a lighter gray */}
             <PolarAngleAxis
               dataKey="name"
               tickFormatter={(name) => name.replace("/", "\n")} // Adjusted for new labels
@@ -364,11 +372,10 @@ const GNHAlignedIndicators = () => {
           </RadarChart>
         </ResponsiveContainer>
       </div>
+      <div style={{fontWeight:500}}>Scores closer to 1 indicate higher wellbeing in that aspect.</div>
     </Section>
   );
 };
-
-
 
 // CoreCapitalIndicators Component
 const CoreCapitalIndicators = () => {

@@ -29,14 +29,14 @@ export default function Sidebar({ role }) {
     <div className="sidebar">
       <div className="logo">
         <img src={logo} alt="" />
-        <h1>OMNI VILLAGE</h1>
+        {/* <h1>OMNI VILLAGE</h1> */}
       </div>
       <Link
         to="/chat"
         className={paths.includes("chat") ? "link active" : "link"}
       >
         <i className="fa-solid fa-robot"></i>
-        <p>Omni Bot</p>
+        <p>Ask Me</p>
       </Link>
       {/* <Link
         to="/overview"
