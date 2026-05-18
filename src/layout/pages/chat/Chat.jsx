@@ -70,11 +70,11 @@ function App() {
 
     try {
       const response = await fetch(
-        "https://dashboard-ai-3dd20e22d0c6.herokuapp.com/chat",
+        "https://omniverse-dashboard-chatbot-37672ae1d2c9.herokuapp.com/chat",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: userMessage.text }),
+          body: JSON.stringify({ message: userMessage.text }),
         }
       );
 
