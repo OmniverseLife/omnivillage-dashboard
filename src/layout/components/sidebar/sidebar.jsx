@@ -24,6 +24,9 @@ export default function Sidebar({ role }) {
     const [dashboardMenu, setdashboardMenu] = useState(
         paths.includes("dashboard") && true
     );
+    const [questionnaireMenu, setquestionnaireMenu] = useState(
+        paths.includes("questionnaire") && true
+    );
 
     return (
         <div className="sidebar">
@@ -296,6 +299,58 @@ export default function Sidebar({ role }) {
                                 }
                             >
                                 Tobacco & Alcohol
+                            </Link>
+                        </div>
+                    )}
+                    <Link
+                        onClick={() => setquestionnaireMenu(!questionnaireMenu)}
+                        className={
+                            paths.includes("questionnaire")
+                                ? "link active"
+                                : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-clipboard-question"></i>
+                        <p>Questionnaire</p>
+                        <span>
+                            {questionnaireMenu ? (
+                                <i className="fa-solid fa-minus"></i>
+                            ) : (
+                                <i className="fa-solid fa-plus"></i>
+                            )}
+                        </span>
+                    </Link>
+                    {questionnaireMenu && (
+                        <div className="menu">
+                            <Link
+                                to="/questionnaire/categories"
+                                className={
+                                    paths.includes("categories")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Categories
+                            </Link>
+                            <Link
+                                to="/questionnaire/questions"
+                                className={
+                                    paths.includes("questions")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Questions
+                            </Link>
+                            <Link
+                                to="/questionnaire/responses"
+                                className={
+                                    paths.includes("responses")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Responses
                             </Link>
                         </div>
                     )}

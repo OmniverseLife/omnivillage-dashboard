@@ -258,4 +258,36 @@ export const endpoints = {
         mobility: "/mobility-officer-dropdown",
         water: "/water-officer-dropdown",
     },
+
+    countries: {
+        get: "/countries",
+        add: "/countries/add-country",
+        edit: "/countries/edit-country",
+        delete: "/countries/delete-country",
+    },
+
+    questionnaire: {
+        categories: {
+            get: "/categories",
+            add: "/categories/add-category",
+            edit: "/categories/edit-category",
+            reparent: "/categories/reparent",
+            reorder: "/categories/reorder",
+            delete: "/categories/delete-category",
+        },
+        questions: {
+            get: "/questions",
+            add: "/questions/add-question",
+            edit: "/questions/edit-question",
+            replace: "/questions/replace-question",
+            toggle: "/questions/toggle-active",
+            reorder: "/questions/reorder",
+            delete: "/questions/delete-question",
+        },
+        responses: {
+            list: "/responses",
+            rows: "/responses/rows",
+            stats: "/responses/stats",
+        },
+    },
 };

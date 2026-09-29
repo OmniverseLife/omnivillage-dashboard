@@ -1,0 +1,100 @@
+/*
+ * Unlayered, loaded AFTER @mantine/core's layered build.
+ *
+ * Why this file has to exist: index.css is the stock Vite template and carries
+ * unlayered global rules — `button { background-color:#1a1a1a }`,
+ * `:root { color: rgba(255,255,255,.87) }`, `* { outline:none !important }`.
+ * Unlayered rules beat anything inside `@layer mantine`, so without this every
+ * Mantine button rendered as a black block and all inherited text was white.
+ *
+ * `revert-layer` rolls each property back to the value from the previous
+ * cascade layer — i.e. Mantine's own — rather than hardcoding replacements.
+ * Selectors match Mantine's class prefix rather than a DOM subtree so they also
+ * cover portalled content (Modal, Tooltip, Select dropdowns), which renders on
+ * document.body and is therefore outside any wrapper element.
+ */
+
+/*
+ * index.css line 2 is `* { margin:0; padding:0; box-sizing:border-box;
+ * outline:none !important }` — unlayered, so it strips the padding and margin
+ * off EVERY Mantine element: table cells collapse, modals lose their inner
+ * spacing, inputs lose their inset. `*` has specificity (0,0,0); the attribute
+ * selector below is (0,1,0) and wins, then defers to Mantine's layer.
+ */
+[class*="mantine-"] {
+    margin: revert-layer;
+    padding: revert-layer;
+}
+
+button[class*="mantine-"],
+a[class*="mantine-"],
+input[class*="mantine-"],
+textarea[class*="mantine-"],
+select[class*="mantine-"] {
+    background-color: revert-layer;
+    background-image: revert-layer;
+    border: revert-layer;
+    border-color: revert-layer;
+    border-radius: revert-layer;
+    padding: revert-layer;
+    font-size: revert-layer;
+    font-weight: revert-layer;
+    font-family: revert-layer;
+    line-height: revert-layer;
+    color: revert-layer;
+    transition: revert-layer;
+    cursor: revert-layer;
+}
+
+button[class*="mantine-"]:hover,
+a[class*="mantine-"]:hover {
+    border-color: revert-layer;
+    background-color: revert-layer;
+}
+
+/* index.css kills every focus ring with `* { outline:none !important }`.
+   Put Mantine's back — losing it is an accessibility regression, not a style. */
+[class*="mantine-"]:focus-visible {
+    outline: revert-layer !important;
+    outline-offset: revert-layer !important;
+}
+
+/*
+ * Inherited text colour. index.css sets `:root { color: rgba(255,255,255,.87) }`,
+ * so anything that INHERITS its colour renders near-white.
+ *
+ * This is set on CONTAINERS only — the in-tree root and Mantine's portal
+ * wrappers (`data-portal`). That matters: a colour on a container only changes
+ * what descendants inherit, and never overrides a colour a component declares
+ * for itself. Targeting component classes instead (an earlier version matched
+ * `mantine-Tooltip-*`) forced dark text onto the tooltip's own dark background
+ * and would equally flatten a red "Delete" menu item.
+ */
+.questionnaire-root,
+[data-portal] {
+    color: var(--mantine-color-text);
+}
+
+/*
+ * Mantine's modal/drawer surface declares `position:fixed; top:0; bottom:0`
+ * but NO left/right — it relies on the static position being x=0, which holds
+ * when the portal is a normal block child of <body>.
+ *
+ * index.css makes `body { display:flex; place-items:center }` (Vite template),
+ * so the portal becomes a zero-width flex item placed AFTER #root. The fixed
+ * child then falls back to that static position and renders entirely
+ * off-screen to the right. Pinning left/right removes the dependency.
+ */
+[class*="mantine-Modal-inner"],
+[class*="mantine-Drawer-inner"] {
+    left: 0;
+    right: 0;
+}
+
+/* Same reasoning for the portal wrapper: keep it out of body's flex flow. */
+body > div:has(> [class*="mantine-Modal-root"]),
+body > div:has(> [class*="mantine-Drawer-root"]) {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

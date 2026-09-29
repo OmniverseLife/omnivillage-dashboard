@@ -61,6 +61,15 @@ function App() {
             />
 
             <Route
+              path="/questionnaire"
+              element={
+                <AuthProvider role="admin" route="/questionnaire">
+                  <Navigate to="/questionnaire/categories" replace={true} />
+                </AuthProvider>
+              }
+            />
+
+            <Route
               path="/consumption"
               element={
                 <AuthProvider role="admin" route="/consumption">

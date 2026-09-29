@@ -2,6 +2,23 @@ import { lazy } from "react";
 
 export const routes = [
     {
+        path: "/questionnaire/categories",
+        Component: lazy(() =>
+            import("../layout/pages/questionnaire/categories")
+        ),
+        role: "admin",
+    },
+    {
+        path: "/questionnaire/questions",
+        Component: lazy(() => import("../layout/pages/questionnaire/questions")),
+        role: "admin",
+    },
+    {
+        path: "/questionnaire/responses",
+        Component: lazy(() => import("../layout/pages/questionnaire/responses")),
+        role: "admin",
+    },
+    {
         path: "/users",
         Component: lazy(() => import("../layout/pages/users/users")),
         role: "admin",

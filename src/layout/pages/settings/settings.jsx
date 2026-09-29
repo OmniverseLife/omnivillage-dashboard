@@ -21,6 +21,7 @@ import {
   addFeed,
   addFishFeed,
   addVillage,
+  fetchCountries,
   deleteFeed,
   deleteFishFeed,
   deleteVillage,
@@ -32,6 +33,7 @@ import {
   fetchVillages,
 } from "../../../functions/others";
 import Loading from "../../components/loading";
+import CountriesSection from "../../components/questionnaire/CountriesSection";
 import { toast } from "sonner";
 import * as yup from "yup";
 import { Controller, useForm } from "react-hook-form";
@@ -115,6 +117,15 @@ export default function Settings() {
   } = useQuery({
     queryKey: ["villages"],
     queryFn: fetchVillages,
+  });
+
+  const {
+    data: countries = [],
+    isLoading: isCountriesLoading,
+  } = useQuery({
+    queryKey: ["countries"],
+    queryFn: () => fetchCountries(),
+    initialData: [],
   });
 
   const {
@@ -436,7 +447,14 @@ export default function Settings() {
 
   return (
     <Wrapper>
-      <Loading isLoading={isLoading || isFeedLoading || isFishFeedLoading} />
+      <Loading
+        isLoading={
+          isLoading ||
+          isFeedLoading ||
+          isFishFeedLoading ||
+          isCountriesLoading
+        }
+      />
       <StyledSettings>
         <Cultivation />
         <div className="gap"></div>
@@ -449,6 +467,9 @@ export default function Settings() {
         <TreesShrubs />
         <div className="gap"></div>
         <ConsumptionCrop />
+        <div className="gap"></div>
+        <CountriesSection />
+        <div className="gap"></div>
         <Stack
           direction="row"
           alignItems="center"
@@ -601,15 +622,15 @@ export default function Settings() {
                   onChange={(_, country) => onChange(country)}
                   aria-label="Platform"
                 >
-                  <ToggleButton value="india" style={{ outline: "none" }}>
-                    India
-                  </ToggleButton>
-                  <ToggleButton value="malaysia" style={{ outline: "none" }}>
-                    Malaysia
-                  </ToggleButton>
-                  <ToggleButton value="bhutan" style={{ outline: "none" }}>
-                    Bhutan
-                  </ToggleButton>
+                  {countries.map((_country) => (
+                    <ToggleButton
+                      key={_country._id}
+                      value={_country.name}
+                      style={{ outline: "none", textTransform: "capitalize" }}
+                    >
+                      {_country.display_name || _country.name}
+                    </ToggleButton>
+                  ))}
                 </ToggleButtonGroup>
               )}
             />
@@ -745,15 +766,15 @@ export default function Settings() {
                   onChange={(_, country) => onChange(country)}
                   aria-label="Platform"
                 >
-                  <ToggleButton value="india" style={{ outline: "none" }}>
-                    India
-                  </ToggleButton>
-                  <ToggleButton value="malaysia" style={{ outline: "none" }}>
-                    Malaysia
-                  </ToggleButton>
-                  <ToggleButton value="bhutan" style={{ outline: "none" }}>
-                    Bhutan
-                  </ToggleButton>
+                  {countries.map((_country) => (
+                    <ToggleButton
+                      key={_country._id}
+                      value={_country.name}
+                      style={{ outline: "none", textTransform: "capitalize" }}
+                    >
+                      {_country.display_name || _country.name}
+                    </ToggleButton>
+                  ))}
                 </ToggleButtonGroup>
               )}
             />
