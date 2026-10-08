@@ -5,7 +5,9 @@ import { Box, Group, Paper, Stack, Text, ThemeIcon, Title } from "@mantine/core"
  * rhythm instead of each inventing its own header and empty state.
  */
 
-export function PageHeader({ title, description, action }) {
+// `maw` is how wide the description may run: wider where the design keeps a
+// longer sentence on one line.
+export function PageHeader({ title, description, action, maw = 640 }) {
     return (
         <Group
             justify="space-between"
@@ -19,7 +21,7 @@ export function PageHeader({ title, description, action }) {
                     {title}
                 </Title>
                 {description && (
-                    <Text size="sm" c="dimmed" mt={4} maw={640}>
+                    <Text size="sm" c="dimmed" mt={4} maw={maw}>
                         {description}
                     </Text>
                 )}
@@ -30,6 +32,22 @@ export function PageHeader({ title, description, action }) {
                 </Group>
             )}
         </Group>
+    );
+}
+
+/** The small-caps heading the design puts over each part of a panel or list. */
+export function SectionHeading({ children, ...rest }) {
+    return (
+        <Text
+            size="xs"
+            fw={700}
+            c="dimmed"
+            tt="uppercase"
+            style={{ letterSpacing: "0.05em" }}
+            {...rest}
+        >
+            {children}
+        </Text>
     );
 }
 

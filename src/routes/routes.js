@@ -2,20 +2,35 @@ import { lazy } from "react";
 
 export const routes = [
     {
-        path: "/questionnaire/categories",
-        Component: lazy(() =>
-            import("../layout/pages/questionnaire/categories")
-        ),
-        role: "admin",
+        // A regional team that comes here is sent on to its own place.
+        path: "/questionnaire/master",
+        Component: lazy(() => import("../layout/pages/questionnaire/editor")),
+        role: "admin,regional",
     },
     {
-        path: "/questionnaire/questions",
-        Component: lazy(() => import("../layout/pages/questionnaire/questions")),
+        path: "/questionnaire/place/:placeId",
+        Component: lazy(() => import("../layout/pages/questionnaire/editor")),
+        role: "admin,regional",
+    },
+    {
+        // Every place beside the Master: a super admin's overview.
+        path: "/questionnaire/regional",
+        Component: lazy(() => import("../layout/pages/questionnaire/regional")),
         role: "admin",
     },
     {
         path: "/questionnaire/responses",
         Component: lazy(() => import("../layout/pages/questionnaire/responses")),
+        role: "admin,regional",
+    },
+    {
+        path: "/locations",
+        Component: lazy(() => import("../layout/pages/questionnaire/locations")),
+        role: "admin",
+    },
+    {
+        path: "/people",
+        Component: lazy(() => import("../layout/pages/questionnaire/people")),
         role: "admin",
     },
     {

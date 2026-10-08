@@ -48,9 +48,13 @@ function Users() {
         name: `${_user.first_name} ${_user.last_name}`,
         phone: `${_user.country_code} ${_user.phone}`,
         country: _user.country,
-        totalLand: `${_user.total_land} ${(
-            _user.land_measurement_symbol || _user.land_measurement
-        ).replace("-", "")}`,
+        // An account that has not finished its profile has no land unit
+        // yet: without the fallback one such user blanked the whole page.
+        totalLand: `${_user.total_land ?? ""} ${(
+            _user.land_measurement_symbol ||
+            _user.land_measurement ||
+            ""
+        ).replace("-", "")}`.trim(),
     }));
 
     const columns = [

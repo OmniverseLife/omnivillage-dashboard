@@ -1,57 +1,82 @@
 import {
-    ActionIcon,
-    Badge,
+    Anchor,
     Box,
     Button,
     Group,
-    Paper,
     ScrollArea,
-    SegmentedControl,
-    Stack,
+    Switch,
     Text,
     TextInput,
-    Tooltip,
 } from "@mantine/core";
-import { IconLock, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { Controller, useFieldArray } from "react-hook-form";
-import { DEFAULT_LANGUAGE, languageName, localise } from "./localise";
+import StatusPill from "./StatusPill";
+import { DEFAULT_LANGUAGE, localise } from "./localise";
 import { slugifyLocalised } from "./optionHelpers";
+import { SectionHeading } from "./shell";
 
-const HEX_ID = /^[a-f0-9]{24}$/i;
+const HELP = {
+    edit: "The label is what people read. The key is stored with every answer and never changes.",
+    add: "Shown for Single select and Multi select. The key is filled in from the label and locks when you save.",
+};
+
+// Room for a word-sized key; a seeded option's key is a 24-character record
+// id, which is cut short and shown whole on hover.
+const KEY_WIDTH = 170;
 
 /**
  * Options for a select question, built for real master data: seeded questions
- * carry up to 115 options (Crop), so this is a compact, searchable,
- * height-bounded list with ONE language switcher for the whole list — not a
- * card and a language picker per option.
+ * carry up to 115 options (Crop), so this is a compact, height-bounded list
+ * that turns searchable once it is long. The language comes from the form it
+ * sits in: one selector there drives every field and this list.
  *
  * `value` is the option's immutable identity (stored with every answer);
- * `label` is localised display copy. Once saved, the key is shown read-only
- * and de-emphasised — for seeded options it is the master-data record id,
- * which means nothing to an admin but must never change.
+ * `label` is localised display copy. What a row offers depends on the row,
+ * not on the list:
+ *   - an option that was loaded (the form marks it `saved`) shows its key
+ *     read-only, and "Archive" — or "Delete" once `usedOptions` shows that no
+ *     saved answer holds it. An archived one is greyed, with "Restore";
+ *   - an option added here has an editable key and "Remove".
+ * Nothing is sent from here: the form saves the whole list.
+ *
+ * `usedOptions` left undefined means "not known yet", which offers Archive:
+ * the choice that is always safe. `mode` picks the wording above the list.
+ *
+ * Given `place` (`{ _id, name, nameOf(id), published }`) it is the list of a
+ * question that place did not add (PDF p.15). A place cannot reword or
+ * archive an option: each row has a switch (`asked`) that decides whether
+ * the place offers it, and the place adds options of its own, whose key the
+ * server gives. Such a row is told by having no `value` yet, or the place's
+ * id in `addedBy`; it can be removed until it has been published
+ * (`published` holds the keys that have): answers may sit on it after that,
+ * and its switch is the way to stop offering it.
  */
 export default function OptionsList({
     control,
     register,
     watch,
     setValue,
-    languages = [DEFAULT_LANGUAGE],
     name = "options",
-    lockSaved = true,
+    mode = "add",
+    language = DEFAULT_LANGUAGE,
+    usedOptions,
     compact = false,
+    place,
 }) {
     const { fields, append, remove } = useFieldArray({ control, name });
-    const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
     const [query, setQuery] = useState("");
 
     const all = watch(name) || [];
-    const current = languages.includes(language) ? language : DEFAULT_LANGUAGE;
 
-    const untranslated =
-        current === DEFAULT_LANGUAGE
-            ? 0
-            : all.filter((o) => !o?.label?.[current]?.trim?.()).length;
+    const ownIn = (option) => !option.value || option.addedBy === place._id;
+    const removableIn = (option) =>
+        !option.value ||
+        (option.addedBy === place._id &&
+            !(place.published || []).includes(option.value));
+    // Its place is kept in every row once one row has it, so that the
+    // labels and switches of the list stay in line.
+    const anyRemovable = Boolean(place) && all.some(removableIn);
 
     // Filter by label in ANY language, but keep the original field index so
     // form paths stay correct.
@@ -64,210 +89,309 @@ export default function OptionsList({
             return haystack.includes(query.trim().toLowerCase());
         });
 
+    const actionFor = (option, index) => {
+        const path = `${name}.${index}.archived`;
+        if (!option.saved)
+            return { label: "Remove", run: () => remove(index) };
+        if (option.archived)
+            return {
+                label: "Restore",
+                run: () => setValue(path, false, { shouldDirty: true }),
+            };
+        if (usedOptions && !usedOptions.includes(option.value))
+            return { label: "Delete", run: () => remove(index) };
+        return {
+            label: "Archive",
+            run: () => setValue(path, true, { shouldDirty: true }),
+        };
+    };
+
     return (
         <Box>
-            <Group justify="space-between" align="flex-end" mb="xs" wrap="nowrap">
-                <Box>
-                    <Group gap={8}>
-                        <Text size="sm" fw={600}>
-                            Options
-                        </Text>
-                        <Badge tt="none" variant="light" color="gray" size="sm">
-                            {fields.length}
-                        </Badge>
-                        {untranslated > 0 && (
-                            <Badge tt="none" variant="light" color="orange" size="sm">
-                                {untranslated} missing in {languageName(current)}
-                            </Badge>
-                        )}
-                    </Group>
-                    {!compact && (
-                        <Text size="xs" c="dimmed">
-                            The label is what people read. The key is stored with
-                            every answer and cannot change once saved.
-                        </Text>
-                    )}
-                </Box>
-                <Button
-                    size="xs"
-                    variant="light"
-                    leftSection={<IconPlus size={14} />}
-                    onClick={() => append({ value: "", label: {} })}
-                >
-                    Add option
-                </Button>
-            </Group>
+            <SectionHeading>
+                {place ? `Answer options in ${place.name}` : "Answer options"}
+                {!place &&
+                    mode === "edit" &&
+                    ` · ${all.filter((option) => !option?.archived).length}`}
+            </SectionHeading>
+            {!compact && (
+                <Text size="sm" c="dimmed" mt={4}>
+                    {place
+                        ? `Switch off options that do not apply in ${place.name}, or add options only ${place.name} needs. Keys never change.`
+                        : HELP[mode]}
+                </Text>
+            )}
 
-            <Paper withBorder radius="sm">
-                <Group
-                    gap="xs"
-                    p="xs"
-                    wrap="nowrap"
-                    style={{ borderBottom: "1px solid var(--mantine-color-gray-2)" }}
-                >
-                    <TextInput
-                        size="xs"
-                        placeholder="Search options"
-                        leftSection={<IconSearch size={14} />}
-                        value={query}
-                        onChange={(e) => setQuery(e.currentTarget.value)}
-                        style={{ flex: 1 }}
-                    />
-                    {languages.length > 1 && (
-                        <SegmentedControl
-                            size="xs"
-                            value={current}
-                            onChange={setLanguage}
-                            data={languages.map((code) => ({
-                                value: code,
-                                label: languageName(code),
-                            }))}
-                        />
-                    )}
-                </Group>
+            {fields.length > 7 && (
+                <TextInput
+                    mt="sm"
+                    aria-label="Search options"
+                    placeholder="Search options"
+                    leftSection={<IconSearch size={14} />}
+                    value={query}
+                    onChange={(event) => setQuery(event.currentTarget.value)}
+                />
+            )}
 
-                <ScrollArea.Autosize mah={compact ? 240 : 340} type="auto">
-                    {fields.length === 0 ? (
-                        <Text size="xs" c="dimmed" p="sm">
-                            No options yet — a select question needs at least one.
-                        </Text>
-                    ) : visible.length === 0 ? (
-                        <Text size="xs" c="dimmed" p="sm">
-                            No options match “{query}”.
-                        </Text>
-                    ) : (
-                        <Stack gap={0}>
-                            {visible.map(({ field, index }) => {
-                                const saved = all[index]?.value;
-                                const locked = lockSaved && Boolean(field.value);
-                                return (
-                                    <Group
-                                        key={field.id}
-                                        gap="sm"
-                                        px="xs"
-                                        py={6}
-                                        wrap="nowrap"
-                                        style={{
-                                            borderBottom:
-                                                "1px solid var(--mantine-color-gray-1)",
-                                        }}
-                                    >
-                                        <Controller
-                                            control={control}
-                                            name={`${name}.${index}.label`}
-                                            render={({ field: labelField }) => (
-                                                <TextInput
-                                                    size="xs"
-                                                    style={{ flex: 1 }}
-                                                    value={
-                                                        labelField.value?.[current] ||
-                                                        ""
-                                                    }
-                                                    // In another language, show the
-                                                    // English as a hint to translate.
-                                                    placeholder={
-                                                        current === DEFAULT_LANGUAGE
-                                                            ? "Option label"
-                                                            : localise(
-                                                                  labelField.value
-                                                              ) || "Option label"
-                                                    }
-                                                    onChange={(e) => {
-                                                        const next = {
-                                                            ...(labelField.value ||
-                                                                {}),
-                                                            [current]:
-                                                                e.currentTarget.value,
-                                                        };
-                                                        labelField.onChange(next);
-                                                        if (
-                                                            !locked &&
-                                                            current ===
-                                                                DEFAULT_LANGUAGE &&
-                                                            !watch(
-                                                                `${name}.${index}.value`
-                                                            )
-                                                        ) {
-                                                            setValue(
-                                                                `${name}.${index}.value`,
-                                                                slugifyLocalised(
-                                                                    next[
-                                                                        DEFAULT_LANGUAGE
-                                                                    ]
-                                                                )
-                                                            );
-                                                        }
+            <ScrollArea.Autosize
+                mah={compact ? 240 : 340}
+                type="auto"
+                // Keeps the scrollbar of a long list off the links at the
+                // end of each row.
+                offsetScrollbars="present"
+                mt="sm"
+            >
+                {fields.length === 0 ? (
+                    <Text size="sm" c="dimmed">
+                        No options yet. A select question needs at least one.
+                    </Text>
+                ) : visible.length === 0 ? (
+                    <Text size="sm" c="dimmed">
+                        No options match “{query}”.
+                    </Text>
+                ) : (
+                    visible.map(({ field, index }) => {
+                        const option = all[index] || {};
+                        const keyPath = `${name}.${index}.value`;
+                        const action = actionFor(option, index);
+                        const own = Boolean(place) && ownIn(option);
+                        const off = Boolean(place) && option.asked === false;
+                        const keyText = (
+                            <Text
+                                size="xs"
+                                c="dimmed"
+                                ff="monospace"
+                                truncate
+                                w={KEY_WIDTH}
+                                title={option.value}
+                                style={{
+                                    flexShrink: 0,
+                                    opacity: option.archived ? 0.55 : 1,
+                                }}
+                            >
+                                key: {option.value}
+                            </Text>
+                        );
+                        return (
+                            <Group
+                                key={field.id}
+                                gap="sm"
+                                py={5}
+                                wrap="nowrap"
+                            >
+                                <Controller
+                                    control={control}
+                                    name={`${name}.${index}.label`}
+                                    render={({ field: labelField }) => (
+                                        <TextInput
+                                            // The ref lets the form put the
+                                            // cursor in a row just added.
+                                            ref={labelField.ref}
+                                            aria-label="Option label"
+                                            style={{ flex: 1, minWidth: 0 }}
+                                            disabled={
+                                                place
+                                                    ? off
+                                                    : Boolean(option.archived)
+                                            }
+                                            // A place writes the label of
+                                            // its own options only.
+                                            readOnly={Boolean(place) && !own}
+                                            title={
+                                                place && !own
+                                                    ? "A place cannot reword an option it did not add."
+                                                    : undefined
+                                            }
+                                            value={
+                                                labelField.value?.[language] ||
+                                                ""
+                                            }
+                                            // In another language, show the
+                                            // English as a hint to translate.
+                                            placeholder={
+                                                (language !== DEFAULT_LANGUAGE &&
+                                                    localise(
+                                                        labelField.value
+                                                    )) ||
+                                                "Option label"
+                                            }
+                                            onChange={(event) => {
+                                                const next = {
+                                                    ...(labelField.value || {}),
+                                                    [language]:
+                                                        event.currentTarget
+                                                            .value,
+                                                };
+                                                // The key follows the English
+                                                // label until someone types a
+                                                // key of their own: it is
+                                                // rewritten only while it is
+                                                // still what the label gave.
+                                                // (Not in a place: the server
+                                                // gives its options their key.)
+                                                if (
+                                                    !place &&
+                                                    !option.saved &&
+                                                    language ===
+                                                        DEFAULT_LANGUAGE &&
+                                                    (watch(keyPath) || "") ===
+                                                        slugifyLocalised(
+                                                            labelField.value?.[
+                                                                DEFAULT_LANGUAGE
+                                                            ]
+                                                        )
+                                                ) {
+                                                    setValue(
+                                                        keyPath,
+                                                        slugifyLocalised(
+                                                            next[
+                                                                DEFAULT_LANGUAGE
+                                                            ]
+                                                        ),
+                                                        { shouldDirty: true }
+                                                    );
+                                                }
+                                                labelField.onChange(next);
+                                            }}
+                                        />
+                                    )}
+                                />
+
+                                {place ? (
+                                    <>
+                                        {/* What the place did to it, where
+                                            the Master shows its key. */}
+                                        <Box w={KEY_WIDTH} style={{ flexShrink: 0 }}>
+                                            {off ? (
+                                                <StatusPill
+                                                    status={{
+                                                        kind: "hidden",
+                                                        here:
+                                                            !option.hiddenBy ||
+                                                            option.hiddenBy ===
+                                                                place._id,
+                                                        placeName: place.nameOf(
+                                                            option.hiddenBy
+                                                        ),
                                                     }}
                                                 />
+                                            ) : own || option.addedBy ? (
+                                                <StatusPill
+                                                    status={{
+                                                        kind: "added",
+                                                        here: own,
+                                                        placeName: place.nameOf(
+                                                            option.addedBy
+                                                        ),
+                                                    }}
+                                                />
+                                            ) : (
+                                                keyText
                                             )}
-                                        />
-
-                                        {locked ? (
-                                            <Tooltip
-                                                withArrow
-                                                multiline
-                                                w={260}
-                                                label={
-                                                    HEX_ID.test(saved || "")
-                                                        ? `Linked to a master-data record (${saved}). Locked: changing it would detach past answers.`
-                                                        : `Key: ${saved}. Locked: changing it would detach past answers.`
-                                                }
+                                        </Box>
+                                        {anyRemovable && (
+                                            <Box
+                                                w={64}
+                                                ta="right"
+                                                style={{ flexShrink: 0 }}
                                             >
-                                                <Group
-                                                    gap={4}
-                                                    w={130}
-                                                    wrap="nowrap"
-                                                    style={{ flexShrink: 0 }}
-                                                >
-                                                    <IconLock
-                                                        size={12}
-                                                        style={{
-                                                            color: "var(--mantine-color-gray-5)",
-                                                            flexShrink: 0,
-                                                        }}
-                                                    />
-                                                    <Text
-                                                        size="xs"
-                                                        c="dimmed"
-                                                        truncate
+                                                {removableIn(option) && (
+                                                    <Anchor
+                                                        component="button"
+                                                        type="button"
+                                                        size="sm"
+                                                        fw={600}
+                                                        onClick={() =>
+                                                            remove(index)
+                                                        }
                                                     >
-                                                        {HEX_ID.test(saved || "")
-                                                            ? "Master data"
-                                                            : saved}
-                                                    </Text>
-                                                </Group>
-                                            </Tooltip>
+                                                        Remove
+                                                    </Anchor>
+                                                )}
+                                            </Box>
+                                        )}
+                                        {/* Not on a row added just now: it
+                                            has no key yet to switch. */}
+                                        <Box w={46} style={{ flexShrink: 0 }}>
+                                            {option.value && (
+                                                <Switch
+                                                    size="md"
+                                                    aria-label={`Offer “${localise(
+                                                        option.label,
+                                                        language
+                                                    )}” in ${place.name}`}
+                                                    checked={!off}
+                                                    onChange={(event) =>
+                                                        setValue(
+                                                            `${name}.${index}.asked`,
+                                                            event.currentTarget
+                                                                .checked,
+                                                            { shouldDirty: true }
+                                                        )
+                                                    }
+                                                />
+                                            )}
+                                        </Box>
+                                    </>
+                                ) : (
+                                    <>
+                                        {option.saved ? (
+                                            keyText
                                         ) : (
                                             <TextInput
-                                                size="xs"
-                                                w={130}
+                                                aria-label="Option key"
+                                                w={KEY_WIDTH}
                                                 placeholder="key"
+                                                style={{ flexShrink: 0 }}
                                                 styles={{
                                                     input: {
                                                         fontFamily:
                                                             "var(--mantine-font-family-monospace)",
                                                     },
                                                 }}
-                                                {...register(`${name}.${index}.value`)}
+                                                {...register(keyPath)}
                                             />
                                         )}
 
-                                        <ActionIcon
-                                            variant="subtle"
-                                            color="red"
+                                        <Anchor
+                                            component="button"
+                                            type="button"
                                             size="sm"
-                                            aria-label="Remove option"
-                                            onClick={() => remove(index)}
+                                            fw={600}
+                                            w={64}
+                                            ta="right"
+                                            style={{ flexShrink: 0 }}
+                                            onClick={action.run}
                                         >
-                                            <IconTrash size={14} />
-                                        </ActionIcon>
-                                    </Group>
-                                );
-                            })}
-                        </Stack>
-                    )}
-                </ScrollArea.Autosize>
-            </Paper>
+                                            {action.label}
+                                        </Anchor>
+                                    </>
+                                )}
+                            </Group>
+                        );
+                    })
+                )}
+            </ScrollArea.Autosize>
+
+            <Button
+                mt="sm"
+                variant="default"
+                leftSection={<IconPlus size={14} />}
+                onClick={() => {
+                    // A search would hide the empty row it is about to add.
+                    setQuery("");
+                    // The cursor goes to the label; left to itself the form
+                    // would pick the key, the field it met first.
+                    append(
+                        place
+                            ? { label: {}, asked: true }
+                            : { value: "", label: {} },
+                        { focusName: `${name}.${fields.length}.label` }
+                    );
+                }}
+            >
+                {place ? `Add option for ${place.name}` : "Add option"}
+            </Button>
         </Box>
     );
 }

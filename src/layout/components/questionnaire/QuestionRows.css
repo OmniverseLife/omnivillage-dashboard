@@ -1,0 +1,15 @@
+/*
+ * A place's list has a tick box on every row and one in its heading. They
+ * are drawn always and shown when wanted: on the row under the pointer, on
+ * the one holding keyboard focus, and on every row once anything is ticked.
+ * Hidden with opacity, not display, so Tab still reaches them.
+ */
+.qn-tick {
+    opacity: 0;
+}
+
+tr:hover .qn-tick,
+.qn-tick:focus-within,
+table[data-ticking] .qn-tick {
+    opacity: 1;
+}

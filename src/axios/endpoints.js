@@ -266,7 +266,28 @@ export const endpoints = {
         delete: "/countries/delete-country",
     },
 
+    places: {
+        list: "/places",
+    },
+
+    team: {
+        list: "/admin/team",
+        assign: "/admin/assign",
+    },
+
     questionnaire: {
+        // The editor screen: one payload for a whole questionnaire, and what
+        // acts on the changes waiting in it.
+        editor: "/questionnaire/editor",
+        // What one place changes about a question or category: whether it
+        // is asked there, its wording, its options.
+        overrides: "/questionnaire/overrides",
+        usage: "/questionnaire/usage",
+        publish: "/questionnaire/publish",
+        discard: "/questionnaire/discard",
+        history: "/questionnaire/history",
+        // Takes back the latest published change, and only that one.
+        undo: "/questionnaire/undo",
         categories: {
             get: "/categories",
             add: "/categories/add-category",
@@ -276,12 +297,11 @@ export const endpoints = {
             delete: "/categories/delete-category",
         },
         questions: {
-            get: "/questions",
             add: "/questions/add-question",
             edit: "/questions/edit-question",
-            replace: "/questions/replace-question",
             toggle: "/questions/toggle-active",
             reorder: "/questions/reorder",
+            move: "/questions/move",
             delete: "/questions/delete-question",
         },
         responses: {

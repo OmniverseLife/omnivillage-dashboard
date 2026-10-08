@@ -20,22 +20,26 @@ import OptionsList from "./OptionsList";
 /**
  * Children of a repeatable_group or a section.
  *
- * Each child is saved as its own question doc with parentQuestionId set, so the
- * structural-edit rule applies to a child exactly as it does to a top-level
- * question. A group child may itself be a repeatable_group — that is the
- * poultry shape (Livestock -> Products -> Output) — and the server caps nesting
- * at two levels, so the picker hides it once we are already nested.
+ * Each child is saved as its own question doc with parentQuestionId set, and
+ * is also a row of its own in the editor's list: that row is where a saved
+ * field is archived, deleted or given another type. A group child may itself
+ * be a repeatable_group — that is the poultry shape (Livestock -> Products ->
+ * Output) — and the server caps nesting at two levels, so the picker hides it
+ * once we are already nested.
  *
  * A group's fields can also be laid out in sections (Crop -> Utilisation,
  * Important information). Such a section is only a heading: what it holds is
  * stored in the row, exactly like the fields beside it.
+ *
+ * `language` is the one the panel's selector chose; every label and option
+ * list in here follows it.
  */
 export default function ChildQuestionsEditor({
     control,
     register,
     watch,
     setValue,
-    languages,
+    language,
     parentType = "repeatable_group",
     depth = 1,
     name = "children",
@@ -102,7 +106,8 @@ export default function ChildQuestionsEditor({
                         <Accordion.Control>
                             <Group gap="xs" wrap="nowrap">
                                 <Text size="sm" fw={500}>
-                                    {localise(field.label) || `Untitled ${index + 1}`}
+                                    {localise(field.label, language) ||
+                                        `Untitled ${index + 1}`}
                                 </Text>
                                 {field._id && (
                                     <Badge tt="none" size="xs" variant="default">
@@ -122,7 +127,7 @@ export default function ChildQuestionsEditor({
                                                 <LocalisedInput
                                                     label="Label"
                                                     required
-                                                    languages={languages}
+                                                    language={language}
                                                     value={labelField.value}
                                                     onChange={labelField.onChange}
                                                 />
@@ -136,8 +141,10 @@ export default function ChildQuestionsEditor({
                                             <Select
                                                 label="Type"
                                                 w={200}
-                                                // Locked after save: a type change
-                                                // is always structural.
+                                                // Locked once saved. Its own row
+                                                // in the list is where the type
+                                                // changes, while nothing has
+                                                // been answered yet.
                                                 disabled={Boolean(field._id)}
                                                 data={types.map((t) => ({
                                                     value: t.value,
@@ -148,15 +155,21 @@ export default function ChildQuestionsEditor({
                                             />
                                         )}
                                     />
-                                    <ActionIcon
-                                        variant="subtle"
-                                        color="danger"
-                                        size="lg"
-                                        aria-label="Remove"
-                                        onClick={() => remove(index)}
-                                    >
-                                        <IconTrash size={16} />
-                                    </ActionIcon>
+                                    {/* A saved field is a question of its
+                                        own, which may have answers: it is
+                                        archived or deleted from its own row
+                                        in the list, not dropped from here. */}
+                                    {!field._id && (
+                                        <ActionIcon
+                                            variant="subtle"
+                                            color="danger"
+                                            size="lg"
+                                            aria-label="Remove"
+                                            onClick={() => remove(index)}
+                                        >
+                                            <IconTrash size={16} />
+                                        </ActionIcon>
+                                    )}
                                 </Group>
 
                                 {watch(`${name}.${index}.type`) !== "section" && (
@@ -189,9 +202,19 @@ export default function ChildQuestionsEditor({
                                                 register={register}
                                                 watch={watch}
                                                 setValue={setValue}
-                                                languages={languages}
+                                                language={language}
                                                 name={`${name}.${index}.options`}
-                                                lockSaved={Boolean(field._id)}
+                                                mode={field._id ? "edit" : "add"}
+                                                // Which options are in use is
+                                                // only looked up for the
+                                                // question a panel is opened
+                                                // on. Here an answered field
+                                                // offers Archive throughout.
+                                                usedOptions={
+                                                    field.answered
+                                                        ? undefined
+                                                        : []
+                                                }
                                                 compact
                                             />
                                         ) : typeField.value === "repeatable_group" ? (
@@ -200,7 +223,7 @@ export default function ChildQuestionsEditor({
                                                 register={register}
                                                 watch={watch}
                                                 setValue={setValue}
-                                                languages={languages}
+                                                language={language}
                                                 depth={depth + 1}
                                                 name={`${name}.${index}.children`}
                                             />
@@ -210,7 +233,7 @@ export default function ChildQuestionsEditor({
                                                 register={register}
                                                 watch={watch}
                                                 setValue={setValue}
-                                                languages={languages}
+                                                language={language}
                                                 parentType="section"
                                                 name={`${name}.${index}.children`}
                                             />

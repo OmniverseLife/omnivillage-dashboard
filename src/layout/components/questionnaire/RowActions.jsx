@@ -7,10 +7,17 @@ import { IconDots } from "@tabler/icons-react";
  * noisy; destructive and rarely-used actions belong behind one affordance.
  *
  * `items`: [{ label, icon, onClick, color?, disabled?, divider? }]
+ * `width` and `position` are for a menu whose items run long (they carry a
+ * place's name, say): wider, and opening to the side that has room for it.
  */
-export default function RowActions({ items, label = "Row actions" }) {
+export default function RowActions({
+    items,
+    label = "Row actions",
+    width = 200,
+    position = "bottom-end",
+}) {
     return (
-        <Menu position="bottom-end" withinPortal shadow="md" width={200}>
+        <Menu position={position} withinPortal shadow="md" width={width}>
             <Menu.Target>
                 <ActionIcon
                     variant="subtle"

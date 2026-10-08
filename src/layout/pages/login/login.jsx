@@ -111,7 +111,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       toast.success("Logged In Successfully!");
-      navigate("/dashboard");
+      navigate("/");
     },
     onError: (err) => {
       toast.error(Object.values(err.response.data)[0]);

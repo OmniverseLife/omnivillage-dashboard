@@ -21,20 +21,27 @@ import { DEFAULT_LANGUAGE, languageName, missingLanguages } from "./localise";
  *
  * English is required because it is the stored fallback: a question with no
  * English renders blank for anyone whose language has no translation yet.
+ *
+ * Given `language`, the form it sits in owns the choice (one selector for
+ * every field of that form) and this one shows no switcher of its own.
  */
 export default function LocalisedInput({
     label,
     value,
     onChange,
     languages = [DEFAULT_LANGUAGE],
+    language,
     required = false,
     multiline = false,
     placeholder,
     description,
+    // Anything else goes to the input itself (`data-autofocus`, for one).
+    ...input
 }) {
     const [active, setActive] = useState(DEFAULT_LANGUAGE);
-    const current = languages.includes(active) ? active : DEFAULT_LANGUAGE;
-    const missing = missingLanguages(value, languages);
+    const current =
+        language || (languages.includes(active) ? active : DEFAULT_LANGUAGE);
+    const missing = language ? [] : missingLanguages(value, languages);
 
     const Field = multiline ? Textarea : TextInput;
 
@@ -59,7 +66,7 @@ export default function LocalisedInput({
                         </Tooltip>
                     )}
 
-                    {languages.length > 1 && (
+                    {!language && languages.length > 1 && (
                         <SegmentedControl
                             size="xs"
                             value={current}
@@ -82,8 +89,13 @@ export default function LocalisedInput({
             <Field
                 autosize={multiline || undefined}
                 minRows={multiline ? 2 : undefined}
+                // In another language the English is the hint: it is what
+                // is being translated, and what people see until it is.
                 placeholder={
-                    placeholder || `${label} in ${languageName(current)}`
+                    (current !== DEFAULT_LANGUAGE &&
+                        value?.[DEFAULT_LANGUAGE]) ||
+                    placeholder ||
+                    `${label} in ${languageName(current)}`
                 }
                 value={(value && value[current]) || ""}
                 onChange={(event) =>
@@ -92,6 +104,7 @@ export default function LocalisedInput({
                         [current]: event.currentTarget.value,
                     })
                 }
+                {...input}
             />
         </Stack>
     );

@@ -52,6 +52,13 @@ a[class*="mantine-"]:hover {
     background-color: revert-layer;
 }
 
+/* index.css also gives every link `text-decoration: inherit`, which would
+   keep a Mantine link from ever showing its own underline under the pointer
+   (and a Button that is a link from saying it has none). */
+a[class*="mantine-"] {
+    text-decoration: revert-layer;
+}
+
 /* index.css kills every focus ring with `* { outline:none !important }`.
    Put Mantine's back — losing it is an accessibility regression, not a style. */
 [class*="mantine-"]:focus-visible {
@@ -97,4 +104,17 @@ body > div:has(> [class*="mantine-Drawer-root"]) {
     position: absolute;
     top: 0;
     left: 0;
+}
+
+/*
+ * index.css loads Montserrat in ONE weight (500) and sets `font-synthesis:
+ * none` on :root, so nothing in the dashboard can render bold: every fw={600}
+ * or fw={700} here came out at 500. These screens rely on weight for meaning
+ * (the selected category, "1 hidden · 2 changed · 1 added", a country row), so
+ * the browser is allowed to synthesise it — inside these screens and their
+ * portals only. The old pages keep exactly the rendering they had.
+ */
+.questionnaire-root,
+[data-portal] {
+    font-synthesis: weight;
 }

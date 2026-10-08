@@ -12,17 +12,12 @@ export const dataTableProps = {
     verticalSpacing: "sm",
     horizontalSpacing: "md",
     minHeight: 180,
-    styles: {
-        header: {
-            backgroundColor: "var(--mantine-color-gray-0)",
-        },
-    },
+    // Sentence case on white, as the design draws every table: small, muted,
+    // semi-bold. (Was an uppercase band; the old pages do not use this file.)
     defaultColumnProps: {
         titleStyle: {
-            fontSize: "var(--mantine-font-size-xs)",
+            fontSize: "var(--mantine-font-size-sm)",
             fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
             color: "var(--mantine-color-gray-6)",
         },
     },

@@ -1,5 +1,6 @@
 import {
     Alert,
+    Anchor,
     Box,
     Button,
     Divider,
@@ -10,171 +11,446 @@ import {
     Stack,
     Switch,
     Text,
+    TextInput,
 } from "@mantine/core";
-import { IconAlertTriangle, IconInfoCircle, IconLock } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { fetchUsage } from "../../../functions/questionnaire";
 import ChildQuestionsEditor from "./ChildQuestionsEditor";
+import {
+    ArchiveQuestionDialog,
+    MasterImpactDialog,
+    ReplacementDialog,
+} from "./ConfirmDialogs";
 import LocalisedInput from "./LocalisedInput";
-import OptionsEditor from "./OptionsEditor";
-import TargetingTree from "./TargetingTree";
-import { PARENT_TYPES, QUESTION_TYPES, SELECT_TYPES } from "./constants";
+import OptionsList from "./OptionsList";
+import {
+    PARENT_TYPES,
+    QUESTION_TYPES,
+    SELECT_TYPES,
+    STICKY_FOOTER,
+    nameList,
+    plural,
+    shortTypeLabel,
+} from "./constants";
+import {
+    DEFAULT_LANGUAGE,
+    languageName,
+    localise,
+    withoutBlanks,
+} from "./localise";
+import { SectionHeading } from "./shell";
 
+// The design opens on a single select with two empty rows to fill in.
 const emptyForm = {
     label: {},
     helper_text: {},
-    type: "text",
-    options: [],
+    type: "single_select",
+    options: [
+        { value: "", label: {} },
+        { value: "", label: {} },
+    ],
     children: [],
     required: false,
-    order: 0,
     min: "",
     max: "",
     presentation: "inline",
-    targeting: { excludedCountries: [], excludedVillages: [] },
 };
 
 /**
- * One modal for add and edit.
+ * A saved question as form values, fields of a group included. `saved` marks
+ * the options whose key is already stored with answers: the options list
+ * locks those and offers Archive instead of Remove.
+ */
+const toForm = (question) => ({
+    ...emptyForm,
+    ...question,
+    label: question.label || {},
+    helper_text: question.helper_text || {},
+    min: question.min ?? "",
+    max: question.max ?? "",
+    presentation: question.presentation || "inline",
+    options: (question.options || []).map((option) => ({
+        ...option,
+        saved: true,
+    })),
+    children: (question.children || []).map(toForm),
+});
+
+const number = (value) =>
+    value === "" || value === null || value === undefined ? null : Number(value);
+
+/** Form values as the API takes them. A row left wholly blank is no option. */
+const payloadOf = (form) => ({
+    label: withoutBlanks(form.label),
+    helper_text: withoutBlanks(form.helper_text),
+    type: form.type,
+    options: SELECT_TYPES.includes(form.type)
+        ? (form.options || [])
+              .filter((option) => option.value || localise(option.label))
+              .map((option) => ({
+                  value: (option.value || "").trim(),
+                  label: withoutBlanks(option.label),
+                  ...(option.archived && { archived: true }),
+              }))
+        : [],
+    required: form.type !== "section" && Boolean(form.required),
+    min: number(form.min),
+    max: number(form.max),
+    presentation: form.presentation || "inline",
+});
+
+/** What stops a save, in words. The server checks everything again. */
+const problemWith = (form, field = false) => {
+    const body = payloadOf(form);
+    if (!body.label[DEFAULT_LANGUAGE])
+        return field
+            ? "Every field needs a label in English."
+            : "Enter the question in English.";
+    if (SELECT_TYPES.includes(body.type)) {
+        if (!body.options.some((option) => !option.archived))
+            return "Add at least one option.";
+        if (
+            body.options.some(
+                (option) => !option.value || !option.label[DEFAULT_LANGUAGE]
+            )
+        )
+            return "Every option needs a label in English and a key.";
+        if (
+            new Set(body.options.map((option) => option.value)).size <
+            body.options.length
+        )
+            return "Two options have the same key.";
+    }
+    return PARENT_TYPES.includes(body.type)
+        ? (form.children || [])
+              .map((child) => problemWith(child, true))
+              .find(Boolean)
+        : undefined;
+};
+
+const changedKeys = (before, after) =>
+    Object.keys(after).filter(
+        (key) => JSON.stringify(after[key]) !== JSON.stringify(before[key])
+    );
+
+const pick = (source, keys) =>
+    Object.fromEntries(keys.map((key) => [key, source[key]]));
+
+/** Every field under a question, at any depth, by id. */
+const fieldsById = (question, found = new Map()) => {
+    (question?.children || []).forEach((child) => {
+        found.set(child._id, child);
+        fieldsById(child, found);
+    });
+    return found;
+};
+
+/**
+ * What to send for the fields of a group or section, as a tree of
+ * `{ _id, rev, body, children }`: everything for a new field, and for a saved
+ * one only what changed. Sending a saved field whole would put every one of
+ * them in the list of changes to publish.
+ */
+const fieldWrites = (children, originals) =>
+    children.map((child) => {
+        const body = payloadOf(child);
+        const original = originals.get(child._id);
+        return {
+            _id: child._id,
+            rev: child.rev,
+            body: original
+                ? pick(body, changedKeys(payloadOf(toForm(original)), body))
+                : body,
+            children: PARENT_TYPES.includes(child.type)
+                ? fieldWrites(child.children || [], originals)
+                : [],
+        };
+    });
+
+const hasWrites = (write) =>
+    !write._id ||
+    Object.keys(write.body).length > 0 ||
+    write.children.some(hasWrites);
+
+/** Whether a saved field, at any depth, is about to have one of `keys` changed. */
+const touches = (writes, keys) =>
+    writes.some(
+        (write) =>
+            (write._id && keys.some((key) => key in write.body)) ||
+            touches(write.children, keys)
+    );
+
+const answeredAnywhere = (question) =>
+    Boolean(question.answered) ||
+    (question.children || []).some(answeredAnywhere);
+
+// The wording that belongs to one kind of questionnaire: the Master's here,
+// a place's from `placeCopy`, so neither is threaded through the panel.
+const COPY = {
+    master: {
+        addTitle: "Add question to the Master",
+        addNote:
+            "Every place gets this question, switched on. A regional team can switch it off or reword it for its own place.",
+        editTitle: "Edit question",
+        editSubtitle: (page) => `Master questionnaire · ${page}`,
+        editNote: (reach) =>
+            `You are editing the Master. Changes reach every place that has not made its own change to this question: ${plural(
+                reach?.countries ?? 0,
+                "country",
+                "countries"
+            )}, ${plural(reach?.villages ?? 0, "village")}.`,
+    },
+};
+
+/** For a question a place added itself (PDF p.16), in that place's name. */
+const placeCopy = (name, reach) => {
+    const note = `This question is asked in ${reach} only. It is not added to the Master or to any other place.`;
+    return {
+        addTitle: `Add question to ${name}`,
+        addNote: note,
+        editTitle: `Edit question for ${name}`,
+        editSubtitle: (page) => `${name} · ${page}`,
+        editNote: () => note,
+    };
+};
+
+/**
+ * "Asked in every place. Reworded in Ladakh." (PDF p.3): where places differ
+ * from the Master on this question, with every place named.
+ */
+const whereUsed = ({
+    hiddenIn = [],
+    rewordedIn = [],
+    optionsChangedIn = [],
+} = {}) =>
+    [
+        `Asked in every place${
+            hiddenIn.length ? ` except ${nameList(hiddenIn)}` : ""
+        }.`,
+        rewordedIn.length && `Reworded in ${nameList(rewordedIn)}.`,
+        optionsChangedIn.length &&
+            `Options changed in ${nameList(optionsChangedIn)}.`,
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+/**
+ * The panel a question is added and edited in (PDF p.3 and p.4).
  *
- * The structural rule is surfaced here rather than discovered via a 409:
- *   - the type picker is disabled in edit mode,
- *   - changing an option's value key offers only Replace,
- *   - changing any wording asks whether the MEANING changed, because that is
- *     the one call the server cannot make for itself.
+ * It decides WHAT a save consists of and hands that to the editor, which
+ * sends it: `onAdd(body, fields)`, or `onEdit(changes, fields)` with only the
+ * keys that differ from the saved question.
+ *
+ * Adding a replacement is the add form with `replaces` (the old question) and
+ * `preset` (the chosen type, and the wording and options when they were
+ * copied). `copiesFields` says the server copies the old group's fields, so
+ * none are authored here.
+ *
+ * In a place it serves the questions that place added itself (p.16);
+ * `placeName` is the place's name. Such a question is never archived or
+ * replaced, and is deleted only while it has not been published. On a
+ * `listPage` (one repeating list) a new question goes inside each entry.
  */
 export default function QuestionFormModal({
-    open,
+    scope,
+    placeName,
+    placeReach,
+    listPage,
+    opened,
     onClose,
-    editItem,
-    categoryId,
-    countries,
-    villages,
+    question,
+    category,
+    replaces,
+    preset,
+    copiesFields,
+    reach,
     languages,
-    onSubmitEdit,
-    onSubmitAdd,
-    onSubmitReplace,
-    isSaving,
+    language: pageLanguage,
+    onAdd,
+    onEdit,
+    onArchive,
+    onDelete,
+    onReplace,
+    saving,
 }) {
-    const { control, register, handleSubmit, reset, watch, setValue } = useForm({
-        defaultValues: emptyForm,
-    });
-    const [confirm, setConfirm] = useState(null);
+    const {
+        control,
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        setValue,
+        formState: { isDirty },
+    } = useForm({ defaultValues: emptyForm });
+    const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+    // The three questions this panel can ask on top of itself.
+    const [impact, setImpact] = useState({ opened: false });
+    const [removing, setRemoving] = useState(false);
+    const [replacing, setReplacing] = useState(false);
 
-    const isEdit = Boolean(editItem);
+    const master = scope.type === "master";
+    const copy = master ? COPY.master : placeCopy(placeName, placeReach);
     const type = watch("type");
+    const isGroup = type === "repeatable_group";
+    const locked = Boolean(question?.answered);
+    const answered = Boolean(question) && answeredAnywhere(question);
+    // Only the Master archives. What a place may remove, it deletes.
+    const archives = master && answered;
+    const archived =
+        question?.active === false || Boolean(question?.replacedByPending);
 
+    // Filled when the panel opens and not again while it is open, so a
+    // reload of the list behind it cannot wipe what is being typed.
     useEffect(() => {
-        if (!open) return;
-        reset(
-            editItem
-                ? {
-                      ...emptyForm,
-                      ...editItem,
-                      label: editItem.label || {},
-                      helper_text: editItem.helper_text || {},
-                      min: editItem.min ?? "",
-                      max: editItem.max ?? "",
-                      options: editItem.options || [],
-                      children: editItem.children || [],
-                      targeting: {
-                          excludedCountries:
-                              editItem.targeting?.excludedCountries || [],
-                          excludedVillages:
-                              editItem.targeting?.excludedVillages || [],
-                      },
-                  }
-                : emptyForm
-        );
-    }, [open, editItem, reset]);
+        if (!opened) return;
+        setLanguage(pageLanguage);
+        setImpact({ opened: false });
+        setRemoving(false);
+        setReplacing(false);
+        reset(question ? toForm(question) : { ...emptyForm, ...preset });
+    }, [opened, question, preset, pageLanguage, reset]);
 
-    const toPayload = (form) => ({
-        label: form.label,
-        helper_text: form.helper_text || {},
-        type: form.type,
-        options: SELECT_TYPES.includes(form.type) ? form.options : [],
-        required: Boolean(form.required),
-        order: Number(form.order) || 0,
-        min: form.min === "" ? null : Number(form.min),
-        max: form.max === "" ? null : Number(form.max),
-        presentation: form.presentation,
-        targeting: form.targeting,
-        children: form.children || [],
+    // Only an answered question has options that cannot simply be deleted.
+    const { data: usage } = useQuery({
+        queryKey: ["questionnaire-usage", "question", question?._id],
+        queryFn: () => fetchUsage({ questionId: question._id }),
+        enabled: opened && answered,
     });
 
-    /** Classifies the edit so the right path is taken. */
-    const classify = (form) => {
-        if (!editItem) return "add";
-        if (form.type !== editItem.type) return "structural";
+    const page = localise(category?.title, pageLanguage);
+    const name = localise(question?.label, pageLanguage);
+    const subtitle = question
+        ? copy.editSubtitle(page)
+        : replaces
+        ? page
+        : `${page} · ${
+              listPage ? "added to each entry" : "added at the end of the page"
+          }`;
 
-        const oldValues = (editItem.options || []).map((o) => o.value);
-        const newValues = (form.options || []).map((o) => o.value);
-        const keyChanged =
-            oldValues.some((v) => !newValues.includes(v)) &&
-            newValues.some((v) => !oldValues.includes(v));
-        if (keyChanged) return "structural";
-
-        const labelChanged =
-            JSON.stringify(form.label || {}) !==
-            JSON.stringify(editItem.label || {});
-        const optionLabelChanged = (form.options || []).some((option) => {
-            const previous = (editItem.options || []).find(
-                (o) => o.value === option.value
-            );
-            return (
-                previous &&
-                JSON.stringify(previous.label || {}) !==
-                    JSON.stringify(option.label || {})
-            );
-        });
-        if (labelChanged || optionLabelChanged) return "judgement";
-
-        return "cosmetic";
+    const requestClose = () => {
+        if (
+            isDirty &&
+            !window.confirm("Close without saving what you changed?")
+        )
+            return;
+        onClose();
     };
 
     const onSubmit = (form) => {
-        const payload = toPayload(form);
-        const verdict = classify(form);
-        if (verdict === "add") return onSubmitAdd(payload);
-        if (verdict === "cosmetic") return onSubmitEdit(payload);
-        setConfirm({ verdict, payload });
-    };
+        const problem = problemWith(form);
+        if (problem) {
+            // English is what can be missing while another language is shown.
+            setLanguage(DEFAULT_LANGUAGE);
+            toast.error(problem);
+            return;
+        }
+        const body = payloadOf(form);
+        const fields =
+            PARENT_TYPES.includes(form.type) && !copiesFields
+                ? fieldWrites(form.children || [], fieldsById(question))
+                : [];
+        if (!question) return onAdd(body, fields);
 
-    const isGroup = type === "repeatable_group";
+        const changes = pick(
+            body,
+            changedKeys(payloadOf(toForm(question)), body)
+        );
+        if (!Object.keys(changes).length && !fields.some(hasWrites))
+            return onClose();
+
+        const reworded =
+            "label" in changes ||
+            "helper_text" in changes ||
+            touches(fields, ["label", "helper_text"]);
+        // A new type empties the options by itself; that is not this edit.
+        const reoptioned =
+            ("options" in changes && !("type" in changes)) ||
+            touches(fields, ["options"]);
+        // Nothing reaches a place from a question that was never published.
+        if (master && !question.unpublished && (reworded || reoptioned)) {
+            setImpact({
+                opened: true,
+                wording: reworded,
+                // Places that reworded THIS question keep their wording.
+                // How far a reworded field reaches is not counted apart.
+                kept:
+                    "label" in changes || "helper_text" in changes
+                        ? question.usage?.wording
+                        : undefined,
+                summary: [
+                    reworded && "wording changed",
+                    reoptioned && "options changed",
+                ]
+                    .filter(Boolean)
+                    .join(", "),
+                save: () => onEdit(changes, fields),
+            });
+            return;
+        }
+        onEdit(changes, fields);
+    };
 
     return (
         <>
             <Modal
-                opened={open}
-                onClose={onClose}
-                size="xl"
+                opened={opened}
+                onClose={requestClose}
+                // Esc reaches every open dialog: it must close only the one
+                // on top.
+                closeOnEscape={!impact.opened && !removing && !replacing}
+                size={580}
                 centered
                 radius="md"
                 title={
                     <Box>
                         <Text fw={700}>
-                            {isEdit ? "Edit question" : "Add question"}
+                            {question ? copy.editTitle : copy.addTitle}
                         </Text>
                         <Text size="xs" c="dimmed">
-                            {isEdit
-                                ? "Wording is safe to change. Type and option keys are not."
-                                : "This appears in the app for everyone the screen targets."}
+                            {subtitle}
                         </Text>
                     </Box>
                 }
             >
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <Stack gap="lg">
+                    <Stack gap="md">
+                        <Alert variant="light">
+                            {question ? copy.editNote(reach) : copy.addNote}
+                        </Alert>
+                        {replaces && (
+                            <Text size="sm">
+                                Replaces “{localise(replaces.label, pageLanguage)}
+                                ”, which is archived when you publish.
+                            </Text>
+                        )}
+
+                        <Group justify="space-between" wrap="nowrap">
+                            <SectionHeading>Wording</SectionHeading>
+                            <Select
+                                aria-label="Language"
+                                w={150}
+                                allowDeselect={false}
+                                data={languages.map((code) => ({
+                                    value: code,
+                                    label: languageName(code),
+                                }))}
+                                value={language}
+                                onChange={setLanguage}
+                            />
+                        </Group>
                         <Controller
                             control={control}
                             name="label"
                             render={({ field }) => (
                                 <LocalisedInput
                                     label="Question"
-                                    required
-                                    languages={languages}
+                                    language={language}
                                     value={field.value}
                                     onChange={field.onChange}
+                                    data-autofocus
                                 />
                             )}
                         />
@@ -184,55 +460,80 @@ export default function QuestionFormModal({
                             render={({ field }) => (
                                 <LocalisedInput
                                     label="Helper text"
-                                    languages={languages}
+                                    language={language}
                                     value={field.value}
                                     onChange={field.onChange}
-                                    placeholder="Optional — shown under the question"
+                                    placeholder="Optional. Shown under the question"
                                 />
                             )}
                         />
 
-                        <Group grow align="flex-end">
+                        <Divider />
+                        <SectionHeading>Answer</SectionHeading>
+                        {locked || preset?.type ? (
+                            <TextInput
+                                label="Answer type"
+                                disabled
+                                readOnly
+                                value={`${shortTypeLabel(type)}${
+                                    locked ? " (locked)" : ""
+                                }`}
+                                description={
+                                    locked &&
+                                    "Locked because answers are already saved. Changing it would change what past answers mean."
+                                }
+                                inputWrapperOrder={[
+                                    "label",
+                                    "input",
+                                    "description",
+                                ]}
+                            />
+                        ) : (
                             <Controller
                                 control={control}
                                 name="type"
                                 render={({ field }) => (
                                     <Select
-                                        label="Type"
-                                        disabled={isEdit}
-                                        rightSection={
-                                            isEdit ? <IconLock size={14} /> : undefined
-                                        }
-                                        data={QUESTION_TYPES.map((t) => ({
-                                            value: t.value,
-                                            label: t.label,
+                                        label="Answer type"
+                                        allowDeselect={false}
+                                        // A field inside a group or
+                                        // section does not become one.
+                                        data={QUESTION_TYPES.filter(
+                                            (entry) =>
+                                                !question?.parentQuestionId ||
+                                                !PARENT_TYPES.includes(
+                                                    entry.value
+                                                ) ||
+                                                entry.value === question.type
+                                        ).map((entry) => ({
+                                            value: entry.value,
+                                            label: shortTypeLabel(entry.value),
                                         }))}
                                         value={field.value}
                                         onChange={field.onChange}
+                                        description="Choose carefully. The type locks once the first answer is saved."
+                                        inputWrapperOrder={[
+                                            "label",
+                                            "input",
+                                            "description",
+                                        ]}
                                     />
                                 )}
                             />
-                            <Controller
-                                control={control}
-                                name="order"
-                                render={({ field }) => (
-                                    <NumberInput
-                                        label="Display order"
-                                        placeholder="Lower numbers appear first"
-                                        min={0}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                    />
-                                )}
-                            />
-                        </Group>
-
-                        {isEdit && (
-                            <Text size="xs" c="dimmed" mt={-8}>
-                                The type is locked. Changing it would change what past
-                                answers mean — edit the wording, or create a
-                                replacement question.
-                            </Text>
+                        )}
+                        {/* One replacement at a time: the server refuses a
+                            second while the first waits to be published. */}
+                        {master && locked && !question.replacedByPending && (
+                            <Anchor
+                                component="button"
+                                type="button"
+                                size="sm"
+                                fw={600}
+                                style={{ alignSelf: "flex-start" }}
+                                onClick={() => setReplacing(true)}
+                            >
+                                Create a replacement question
+                            </Anchor>
                         )}
 
                         {(type === "number" || isGroup) && (
@@ -269,6 +570,7 @@ export default function QuestionFormModal({
                                 render={({ field }) => (
                                     <Select
                                         label="How rows are entered"
+                                        allowDeselect={false}
                                         data={[
                                             {
                                                 value: "inline",
@@ -293,11 +595,14 @@ export default function QuestionFormModal({
                                 render={({ field }) => (
                                     <Switch
                                         checked={Boolean(field.value)}
-                                        onChange={(e) =>
-                                            field.onChange(e.currentTarget.checked)
+                                        onChange={(event) =>
+                                            field.onChange(
+                                                event.currentTarget.checked
+                                            )
                                         }
                                         label="Required"
-                                        description="The app will not let someone complete this screen without answering."
+                                        description="The app will not let someone finish this page without answering."
+                                        styles={{ label: { fontWeight: 700 } }}
                                     />
                                 )}
                             />
@@ -306,13 +611,18 @@ export default function QuestionFormModal({
                         {SELECT_TYPES.includes(type) && (
                             <>
                                 <Divider />
-                                <OptionsEditor
+                                <OptionsList
                                     control={control}
                                     register={register}
                                     watch={watch}
                                     setValue={setValue}
-                                    isEdit={isEdit}
-                                    languages={languages}
+                                    mode={question ? "edit" : "add"}
+                                    language={language}
+                                    // Not answered: nothing holds any option,
+                                    // so every one of them can be deleted.
+                                    usedOptions={
+                                        locked ? usage?.usedOptions : []
+                                    }
                                 />
                             </>
                         )}
@@ -320,138 +630,128 @@ export default function QuestionFormModal({
                         {PARENT_TYPES.includes(type) && (
                             <>
                                 <Divider />
-                                <ChildQuestionsEditor
-                                    control={control}
-                                    register={register}
-                                    watch={watch}
-                                    setValue={setValue}
-                                    languages={languages}
-                                    parentType={type}
-                                />
+                                {copiesFields ? (
+                                    <Text size="sm" c="dimmed">
+                                        Its fields are copied from “
+                                        {localise(replaces?.label, pageLanguage)}
+                                        ” when you add it. Open the new
+                                        question afterwards to change them.
+                                    </Text>
+                                ) : (
+                                    <ChildQuestionsEditor
+                                        control={control}
+                                        register={register}
+                                        watch={watch}
+                                        setValue={setValue}
+                                        language={language}
+                                        parentType={type}
+                                    />
+                                )}
                             </>
                         )}
 
-                        <Divider />
-                        <Controller
-                            control={control}
-                            name="targeting"
-                            render={({ field }) => (
-                                <TargetingTree
-                                    countries={countries}
-                                    villages={villages}
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                />
-                            )}
-                        />
+                        {master && question && (
+                            <>
+                                <Divider />
+                                <Box>
+                                    <SectionHeading>
+                                        Where it is used
+                                    </SectionHeading>
+                                    <Text size="sm" mt={4}>
+                                        {whereUsed(question.usage)}
+                                    </Text>
+                                    <Text size="sm" c="dimmed" mt={4}>
+                                        Read only. Each regional team switches
+                                        questions on or off for its own place.
+                                    </Text>
+                                </Box>
+                            </>
+                        )}
 
                         <Group
-                            justify="flex-end"
+                            justify="space-between"
                             gap="sm"
-                            style={{
-                                position: "sticky",
-                                bottom: 0,
-                                zIndex: 2,
-                                background: "var(--mantine-color-body)",
-                                borderTop: "1px solid var(--mantine-color-gray-2)",
-                                margin: "0 calc(var(--mantine-spacing-md) * -1)",
-                                padding: "var(--mantine-spacing-sm) var(--mantine-spacing-md)",
-                            }}
+                            wrap="nowrap"
+                            style={STICKY_FOOTER}
                         >
-                            <Button variant="default" onClick={onClose}>
-                                Cancel
-                            </Button>
-                            <Button
-                                type="submit"
-                                loading={isSaving}
-                                disabled={!categoryId}
-                            >
-                                {isEdit ? "Save changes" : "Add question"}
-                            </Button>
+                            {/* Answers decide which: what has any is
+                                archived, what has none is deleted. A place
+                                archives nothing: it deletes what it has
+                                not published yet, and hides the rest. */}
+                            {question &&
+                            (master
+                                ? !(answered && archived)
+                                : question.unpublished) ? (
+                                <Button
+                                    variant="outline"
+                                    color="red.9"
+                                    onClick={() => setRemoving(true)}
+                                >
+                                    {archives
+                                        ? "Archive question"
+                                        : "Delete question"}
+                                </Button>
+                            ) : (
+                                <span />
+                            )}
+                            <Group gap="sm" wrap="nowrap">
+                                <Button variant="default" onClick={requestClose}>
+                                    Cancel
+                                </Button>
+                                <Button type="submit" loading={saving}>
+                                    {question ? "Save to draft" : "Add question"}
+                                </Button>
+                            </Group>
                         </Group>
                     </Stack>
                 </form>
             </Modal>
 
-            {/* Structural change: only Replace is offered. */}
-            <Modal
-                opened={confirm?.verdict === "structural"}
-                onClose={() => setConfirm(null)}
-                title={<Text fw={700}>This creates a new question</Text>}
-                centered
-                radius="md"
-            >
-                <Stack gap="md">
-                    <Alert
-                        icon={<IconAlertTriangle size={16} />}
-                        color="orange"
-                        variant="light"
-                    >
-                        Changing the type, or an option&apos;s key, changes what the
-                        question means. The current question is retired and its
-                        existing answers stay attached to it — nothing is altered or
-                        deleted.
-                    </Alert>
-                    <Group justify="flex-end" gap="sm">
-                        <Button variant="default" onClick={() => setConfirm(null)}>
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                onSubmitReplace(confirm.payload);
-                                setConfirm(null);
-                            }}
-                        >
-                            Create replacement
-                        </Button>
-                    </Group>
-                </Stack>
-            </Modal>
-
-            {/* The judgement the server cannot make. Safe option first. */}
-            <Modal
-                opened={confirm?.verdict === "judgement"}
-                onClose={() => setConfirm(null)}
-                title={<Text fw={700}>Does this change what the question means?</Text>}
-                centered
-                radius="md"
-                size="lg"
-            >
-                <Stack gap="md">
-                    <Text size="sm" c="dimmed">
-                        You changed some wording. If it is only a fix, edit it in
-                        place — past answers are unaffected. If the meaning moved, it
-                        is a different question and needs a new one.
-                    </Text>
-                    <Alert icon={<IconInfoCircle size={16} />} variant="light">
-                        “3–5 people” → “3–4 people” is a meaning change. Fixing a typo
-                        is not.
-                    </Alert>
-                    <Group justify="flex-end" gap="sm" wrap="wrap">
-                        <Button variant="default" onClick={() => setConfirm(null)}>
-                            Cancel
-                        </Button>
-                        <Button
-                            color="red.9"
-                            variant="light"
-                            onClick={() => {
-                                onSubmitReplace(confirm.payload);
-                                setConfirm(null);
-                            }}
-                        >
-                            Meaning changed — new question
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                onSubmitEdit(confirm.payload);
-                                setConfirm(null);
-                            }}
-                        >
-                            Fix wording — edit in place
-                        </Button>
-                    </Group>
-                </Stack>
-            </Modal>
+            <MasterImpactDialog
+                opened={opened && impact.opened}
+                onClose={() => setImpact({ ...impact, opened: false })}
+                name={name}
+                summary={impact.summary}
+                wording={impact.wording}
+                reach={reach}
+                kept={impact.kept}
+                onConfirm={() => {
+                    setImpact({ ...impact, opened: false });
+                    impact.save();
+                }}
+            />
+            <ArchiveQuestionDialog
+                opened={opened && removing}
+                onClose={() => setRemoving(false)}
+                target={
+                    question && {
+                        _id: question._id,
+                        name,
+                        unpublished: question.unpublished,
+                    }
+                }
+                subtitle={subtitle}
+                remove={!archives}
+                lead={
+                    master
+                        ? undefined
+                        : `This question was added in ${placeName} and has not been published, so it can be deleted.`
+                }
+                onConfirm={archives ? onArchive : onDelete}
+                loading={saving}
+            />
+            <ReplacementDialog
+                opened={opened && replacing}
+                onClose={() => setReplacing(false)}
+                question={question}
+                name={name}
+                // Closed in the same step: the panel is about to hold the
+                // new question, and this dialog is about the old one.
+                onCreate={(choice) => {
+                    setReplacing(false);
+                    onReplace(choice);
+                }}
+            />
         </>
     );
 }

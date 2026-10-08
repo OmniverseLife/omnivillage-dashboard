@@ -187,6 +187,13 @@ export default function Settings() {
         reset();
         refetch();
       },
+      // The server refuses a rename while villagers are registered there,
+      // and a change of country: it says which.
+      onError: (error) => {
+        toast.error(
+          error?.response?.data?.message || "Could not update the village"
+        );
+      },
     });
 
   const { mutate: editFeedMutate, isPending: isEditFeedPending } = useMutation({
@@ -217,6 +224,14 @@ export default function Settings() {
         setVillageDeleteId(null);
         toast.success("Deleted Sucessfully");
         refetch();
+      },
+      // The server refuses while the village still has responses, villagers
+      // or questionnaire changes of its own, and says which.
+      onError: (error) => {
+        setVillageDeleteId(null);
+        toast.error(
+          error?.response?.data?.message || "Could not delete the village"
+        );
       },
     });
 

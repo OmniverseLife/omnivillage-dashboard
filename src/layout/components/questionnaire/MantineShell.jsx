@@ -3,7 +3,6 @@
 // already has. That is what lets these screens use Mantine while the 12
 // existing MUI pages render exactly as they did before.
 import "@mantine/core/styles.layer.css";
-import "@mantine/dates/styles.layer.css";
 import "mantine-datatable/styles.layer.css";
 // ...and this undoes the specific Vite-template rules that would otherwise beat
 // Mantine's layered styles. Must be imported LAST. See the file for detail.
@@ -80,6 +79,12 @@ const theme = createTheme({
     },
     components: {
         Button: { defaultProps: { fw: 600 } },
+        // A tick box is a square with slightly rounded corners in the
+        // design. Left to `defaultRadius` it comes out nearly round.
+        Checkbox: { defaultProps: { radius: "sm" } },
+        // The design draws every field label bold, in the panels and in the
+        // small dialogs alike.
+        InputWrapper: { styles: { label: { fontWeight: 700 } } },
         TextInput: { defaultProps: { size: "sm" } },
         Select: { defaultProps: { size: "sm", checkIconPosition: "right" } },
         Textarea: { defaultProps: { size: "sm" } },

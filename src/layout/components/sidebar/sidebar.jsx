@@ -7,6 +7,7 @@ import {
     useSearchParams,
 } from "react-router-dom";
 import logo from "../../../assets/logo.png";
+import { landingFor } from "../AuthProvider/AuthProvider";
 
 export default function Sidebar({ role }) {
     const location = useLocation();
@@ -27,6 +28,58 @@ export default function Sidebar({ role }) {
     const [questionnaireMenu, setquestionnaireMenu] = useState(
         paths.includes("questionnaire") && true
     );
+
+    // A regional team gets its own short menu; the full one below is left as
+    // it was for admin and viewer.
+    if (role === "regional") {
+        return (
+            <div className="sidebar">
+                <div className="logo">
+                    <img src={logo} alt="" />
+                    <h1>OMNI VILLAGE</h1>
+                </div>
+                <Link
+                    // Its own place's questionnaire: where it also lands.
+                    to={landingFor(
+                        JSON.parse(localStorage.getItem("user") || "{}")
+                    )}
+                    className={paths.includes("place") ? "link active" : "link"}
+                >
+                    <i className="fa-solid fa-clipboard-question"></i>
+                    <p>Questionnaire</p>
+                </Link>
+                <Link
+                    to="/questionnaire/responses"
+                    className={
+                        paths.includes("responses") ? "link active" : "link"
+                    }
+                >
+                    <i className="fa-solid fa-table-list"></i>
+                    <p>Responses</p>
+                </Link>
+                <Link
+                    to="/login"
+                    onClick={() => {
+                        localStorage.clear();
+                    }}
+                    className="link"
+                >
+                    <i className="fa-solid fa-power-off"></i>
+                    <p>Logout</p>
+                </Link>
+                <p
+                    style={{
+                        padding: "14px 10px",
+                        fontSize: "12px",
+                        lineHeight: 1.5,
+                        color: "#666",
+                    }}
+                >
+                    A regional team sees only these two pages, and only for its own place.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="sidebar">
@@ -323,24 +376,24 @@ export default function Sidebar({ role }) {
                     {questionnaireMenu && (
                         <div className="menu">
                             <Link
-                                to="/questionnaire/categories"
+                                to="/questionnaire/master"
                                 className={
-                                    paths.includes("categories")
+                                    paths.includes("master")
                                         ? "link active"
                                         : "link"
                                 }
                             >
-                                Categories
+                                Master questionnaire
                             </Link>
                             <Link
-                                to="/questionnaire/questions"
+                                to="/questionnaire/regional"
                                 className={
-                                    paths.includes("questions")
+                                    paths.includes("regional")
                                         ? "link active"
                                         : "link"
                                 }
                             >
-                                Questions
+                                Regional questionnaires
                             </Link>
                             <Link
                                 to="/questionnaire/responses"
@@ -354,6 +407,24 @@ export default function Sidebar({ role }) {
                             </Link>
                         </div>
                     )}
+                    <Link
+                        to="/locations"
+                        className={
+                            paths.includes("locations") ? "link active" : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-location-dot"></i>
+                        <p>Locations</p>
+                    </Link>
+                    <Link
+                        to="/people"
+                        className={
+                            paths.includes("people") ? "link active" : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-user-shield"></i>
+                        <p>People</p>
+                    </Link>
                     <Link
                         to="/users"
                         className={

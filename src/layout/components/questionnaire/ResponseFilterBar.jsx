@@ -2,304 +2,180 @@ import {
     ActionIcon,
     Button,
     Group,
-    MultiSelect,
     NumberInput,
-    Paper,
     Select,
     Stack,
     TextInput,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
 import { IconFilterPlus, IconFilterX, IconX } from "@tabler/icons-react";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { flattenFilterTargets, operatorsFor } from "./constants";
-import { localise } from "./localise";
+
+// These rows sit in a popover. A list of choices that opened outside it (in
+// a portal, as it does by default) would count as a click outside, and
+// choosing from it would close the popover.
+const INSIDE = { withinPortal: false };
 
 /**
- * All filter state lives in the URL, which is the pattern the existing
- * dashboard pages already use. Consequences worth having: a filtered view is a
- * shareable link, the Back button works, and the table and the graphs tab read
- * the same source so they cannot disagree.
+ * The per-question filters of the Responses page: one row per filter, each
+ * a question, a condition and a value.
+ *
+ * `filters` is the list as the URL holds it, one `<question path>:<condition>
+ * :<value>` each, a row still being filled in included (its value is empty,
+ * and the page does not send it). `onChange` is handed the whole next list.
  */
-export default function ResponseFilterBar({
-    searchParams,
-    setSearchParams,
-    screens,
-    countries,
-    villages,
-    columns,
-    language,
-}) {
-    const categoryId = searchParams.get("categoryId") || "";
-    // Deliberately NOT "country"/"village": the shared Wrapper around every page
-    // writes village NAMES into those params, while these hold ObjectIds.
-    const country = searchParams.get("countryId") || "";
-    const selectedVillages = searchParams.getAll("villageId");
-    const filters = searchParams.getAll("f");
-
+export default function ResponseFilterBar({ filters, onChange, columns, language }) {
     const targets = useMemo(
-        () => flattenFilterTargets(columns, [], [], language),
+        () =>
+            flattenFilterTargets(columns, [], [], language).filter(
+                // ponytail: no filter on a date. The server compares a
+                // filter's value as a number or as text, and a saved date is
+                // neither, so such a row could never match. Offer it again
+                // once `f` compares dates.
+                (target) => target.type !== "date"
+            ),
         [columns, language]
     );
-
-    const setParam = (key, value) => {
-        if (!value) searchParams.delete(key);
-        else searchParams.set(key, value);
-        setSearchParams(searchParams);
-    };
-
-    const setFilters = (next) => {
-        searchParams.delete("f");
-        next.forEach((filter) => searchParams.append("f", filter));
-        setSearchParams(searchParams);
-    };
 
     const parse = (raw) => {
         const [path, op, ...rest] = raw.split(":");
         return { path, op, value: rest.join(":") };
     };
 
-    const visibleVillages = country
-        ? villages.filter(
-              (village) =>
-                  village.countryId === country ||
-                  village.country === countries.find((c) => c._id === country)?.name
-          )
-        : villages;
-
-    const hasFilters =
-        filters.length > 0 ||
-        country ||
-        selectedVillages.length > 0 ||
-        searchParams.get("from") ||
-        searchParams.get("to");
+    // Removing a row takes the button that was pressed with it, and focus
+    // with the button: Esc would then no longer reach the popover. Focus
+    // is handed to the one button that is always here.
+    const add = useRef(null);
+    const remove = (next) => {
+        add.current?.focus();
+        onChange(next);
+    };
 
     return (
-        <Paper withBorder radius="md" p="md" mb="md">
-            <Group gap="md" align="flex-end" wrap="wrap">
-                <Select
-                    label="Screen"
-                    w={230}
-                    searchable
-                    data={screens.map((s) => ({
-                        value: s._id,
-                        label: localise(s.title, language),
-                    }))}
-                    value={categoryId || null}
-                    onChange={(v) => {
-                        if (!v) return;
-                        // Columns are per-screen, so every per-question filter
-                        // becomes meaningless the moment the screen changes.
-                        searchParams.delete("f");
-                        setParam("categoryId", v);
-                    }}
-                />
-                <Select
-                    label="Country"
-                    w={170}
-                    clearable
-                    placeholder="All countries"
-                    data={countries.map((c) => ({
-                        value: c._id,
-                        label: c.display_name || c.name,
-                    }))}
-                    value={country || null}
-                    onChange={(v) => {
-                        searchParams.delete("villageId");
-                        setParam("countryId", v || "");
-                    }}
-                />
-                <MultiSelect
-                    label="Villages"
-                    w={230}
-                    clearable
-                    searchable
-                    placeholder={
-                        selectedVillages.length ? undefined : "All villages"
-                    }
-                    data={visibleVillages.map((v) => ({
-                        value: v._id,
-                        label: v.name,
-                    }))}
-                    value={selectedVillages}
-                    onChange={(next) => {
-                        searchParams.delete("villageId");
-                        next.forEach((id) => searchParams.append("villageId", id));
-                        setSearchParams(searchParams);
-                    }}
-                />
-                <DatePickerInput
-                    label="From"
-                    placeholder="Any date"
-                    w={160}
-                    clearable
-                    valueFormat="DD MMM YYYY"
-                    value={
-                        searchParams.get("from")
-                            ? new Date(searchParams.get("from"))
-                            : null
-                    }
-                    onChange={(d) =>
-                        setParam("from", d ? d.toISOString().slice(0, 10) : "")
-                    }
-                />
-                <DatePickerInput
-                    label="To"
-                    placeholder="Any date"
-                    w={160}
-                    clearable
-                    valueFormat="DD MMM YYYY"
-                    value={
-                        searchParams.get("to")
-                            ? new Date(searchParams.get("to"))
-                            : null
-                    }
-                    onChange={(d) =>
-                        setParam("to", d ? d.toISOString().slice(0, 10) : "")
-                    }
-                />
-            </Group>
+        <Stack gap="sm">
+            {filters.map((raw, index) => {
+                const { path, op, value } = parse(raw);
+                const target = targets.find((t) => t.path === path);
+                const update = (next) => {
+                    const copy = [...filters];
+                    copy[index] = next;
+                    onChange(copy);
+                };
 
-            {filters.length > 0 && (
-                <Stack gap="sm" mt="md">
-                    {filters.map((raw, index) => {
-                        const { path, op, value } = parse(raw);
-                        const target = targets.find((t) => t.path === path);
-                        const update = (next) => {
-                            const copy = [...filters];
-                            copy[index] = next;
-                            setFilters(copy);
-                        };
+                return (
+                    <Group key={index} gap="sm" align="flex-end" wrap="nowrap">
+                        <Select
+                            label={index === 0 ? "Question" : undefined}
+                            aria-label="Question"
+                            w={260}
+                            searchable
+                            comboboxProps={INSIDE}
+                            data={targets.map((t) => ({
+                                value: t.path,
+                                label: t.label,
+                            }))}
+                            value={path}
+                            onChange={(v) => {
+                                if (!v) return;
+                                const next = targets.find((t) => t.path === v);
+                                update(
+                                    `${v}:${operatorsFor(next?.type)[0].value}:`
+                                );
+                            }}
+                        />
+                        <Select
+                            label={index === 0 ? "Condition" : undefined}
+                            aria-label="Condition"
+                            w={150}
+                            comboboxProps={INSIDE}
+                            data={operatorsFor(target?.type).map((o) => ({
+                                value: o.value,
+                                label: o.label,
+                            }))}
+                            value={op}
+                            onChange={(v) => v && update(`${path}:${v}:${value}`)}
+                        />
 
-                        return (
-                            <Group key={index} gap="sm" align="flex-end" wrap="nowrap">
-                                <Select
-                                    label={index === 0 ? "Question" : undefined}
-                                    w={260}
-                                    searchable
-                                    data={targets.map((t) => ({
-                                        value: t.path,
-                                        label: t.label,
-                                    }))}
-                                    value={path}
-                                    onChange={(v) => {
-                                        if (!v) return;
-                                        const next = targets.find(
-                                            (t) => t.path === v
-                                        );
-                                        update(
-                                            `${v}:${operatorsFor(next?.type)[0].value}:`
-                                        );
-                                    }}
-                                />
-                                <Select
-                                    label={index === 0 ? "Condition" : undefined}
-                                    w={150}
-                                    data={operatorsFor(target?.type).map((o) => ({
-                                        value: o.value,
-                                        label: o.label,
-                                    }))}
-                                    value={op}
-                                    onChange={(v) =>
-                                        v && update(`${path}:${v}:${value}`)
-                                    }
-                                />
+                        {target?.options?.length > 0 ? (
+                            <Select
+                                label={index === 0 ? "Value" : undefined}
+                                aria-label="Value"
+                                w={200}
+                                searchable
+                                comboboxProps={INSIDE}
+                                data={target.options.map((o) => ({
+                                    value: o.value,
+                                    label: o.label,
+                                }))}
+                                value={value || null}
+                                onChange={(v) =>
+                                    update(`${path}:${op}:${v || ""}`)
+                                }
+                            />
+                        ) : target?.type === "boolean" ? (
+                            <Select
+                                label={index === 0 ? "Value" : undefined}
+                                aria-label="Value"
+                                w={200}
+                                comboboxProps={INSIDE}
+                                data={[
+                                    { value: "true", label: "Yes" },
+                                    { value: "false", label: "No" },
+                                ]}
+                                value={value || null}
+                                onChange={(v) =>
+                                    update(`${path}:${op}:${v || ""}`)
+                                }
+                            />
+                        ) : target?.type === "number" ? (
+                            <NumberInput
+                                label={index === 0 ? "Value" : undefined}
+                                aria-label="Value"
+                                w={200}
+                                value={value === "" ? "" : Number(value)}
+                                onChange={(v) =>
+                                    update(`${path}:${op}:${v ?? ""}`)
+                                }
+                            />
+                        ) : (
+                            <TextInput
+                                label={index === 0 ? "Value" : undefined}
+                                aria-label="Value"
+                                w={200}
+                                value={value}
+                                onChange={(e) =>
+                                    update(
+                                        `${path}:${op}:${e.currentTarget.value}`
+                                    )
+                                }
+                            />
+                        )}
 
-                                {target?.options?.length > 0 ? (
-                                    <Select
-                                        label={index === 0 ? "Value" : undefined}
-                                        w={200}
-                                        searchable
-                                        data={target.options.map((o) => ({
-                                            value: o.value,
-                                            label: o.label,
-                                        }))}
-                                        value={value || null}
-                                        onChange={(v) =>
-                                            update(`${path}:${op}:${v || ""}`)
-                                        }
-                                    />
-                                ) : target?.type === "boolean" ? (
-                                    <Select
-                                        label={index === 0 ? "Value" : undefined}
-                                        w={200}
-                                        data={[
-                                            { value: "true", label: "Yes" },
-                                            { value: "false", label: "No" },
-                                        ]}
-                                        value={value || null}
-                                        onChange={(v) =>
-                                            update(`${path}:${op}:${v || ""}`)
-                                        }
-                                    />
-                                ) : target?.type === "number" ? (
-                                    <NumberInput
-                                        label={index === 0 ? "Value" : undefined}
-                                        w={200}
-                                        value={value === "" ? "" : Number(value)}
-                                        onChange={(v) =>
-                                            update(`${path}:${op}:${v ?? ""}`)
-                                        }
-                                    />
-                                ) : target?.type === "date" ? (
-                                    <DatePickerInput
-                                        label={index === 0 ? "Value" : undefined}
-                                        w={200}
-                                        valueFormat="DD MMM YYYY"
-                                        value={value ? new Date(value) : null}
-                                        onChange={(d) =>
-                                            update(
-                                                `${path}:${op}:${
-                                                    d
-                                                        ? d
-                                                              .toISOString()
-                                                              .slice(0, 10)
-                                                        : ""
-                                                }`
-                                            )
-                                        }
-                                    />
-                                ) : (
-                                    <TextInput
-                                        label={index === 0 ? "Value" : undefined}
-                                        w={200}
-                                        value={value}
-                                        onChange={(e) =>
-                                            update(
-                                                `${path}:${op}:${e.currentTarget.value}`
-                                            )
-                                        }
-                                    />
-                                )}
+                        <ActionIcon
+                            variant="subtle"
+                            color="gray"
+                            size="lg"
+                            aria-label="Remove filter"
+                            onClick={() =>
+                                remove(filters.filter((_, i) => i !== index))
+                            }
+                        >
+                            <IconX size={16} />
+                        </ActionIcon>
+                    </Group>
+                );
+            })}
 
-                                <ActionIcon
-                                    variant="subtle"
-                                    color="gray"
-                                    size="lg"
-                                    aria-label="Remove filter"
-                                    onClick={() =>
-                                        setFilters(
-                                            filters.filter((_, i) => i !== index)
-                                        )
-                                    }
-                                >
-                                    <IconX size={16} />
-                                </ActionIcon>
-                            </Group>
-                        );
-                    })}
-                </Stack>
-            )}
-
-            <Group gap="sm" mt="md">
+            <Group gap="sm">
                 <Button
+                    ref={add}
                     size="xs"
                     variant="light"
                     leftSection={<IconFilterPlus size={14} />}
                     disabled={targets.length === 0}
                     onClick={() => {
                         const first = targets[0];
-                        setFilters([
+                        onChange([
                             ...filters,
                             `${first.path}:${operatorsFor(first.type)[0].value}:`,
                         ]);
@@ -307,23 +183,18 @@ export default function ResponseFilterBar({
                 >
                     Add filter
                 </Button>
-                {hasFilters && (
+                {filters.length > 0 && (
                     <Button
                         size="xs"
                         variant="subtle"
                         color="gray"
                         leftSection={<IconFilterX size={14} />}
-                        onClick={() => {
-                            ["f", "villageId", "countryId", "from", "to"].forEach((k) =>
-                                searchParams.delete(k)
-                            );
-                            setSearchParams(searchParams);
-                        }}
+                        onClick={() => remove([])}
                     >
                         Clear all
                     </Button>
                 )}
             </Group>
-        </Paper>
+        </Stack>
     );
 }

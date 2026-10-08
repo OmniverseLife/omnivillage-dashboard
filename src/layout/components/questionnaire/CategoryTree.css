@@ -1,0 +1,16 @@
+/*
+ * The ••• of a category is drawn on every row and shown on four of them: the
+ * one under the pointer, the one holding keyboard focus, the selected one,
+ * and one whose menu is open (the pointer has left the row for the menu by
+ * then). Hidden with opacity, not display, so Tab still reaches it.
+ */
+.qn-category-menu {
+    opacity: 0;
+}
+
+.qn-category:hover .qn-category-menu,
+.qn-category:focus-within .qn-category-menu,
+.qn-category[data-selected] .qn-category-menu,
+.qn-category-menu:has([aria-expanded="true"]) {
+    opacity: 1;
+}

@@ -17,7 +17,10 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchVillages } from "../../../functions/others";
 import Loading from "../../components/loading/index";
 
-export default function Wrapper({ children }) {
+// `plain` is for pages that keep their own filters in the URL (the
+// questionnaire ones): nothing here waits on the villages list for them, and
+// the legacy `country`/`village` params are not written.
+export default function Wrapper({ children, title, plain }) {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const [villages, setVillages] = useState([]);
@@ -48,12 +51,13 @@ export default function Wrapper({ children }) {
     }, [data, isLoading]);
 
     useEffect(() => {
+        if (plain) return;
         if (searchParams.getAll("village").length === 0 && !isLoading) {
             searchParams.set("country", data[0]?.country);
             searchParams.set("village", data[0]?.name);
             setSearchParams(searchParams);
         }
-    }, [data, isLoading, searchParams, setSearchParams]);
+    }, [data, isLoading, plain, searchParams, setSearchParams]);
 
     return (
         <Box
@@ -64,10 +68,10 @@ export default function Wrapper({ children }) {
                 width: "100vw",
             }}
         >
-            <Loading isLoading={isLoading} />
+            <Loading isLoading={isLoading && !plain} />
             <Sidebar role={role} />
             <div className="rightSide">
-                <Navbar />
+                <Navbar title={title} />
                 {location.pathname.includes("dashboard") && (
                     <Stack
                         direction="row"
@@ -172,7 +176,7 @@ export default function Wrapper({ children }) {
                         </FormControl>
                     </Stack>
                 )}
-                {!isLoading ? children : null}
+                {plain || !isLoading ? children : null}
             </div>
         </Box>
     );
