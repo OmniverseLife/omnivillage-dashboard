@@ -8,6 +8,7 @@ import {
     Modal,
     Select,
     Stack,
+    Switch,
     Text,
     TextInput,
 } from "@mantine/core";
@@ -21,7 +22,9 @@ import StatusPill from "./StatusPill";
 import {
     SELECT_TYPES,
     STICKY_FOOTER,
+    nameList,
     shortTypeLabel,
+    useUnsavedWarning,
 } from "./constants";
 import {
     DEFAULT_LANGUAGE,
@@ -121,9 +124,9 @@ const optionsPatch = (form, question, placeId) => {
 
 /**
  * What one place changes about a question it did not add (PDF p.15): its
- * wording, which of its options the place offers, and options of the place's
- * own. The answer type, and whether the question is asked at all, are not
- * decided here.
+ * wording, whether an answer is required there, which of its options the
+ * place offers, and options of the place's own. The answer type, and whether
+ * the question is asked at all, are not decided here.
  *
  * `question` is the editor's row for it: what the place shows now, what it
  * would show without its own changes (`inherited`), and its own saved changes
@@ -153,7 +156,9 @@ export default function PlaceQuestionPanel({
         watch,
         setValue,
         formState: { isDirty },
-    } = useForm({ defaultValues: { label: {}, helper_text: {}, options: [] } });
+    } = useForm({
+        defaultValues: { label: {}, helper_text: {}, required: false, options: [] },
+    });
     const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
     const [resetting, setResetting] = useState(false);
 
@@ -166,6 +171,7 @@ export default function PlaceQuestionPanel({
         reset({
             label: question.label || {},
             helper_text: question.helper_text || {},
+            required: Boolean(question.required),
             // An archived option is offered nowhere, and no place can
             // bring it back.
             options: (question.options || []).filter(
@@ -176,11 +182,31 @@ export default function PlaceQuestionPanel({
 
     const inherited = question?.inherited || {};
     const from = inherited.fromName || "Master";
+    // What the place goes back to when it gives up its own changes: the
+    // Master's question, or the version of the place above that changed it
+    // (a village under a state that reworded it gets the state's wording).
+    const sources = [
+        ...new Set(
+            [
+                inherited.fromName,
+                inherited.helperFromName,
+                inherited.requiredFromName,
+            ].filter((name) => name && name !== "Master")
+        ),
+    ];
+    const version = sources.length
+        ? `${nameList(sources)}'s version`
+        : "the Master version";
     const saved = question?.own?.state || {};
-    // What Reset would take away: the place's saved wording and options.
-    const changedHere = ["label", "helper_text", "options", "addedOptions"].some(
-        (key) => saved[key] != null
-    );
+    // What Reset would take away: everything the place saved here but its
+    // switch in the list.
+    const changedHere = [
+        "label",
+        "helper_text",
+        "required",
+        "options",
+        "addedOptions",
+    ].some((key) => saved[key] != null);
     const differs = (typed, above) =>
         written(typed) && !sameWording(typed, above);
     const changedPill = <StatusPill status={{ kind: "changed", here: true }} />;
@@ -193,6 +219,7 @@ export default function PlaceQuestionPanel({
             return;
         onClose();
     };
+    useUnsavedWarning(opened && isDirty);
 
     const onSubmit = (form) => {
         const patch = {};
@@ -204,6 +231,12 @@ export default function PlaceQuestionPanel({
         );
         if (label !== undefined) patch.label = label;
         if (helper !== undefined) patch.helper_text = helper;
+        // Set back to what the place inherits, it is no longer its own.
+        if (form.required !== Boolean(question.required))
+            patch.required =
+                form.required === Boolean(inherited.required)
+                    ? null
+                    : form.required;
         if (SELECT_TYPES.includes(question.type))
             Object.assign(patch, optionsPatch(form, question, place._id));
 
@@ -303,7 +336,7 @@ export default function PlaceQuestionPanel({
                                         fw={600}
                                         onClick={() => setResetting(true)}
                                     >
-                                        Reset to the Master version
+                                        Reset to {version}
                                     </Anchor>
                                 )}
                             </Group>
@@ -347,6 +380,44 @@ export default function PlaceQuestionPanel({
                             description="The answer type is the same in every place, so answers stay comparable."
                             inputWrapperOrder={["label", "input", "description"]}
                         />
+                        {question?.type !== "section" && (
+                            <Controller
+                                control={control}
+                                name="required"
+                                render={({ field }) => (
+                                    <Group
+                                        justify="space-between"
+                                        align="flex-start"
+                                        wrap="nowrap"
+                                    >
+                                        <Switch
+                                            checked={Boolean(field.value)}
+                                            onChange={(event) =>
+                                                field.onChange(
+                                                    event.currentTarget.checked
+                                                )
+                                            }
+                                            label={`Required in ${place.name}`}
+                                            description={`The app will not let someone finish this page without answering. ${
+                                                inherited.requiredFromName ||
+                                                "Master"
+                                            }: ${
+                                                inherited.required
+                                                    ? "required"
+                                                    : "not required"
+                                            }.`}
+                                            styles={{ label: { fontWeight: 700 } }}
+                                        />
+                                        {Boolean(field.value) !==
+                                            Boolean(inherited.required) && (
+                                            <Box style={{ flexShrink: 0 }}>
+                                                {changedPill}
+                                            </Box>
+                                        )}
+                                    </Group>
+                                )}
+                            />
+                        )}
 
                         {SELECT_TYPES.includes(question?.type) && (
                             <>
@@ -395,6 +466,7 @@ export default function PlaceQuestionPanel({
                 name={localise(inherited.label, pageLanguage)}
                 placeName={place.name}
                 placeReach={place.reach}
+                version={version}
                 onConfirm={onReset}
                 loading={saving}
             />

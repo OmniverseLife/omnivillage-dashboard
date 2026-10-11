@@ -1,19 +1,21 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import "./sidebar.css";
-import {
-    Link,
-    useLocation,
-    useNavigate,
-    useSearchParams,
-} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 import { landingFor } from "../AuthProvider/AuthProvider";
 
 export default function Sidebar({ role }) {
     const location = useLocation();
-    const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const paths = location.pathname.split("/");
-    const [searchParams] = useSearchParams();
+    // The questionnaire links are told by where an address starts, not by a
+    // word found anywhere in it: /officer/responses is not
+    // /questionnaire/responses. A page under a link's own (one file of a
+    // response) still lights it.
+    const at = (address) =>
+        location.pathname === address ||
+        location.pathname.startsWith(`${address}/`);
 
     const [productionMenu, setproductionMenu] = useState(
         paths.includes("production") && !paths.includes("dashboard") && true
@@ -21,13 +23,13 @@ export default function Sidebar({ role }) {
     const [consumtionMenu, setconsumtionMenu] = useState(
         paths.includes("consumption") && !paths.includes("dashboard") && true
     );
-    const [cropsMenu, setcropsMenu] = useState(paths.includes("crops") && true);
     const [dashboardMenu, setdashboardMenu] = useState(
         paths.includes("dashboard") && true
     );
     const [questionnaireMenu, setquestionnaireMenu] = useState(
-        paths.includes("questionnaire") && true
+        at("/questionnaire")
     );
+    const [officerMenu, setofficerMenu] = useState(at("/officer"));
 
     // A regional team gets its own short menu; the full one below is left as
     // it was for admin and viewer.
@@ -43,7 +45,9 @@ export default function Sidebar({ role }) {
                     to={landingFor(
                         JSON.parse(localStorage.getItem("user") || "{}")
                     )}
-                    className={paths.includes("place") ? "link active" : "link"}
+                    className={
+                        at("/questionnaire/place") ? "link active" : "link"
+                    }
                 >
                     <i className="fa-solid fa-clipboard-question"></i>
                     <p>Questionnaire</p>
@@ -51,16 +55,29 @@ export default function Sidebar({ role }) {
                 <Link
                     to="/questionnaire/responses"
                     className={
-                        paths.includes("responses") ? "link active" : "link"
+                        at("/questionnaire/responses") ? "link active" : "link"
                     }
                 >
                     <i className="fa-solid fa-table-list"></i>
                     <p>Responses</p>
                 </Link>
                 <Link
+                    // What the field officers of its villages saved. Their
+                    // questions are the super admin's to write.
+                    to="/officer/responses"
+                    className={
+                        at("/officer/responses") ? "link active" : "link"
+                    }
+                >
+                    <i className="fa-solid fa-clipboard-list"></i>
+                    <p>Officer responses</p>
+                </Link>
+                <Link
                     to="/login"
                     onClick={() => {
                         localStorage.clear();
+                        // The next account in this tab starts with nothing cached.
+                        queryClient.clear();
                     }}
                     className="link"
                 >
@@ -75,7 +92,7 @@ export default function Sidebar({ role }) {
                         color: "#666",
                     }}
                 >
-                    A regional team sees only these two pages, and only for its own place.
+                    A regional team sees only these pages, and only for its own place.
                 </p>
             </div>
         );
@@ -89,7 +106,10 @@ export default function Sidebar({ role }) {
             </div>
             <Link
                 // to="/dashboard"
-                onClick={() => setdashboardMenu(!dashboardMenu)}
+                onClick={(event) => {
+                    event.preventDefault();
+                    setdashboardMenu(!dashboardMenu);
+                }}
                 className={paths.includes("dashboard") ? "link active" : "link"}
             >
                 <i className="fa-solid fa-chart-line"></i>
@@ -145,7 +165,10 @@ export default function Sidebar({ role }) {
                                 ? "link active"
                                 : "link"
                         }
-                        onClick={() => setproductionMenu(!productionMenu)}
+                        onClick={(event) => {
+                    event.preventDefault();
+                    setproductionMenu(!productionMenu);
+                }}
                         // to="/production"
                     >
                         <i className="fa-solid fa-seedling"></i>
@@ -227,7 +250,10 @@ export default function Sidebar({ role }) {
                         </div>
                     )}
                     <Link
-                        onClick={() => setconsumtionMenu(!consumtionMenu)}
+                        onClick={(event) => {
+                    event.preventDefault();
+                    setconsumtionMenu(!consumtionMenu);
+                }}
                         className={
                             paths.includes("consumption") &&
                             !paths.includes("dashboard")
@@ -356,11 +382,12 @@ export default function Sidebar({ role }) {
                         </div>
                     )}
                     <Link
-                        onClick={() => setquestionnaireMenu(!questionnaireMenu)}
+                        onClick={(event) => {
+                    event.preventDefault();
+                    setquestionnaireMenu(!questionnaireMenu);
+                }}
                         className={
-                            paths.includes("questionnaire")
-                                ? "link active"
-                                : "link"
+                            at("/questionnaire") ? "link active" : "link"
                         }
                     >
                         <i className="fa-solid fa-clipboard-question"></i>
@@ -378,7 +405,7 @@ export default function Sidebar({ role }) {
                             <Link
                                 to="/questionnaire/master"
                                 className={
-                                    paths.includes("master")
+                                    at("/questionnaire/master")
                                         ? "link active"
                                         : "link"
                                 }
@@ -388,7 +415,7 @@ export default function Sidebar({ role }) {
                             <Link
                                 to="/questionnaire/regional"
                                 className={
-                                    paths.includes("regional")
+                                    at("/questionnaire/regional")
                                         ? "link active"
                                         : "link"
                                 }
@@ -398,7 +425,51 @@ export default function Sidebar({ role }) {
                             <Link
                                 to="/questionnaire/responses"
                                 className={
-                                    paths.includes("responses")
+                                    at("/questionnaire/responses")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Responses
+                            </Link>
+                        </div>
+                    )}
+                    <Link
+                        onClick={(event) => {
+                            event.preventDefault();
+                            setofficerMenu(!officerMenu);
+                        }}
+                        className={at("/officer") ? "link active" : "link"}
+                    >
+                        <i className="fa-solid fa-clipboard-list"></i>
+                        {/* The longest name in the menu: should it break
+                            beside the icon and the +, its two lines stay
+                            inside the row. */}
+                        <p style={{ lineHeight: 1.2 }}>Officer questionnaire</p>
+                        <span>
+                            {officerMenu ? (
+                                <i className="fa-solid fa-minus"></i>
+                            ) : (
+                                <i className="fa-solid fa-plus"></i>
+                            )}
+                        </span>
+                    </Link>
+                    {officerMenu && (
+                        <div className="menu">
+                            <Link
+                                to="/officer/questionnaire"
+                                className={
+                                    at("/officer/questionnaire")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Questions
+                            </Link>
+                            <Link
+                                to="/officer/responses"
+                                className={
+                                    at("/officer/responses")
                                         ? "link active"
                                         : "link"
                                 }
@@ -489,6 +560,8 @@ export default function Sidebar({ role }) {
                 to="/login"
                 onClick={() => {
                     localStorage.clear();
+                        // The next account in this tab starts with nothing cached.
+                        queryClient.clear();
                 }}
                 style={{ marginTop: "auto" }}
                 className="link"

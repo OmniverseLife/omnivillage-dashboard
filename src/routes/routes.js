@@ -24,6 +24,32 @@ export const routes = [
         role: "admin,regional",
     },
     {
+        // One photo or recording of an answer: where a link in Responses,
+        // or in a file exported from it, leads.
+        path: "/questionnaire/responses/file/:fileId",
+        Component: lazy(() => import("../layout/pages/questionnaire/file")),
+        role: "admin,regional",
+    },
+    {
+        // The questionnaire field officers answer about their villages: the
+        // same editor on a tree of its own. No place changes it, so it has
+        // the Master's screen and no other. Not under /questionnaire: the
+        // menu tells its links apart by where an address starts.
+        path: "/officer/questionnaire",
+        Component: lazy(() =>
+            import("../layout/pages/questionnaire/officerEditor")
+        ),
+        role: "admin",
+    },
+    {
+        // What the officers saved, by place: a regional team for its own.
+        path: "/officer/responses",
+        Component: lazy(() =>
+            import("../layout/pages/questionnaire/officerResponses")
+        ),
+        role: "admin,regional",
+    },
+    {
         path: "/locations",
         Component: lazy(() => import("../layout/pages/questionnaire/locations")),
         role: "admin",

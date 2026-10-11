@@ -8,3 +8,8 @@
 /* .users .css-apqrd9-MuiTableBody-root:nth-child(even) {
   background-color: rgb(255, 255, 255);
 } */
+
+/* A village's name is stored in lower case. */
+.users .capitalised {
+  text-transform: capitalize;
+}

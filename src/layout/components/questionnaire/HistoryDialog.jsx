@@ -78,7 +78,8 @@ const closed = (dialog) => ({ ...dialog, opened: false });
  *
  * Opened from a place it is that place's history: its own changes and those
  * of the places inside it (`places` is the list of every place), which is
- * also all a regional team is given.
+ * also all a regional team is given. Opened from the officers' questionnaire
+ * it lists that questionnaire's changes and no others.
  *
  * The newest change the account can see is the one that can be taken back:
  * the server names it (`latest`, whatever the filters show; null when that
@@ -102,10 +103,14 @@ export default function HistoryDialog({
 
     const filtered = Boolean(place !== home || actor || range);
 
+    // The villagers' questionnaire and the officers' each have a history,
+    // and a latest change, of their own (`scope.audience`).
+    const { audience } = scope;
     const { data, isLoading, isError } = useQuery({
-        queryKey: ["questionnaire-history", place, actor, range, page],
+        queryKey: ["questionnaire-history", audience, place, actor, range, page],
         queryFn: () =>
             fetchHistory({
+                audience,
                 place: place || undefined,
                 actor: actor || undefined,
                 from: range ? since(Number(range)) : undefined,
@@ -163,38 +168,43 @@ export default function HistoryDialog({
                     <Box>
                         <Text fw={700}>Change history</Text>
                         <Text size="xs" c="dimmed">
-                            Every published change: who made it, when, and for
-                            which place
+                            {audience === "officer"
+                                ? "Every published change: who made it and when"
+                                : "Every published change: who made it, when, and for which place"}
                         </Text>
                     </Box>
                 }
             >
                 <Stack gap="md">
                     <Group gap="sm">
-                        <Select
-                            aria-label="Place"
-                            w={160}
-                            allowDeselect={false}
-                            data={
-                                master
-                                    ? [
-                                          { value: "", label: "All places" },
-                                          { value: "master", label: "Master" },
-                                      ]
-                                    : places
-                                          .filter(
-                                              (entry) =>
-                                                  entry._id === home ||
-                                                  entry.path.includes(home)
-                                          )
-                                          .map((entry) => ({
-                                              value: entry._id,
-                                              label: placeName(entry),
-                                          }))
-                            }
-                            value={place}
-                            onChange={filter(setPlace)}
-                        />
+                        {/* The officers' questionnaire has no places to choose
+                            between. */}
+                        {audience !== "officer" && (
+                            <Select
+                                aria-label="Place"
+                                w={160}
+                                allowDeselect={false}
+                                data={
+                                    master
+                                        ? [
+                                              { value: "", label: "All places" },
+                                              { value: "master", label: "Master" },
+                                          ]
+                                        : places
+                                              .filter(
+                                                  (entry) =>
+                                                      entry._id === home ||
+                                                      entry.path.includes(home)
+                                              )
+                                              .map((entry) => ({
+                                                  value: entry._id,
+                                                  label: placeName(entry),
+                                              }))
+                                }
+                                value={place}
+                                onChange={filter(setPlace)}
+                            />
+                        )}
                         <Select
                             aria-label="Who"
                             w={200}
@@ -238,9 +248,11 @@ export default function HistoryDialog({
                                     <Table.Th w={190} style={heading}>
                                         Who
                                     </Table.Th>
-                                    <Table.Th w={170} style={heading}>
-                                        Place
-                                    </Table.Th>
+                                    {audience !== "officer" && (
+                                        <Table.Th w={170} style={heading}>
+                                            Place
+                                        </Table.Th>
+                                    )}
                                     <Table.Th style={heading}>Change</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
@@ -251,13 +263,15 @@ export default function HistoryDialog({
                                         <Table.Tr key={row._id}>
                                             <Table.Td>{when(row.at)}</Table.Td>
                                             <Table.Td>{row.actorName}</Table.Td>
-                                            <Table.Td>
-                                                {row.placeId
-                                                    ? (row.placeNames || []).join(
-                                                          " › "
-                                                      )
-                                                    : "Master"}
-                                            </Table.Td>
+                                            {audience !== "officer" && (
+                                                <Table.Td>
+                                                    {row.placeId
+                                                        ? (
+                                                              row.placeNames || []
+                                                          ).join(" › ")
+                                                        : "Master"}
+                                                </Table.Td>
+                                            )}
                                             <Table.Td>
                                                 {/* Undo stands at the end of
                                                     the one row that has it,
@@ -323,6 +337,9 @@ export default function HistoryDialog({
                                     total={Math.ceil(data.total / PAGE_SIZE)}
                                     value={page}
                                     onChange={setPage}
+                                    getControlProps={(control) => ({
+                                        "aria-label": `${control} page`,
+                                    })}
                                     style={{ flexShrink: 0 }}
                                 />
                             )}
@@ -338,7 +355,7 @@ export default function HistoryDialog({
                     .filter(Boolean)
                     .join(" · ")}
                 added={/^new /.test(undo.row?.summary || "")}
-                onConfirm={() => undoing.mutate(undo.row._id)}
+                onConfirm={() => undoing.mutate({ id: undo.row._id, audience })}
                 loading={undoing.isPending}
             />
         </>

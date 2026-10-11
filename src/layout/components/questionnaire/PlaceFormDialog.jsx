@@ -266,6 +266,13 @@ export default function PlaceFormDialog({ opened, onClose, places, place }) {
                                                 key={code}
                                                 size="md"
                                                 withRemoveButton
+                                                removeButtonProps={{
+                                                    tabIndex: 0,
+                                                    "aria-hidden": false,
+                                                    "aria-label": `Remove ${languageName(
+                                                        code
+                                                    )}`,
+                                                }}
                                                 onRemove={() =>
                                                     field.onChange(
                                                         field.value.filter(
@@ -277,7 +284,11 @@ export default function PlaceFormDialog({ opened, onClose, places, place }) {
                                                 {languageName(code)}
                                             </Pill>
                                         ))}
-                                        <Menu position="bottom-start" shadow="md">
+                                        <Menu
+                                            position="bottom-start"
+                                            shadow="md"
+                                            returnFocus
+                                        >
                                             <Menu.Target>
                                                 <Button
                                                     variant="default"

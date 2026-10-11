@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
     Navigate,
     useNavigate,
@@ -61,10 +61,17 @@ import QuestionRows from "../../components/questionnaire/QuestionRows";
 import StatusPill, { Pill } from "../../components/questionnaire/StatusPill";
 import {
     SELECT_TYPES,
+    changedIn,
+    closed,
+    isRefusal,
+    isStale,
     levelLabel,
     nameList,
+    ownPlaceOf,
     plural,
     reachOf,
+    rememberOwnPlace,
+    retry,
 } from "../../components/questionnaire/constants";
 import {
     DEFAULT_LANGUAGE,
@@ -76,6 +83,9 @@ import { EmptyState } from "../../components/questionnaire/shell";
 import Wrapper from "../../components/wrapper/wrapper";
 
 const MASTER = { type: "master" };
+// The questionnaire field officers answer about their villages: a tree of
+// its own, edited as the Master is. No place has a version of it.
+const OFFICER = { type: "master", audience: "officer" };
 
 // What belongs to the Master: its wording, and the chips that filter its
 // questions by what places have done to them. A place's wording carries the
@@ -86,7 +96,9 @@ const COPY = {
         tag: "Master",
         note: "Every place starts with this questionnaire. Regional teams then switch questions off, reword them or add their own, for their own place only.",
         footnote:
-            "Click a question to edit or archive it. Places are not chosen here: each regional team switches questions on or off for itself. Questions a team added for its own place are listed in that place.",
+            "Click a question to edit or archive it. Places are not chosen here: each regional team switches questions on or off for itself. Questions a team added for its own place are listed in that place. From the keyboard, Alt and the arrow keys move a focused category: up and down among its neighbours, right into the group above it, left out of its group.",
+        searchNote:
+            "Search looks at question wording, helper text and option labels. A status filter works the same way and groups its results by category.",
         chips: [
             { value: "", label: "All" },
             {
@@ -97,17 +109,30 @@ const COPY = {
             {
                 value: "changed",
                 label: "Changed somewhere",
-                test: ({ usage }) =>
-                    usage?.rewordedIn?.length > 0 ||
-                    usage?.optionsChangedIn?.length > 0,
+                test: ({ usage }) => changedIn(usage).length > 0,
             },
         ],
     },
+    // The officers' questionnaire. No place hides or rewords anything in it,
+    // so the Master's sentences about places are left out, and there is
+    // nothing for a chip to filter by: the one left is never drawn.
+    officer: {
+        title: "Officer questionnaire",
+        tag: "Officer",
+        note: "Field officers answer these pages for each village assigned to them. Places do not change them.",
+        footnote:
+            "Click a question to edit or archive it. From the keyboard, Alt and the arrow keys move a focused category: up and down among its neighbours, right into the group above it, left out of its group.",
+        searchNote:
+            "Search looks at question wording, helper text and option labels.",
+        chips: [{ value: "", label: "All" }],
+    },
 };
 
-// A place's chips read each question's status there: what the place did to
-// it, or, for the last one, what a place above it did.
-const PLACE_CHIPS = [
+// A place's chips list what the place itself did, as the count line above
+// them counts it: by what it set, not by the ONE pill a row can show (a
+// question it reworded and then hid shows "Hidden", and is still changed).
+// The last chip is what a place above it did.
+const placeChips = (placeId) => [
     { value: "", label: "All" },
     {
         value: "hidden",
@@ -117,13 +142,15 @@ const PLACE_CHIPS = [
     {
         value: "changed",
         label: "Changed here",
-        test: ({ status }) =>
-            ["changed", "options"].includes(status.kind) && status.here,
+        test: ({ from = {} }) =>
+            [from.label, from.helper_text, from.required, from.options].includes(
+                placeId
+            ),
     },
     {
         value: "added",
         label: "Added here",
-        test: ({ status }) => status.kind === "added" && status.here,
+        test: ({ ownerPlaceId }) => ownerPlaceId === placeId,
     },
 ];
 
@@ -135,14 +162,6 @@ const fromAbove = (names) => ({
 
 const BULK_NOTE =
     "Tick boxes appear when the pointer is over a row. Move to category works only on questions this place added.";
-
-// Closing keeps what a dialog was showing, so its contents do not change
-// under the reader while it fades out.
-const closed = (dialog) => ({ ...dialog, opened: false });
-
-// The server's "no" to opening a place: it is someone else's (403), or
-// there is no such place (404).
-const isRefusal = (err) => [403, 404].includes(err?.response?.status);
 
 /**
  * Out of the app once published: archived, or replaced by a question that is
@@ -300,18 +319,24 @@ const saveFields = async (send, add, categoryId, parentId, fields) => {
  * A place is shown every question it is given, each with what the place did
  * to it. It decides whether to ask one, rewords it, changes its options, and
  * adds questions and categories of its own; it reorders and archives nothing.
+ *
+ * The officers' questionnaire (`scope.audience`) is the Master's screen on
+ * another tree: everything that asks `master` below holds for it too. Only
+ * what the Master says and shows about places is missing.
  */
 function Editor({ scope }) {
     const master = scope.type === "master";
-    const copy = COPY.master;
+    const copy = scope.audience === "officer" ? COPY.officer : COPY.master;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const queryKey = ["questionnaire-editor", scopeKey(scope)];
+    // With the audience: both questionnaires have a Master, and one must
+    // never be drawn from what was loaded for the other.
+    const queryKey = ["questionnaire-editor", scopeKey(scope), scope.audience];
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const language = searchParams.get("lang") || DEFAULT_LANGUAGE;
     const search = searchParams.get("q") || "";
-    const term = search.trim().toLowerCase();
+    // The box keeps up with the keys; the 450 questions are filtered after.
+    const term = useDeferredValue(search.trim().toLowerCase());
     // A place lists what it can switch on or off, and an archived question
     // is in no place's app.
     const showArchived = master && searchParams.get("archived") === "1";
@@ -339,7 +364,7 @@ function Editor({ scope }) {
         queryKey,
         queryFn: () => fetchEditor(scope),
         // A refusal is an answer: asking again would only get it again.
-        retry: (failures, err) => !isRefusal(err) && failures < 3,
+        retry,
     });
     // Every language some place asks for, so each can be written here.
     const { data: places = [] } = useQuery({
@@ -347,6 +372,26 @@ function Editor({ scope }) {
         queryFn: () => fetchPlaces(),
     });
     const languages = useMemo(() => languagesFor(places), [places]);
+    // Only a language that is on offer: an address can name any, and wording
+    // typed under one the panels do not show would be saved out of sight.
+    const language = languages.includes(searchParams.get("lang"))
+        ? searchParams.get("lang")
+        : DEFAULT_LANGUAGE;
+
+    // A regional account's place, as the server holds it now (the copy from
+    // sign-in goes stale when the account is moved to another place), and
+    // the place that copy named when this screen opened.
+    const ownPlace = useMemo(() => ownPlaceOf(places), [places]);
+    const [storedPlace] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem("user") || "{}").place?._id;
+        } catch (unreadable) {
+            return undefined;
+        }
+    });
+    useEffect(() => {
+        if (ownPlace) rememberOwnPlace(ownPlace);
+    }, [ownPlace]);
 
     // The place on screen, as the server writes its name, and how it
     // compares with what is above it.
@@ -361,7 +406,7 @@ function Editor({ scope }) {
     const chips = master
         ? copy.chips
         : [
-              ...PLACE_CHIPS,
+              ...placeChips(scope.placeId),
               ...(compare?.inherited
                   ? [fromAbove(compare.inherited.names)]
                   : []),
@@ -392,9 +437,11 @@ function Editor({ scope }) {
     }, [data, master]);
     const pending = data?.pending || [];
 
-    // The first question page when the URL names none, or one that is gone.
+    // The first question page when the URL names none, or one that is gone:
+    // one the place asks, if it asks any.
     const selected =
         tree.find((entry) => entry._id === searchParams.get("category")) ||
+        tree.find((entry) => entry.is_screen && entry.asked !== false) ||
         tree.find((entry) => entry.is_screen);
 
     // A page the place does not ask (`asked`, which the Master's categories
@@ -442,17 +489,30 @@ function Editor({ scope }) {
     // A page that is one repeating list: the app draws it as a list, and a
     // question a place adds there goes inside each entry, not beside it.
     // For a place the server says which pages are lists, by the very rule
-    // it places a new question with. The Master's payload has no such flag.
-    const isList = (categoryId) => {
-        const flag = data?.categories.find(
-            (category) => category._id === categoryId
-        )?.list;
-        if (typeof flag === "boolean") return flag;
-        const top = (questionsOf.get(categoryId) || []).filter(
-            (question) => !isArchived(question)
+    // it places a new question with; only a place's screen asks.
+    // In the Master a question added to a page that is ONE list stands
+    // beside the list, not inside each entry (a place's goes inside). Such
+    // a page is most of Production and Consumption: the panel says so.
+    const onlyListOf = (categoryId) => {
+        const top = (data?.questions || []).filter(
+            (question) =>
+                question.categoryId === categoryId &&
+                !question.parentQuestionId &&
+                // Archived, or retired by a replacement that waits to be
+                // published, or waiting to be deleted: not in the list on
+                // screen any more.
+                !isArchived(question) &&
+                !question.pendingDelete
         );
-        return top.length === 1 && top[0].type === "repeatable_group";
+        return top.length === 1 && top[0].type === "repeatable_group"
+            ? top[0]
+            : null;
     };
+    const isList = (categoryId) =>
+        Boolean(
+            data?.categories.find((category) => category._id === categoryId)
+                ?.list
+        );
 
     // Only what is on screen counts as ticked: a row ticked on another page
     // must not be hidden from here, where nobody can see it.
@@ -495,13 +555,14 @@ function Editor({ scope }) {
         onSuccess: (answer, job) => job.then?.(answer),
         onError: (err) => {
             toast.error(err?.response?.data?.message || "Something went wrong");
-            // 409: what is on screen is no longer what is saved (someone
-            // else changed it, or it has answers now). `partial`: a save of
-            // several requests stopped halfway. Either way an open form would
-            // be sent again over something it has not seen, so it closes and
-            // the reloaded list is what is left. The Publish dialog stays: it
-            // shows the reloaded changes.
-            if (err?.response?.status === 409 || err?.partial) {
+            // Stale: what is on screen is no longer what is saved. `partial`:
+            // a save of several requests stopped halfway. Either way an open
+            // form would be sent again over something it has not seen, so it
+            // closes and the reloaded list is what is left. Any other refusal
+            // is a rule the person can still put right in the form, which
+            // stays open with what was typed. The Publish dialog stays too:
+            // it shows the reloaded changes.
+            if (isStale(err) || err?.partial) {
                 setPanel(closed);
                 setCategoryForm(closed);
                 setRemoval(closed);
@@ -510,7 +571,16 @@ function Editor({ scope }) {
         },
         onSettled: () => queryClient.invalidateQueries({ queryKey }),
     });
+    // Until the reload that follows a save has landed, the list still holds
+    // the revisions from before it: `busy` covers that stretch too (the
+    // mutation waits for onSettled), and nothing is opened or sent from a
+    // stale row meanwhile.
     const busy = write.isPending;
+    const idle =
+        (action) =>
+        (...args) => {
+            if (!busy) action(...args);
+        };
     const save = (send, then) => write.mutate({ send, then });
     const saveDraft = (send, close) =>
         save(send, (answer) => {
@@ -835,16 +905,42 @@ function Editor({ scope }) {
             onClear={clearTicks}
         />
     );
-    const openQuestion = (category) => (question) =>
-        setPanel({ opened: true, question, category });
-    const refusal = isRefusal(error) && error.response.data?.message;
-    const restoreQuestion = (question) =>
+    const openQuestion = (category) =>
+        idle((question) => setPanel({ opened: true, question, category }));
+    const refusal =
+        (isRefusal(error) &&
+            (error.response.data?.message ||
+                "This page could not be opened.")) ||
+        // A server from before the officers' questionnaire drops the
+        // request's `audience` and sends the villagers' Master. Nothing of
+        // it may be drawn here, where every edit would then land on the
+        // villagers' questionnaire under the officers' title.
+        (Boolean(scope.audience) &&
+            Boolean(data) &&
+            data.scope?.audience !== scope.audience &&
+            "This server does not have the officer questionnaire yet.");
+    const restoreQuestion = idle((question) =>
         saveDraft(() =>
             toggleQuestion({
                 question_id: question._id,
                 rev: question.rev,
                 active: true,
             })
+        )
+    );
+
+    // A team that was moved to another place is taken to the place it has
+    // now, instead of being told that the one its own menu link still led
+    // to is not its own. Any other place that is not its own is refused in
+    // the server's words, below.
+    if (
+        refusal &&
+        ownPlace &&
+        storedPlace === scope.placeId &&
+        ownPlace._id !== scope.placeId
+    )
+        return (
+            <Navigate to={`/questionnaire/place/${ownPlace._id}`} replace={true} />
         );
 
     return (
@@ -854,11 +950,37 @@ function Editor({ scope }) {
         >
             <Loading isLoading={isLoading} />
             <MantineShell>
+                {!isError && refusal && <EmptyState title={refusal} />}
                 {isError &&
                     (refusal ? (
                         // Said plainly, in the server's words, and with
-                        // nothing to try again.
+                        // nothing to try again. Nothing else is drawn: what
+                        // an earlier load left in the cache is not this
+                        // account's, or no longer exists.
                         <EmptyState title={refusal} />
+                    ) : data ? (
+                        // The list on screen is from before: it stays, and
+                        // says so.
+                        <Alert
+                            color="red"
+                            variant="light"
+                            mb="md"
+                            title="The questionnaire could not be loaded again"
+                        >
+                            <Group justify="space-between" gap="md">
+                                <Text size="sm">
+                                    What is below may be out of date. Check the
+                                    connection and try again.
+                                </Text>
+                                <Button
+                                    size="xs"
+                                    variant="default"
+                                    onClick={() => refetch()}
+                                >
+                                    Try again
+                                </Button>
+                            </Group>
+                        </Alert>
                     ) : (
                         <EmptyState
                             title="The questionnaire could not be loaded"
@@ -868,19 +990,21 @@ function Editor({ scope }) {
                             }
                         />
                     ))}
-                {data && (
+                {data && !refusal && (
                     <Paper withBorder radius="md">
                         <Group p="lg" gap="sm" wrap="nowrap">
                             {!master && (
                                 <PlacePicker
                                     places={places}
                                     current={data.scope}
+                                    above={compare?.inherited?.names.at(-1)}
                                     onChoose={openPlace}
                                 />
                             )}
                             <Select
                                 aria-label="Language"
                                 w={130}
+                                style={{ flexShrink: 0 }}
                                 allowDeselect={false}
                                 data={languages.map((code) => ({
                                     value: code,
@@ -897,6 +1021,7 @@ function Editor({ scope }) {
                             <TextInput
                                 aria-label="Search questions"
                                 placeholder="Search questions"
+                                miw={200}
                                 style={{ flex: 1 }}
                                 value={search}
                                 onChange={(event) =>
@@ -905,11 +1030,13 @@ function Editor({ scope }) {
                             />
                             <Button
                                 variant="default"
+                                style={{ flexShrink: 0 }}
                                 onClick={() => setHistoryOpen(true)}
                             >
                                 History
                             </Button>
                             <Button
+                                style={{ flexShrink: 0 }}
                                 disabled={pending.length === 0}
                                 onClick={() => setPublish({ opened: true })}
                             >
@@ -955,23 +1082,30 @@ function Editor({ scope }) {
                                         }.`}
                                 </Text>
                             )}
-                            <Group gap="xs">
-                                {chips.map((entry) => (
-                                    <Button
-                                        key={entry.value}
-                                        variant="default"
-                                        radius="xl"
-                                        aria-pressed={entry === chip}
-                                        fw={entry === chip ? 700 : 500}
-                                        bg={entry === chip ? "gray.2" : undefined}
-                                        onClick={() =>
-                                            setParams({ chip: entry.value })
-                                        }
-                                    >
-                                        {entry.label}
-                                    </Button>
-                                ))}
-                            </Group>
+                            {/* "All" on its own filters nothing. */}
+                            {chips.length > 1 && (
+                                <Group gap="xs">
+                                    {chips.map((entry) => (
+                                        <Button
+                                            key={entry.value}
+                                            variant="default"
+                                            radius="xl"
+                                            aria-pressed={entry === chip}
+                                            fw={entry === chip ? 700 : 500}
+                                            bg={
+                                                entry === chip
+                                                    ? "gray.2"
+                                                    : undefined
+                                            }
+                                            onClick={() =>
+                                                setParams({ chip: entry.value })
+                                            }
+                                        >
+                                            {entry.label}
+                                        </Button>
+                                    ))}
+                                </Group>
+                            )}
                         </Stack>
                         <Divider />
 
@@ -989,13 +1123,13 @@ function Editor({ scope }) {
                                     setParams({ category: id, q: "", chip: "" })
                                 }
                                 onAdd={(parent) => openCategoryForm({ parent })}
-                                onRename={(category) =>
+                                onRename={idle((category) =>
                                     openCategoryForm({
                                         category,
                                         path: pathOf(category),
                                     })
-                                }
-                                onRemove={(category, remove) =>
+                                )}
+                                onRemove={idle((category, remove) =>
                                     setRemoval({
                                         opened: true,
                                         category,
@@ -1006,8 +1140,8 @@ function Editor({ scope }) {
                                             unpublished: category.unpublished,
                                         },
                                     })
-                                }
-                                onRestore={(category) =>
+                                )}
+                                onRestore={idle((category) =>
                                     saveDraft(() =>
                                         editCategory({
                                             category_id: category._id,
@@ -1015,20 +1149,20 @@ function Editor({ scope }) {
                                             active: true,
                                         })
                                     )
-                                }
-                                onReorder={(moved) => {
+                                )}
+                                onReorder={idle((moved) => {
                                     showNow("categories", moved);
                                     save(() =>
                                         reorderCategories(
                                             orders(moved, "category_id")
                                         )
                                     );
-                                }}
-                                onMove={moveCategory}
-                                onHide={(category) =>
+                                })}
+                                onMove={idle(moveCategory)}
+                                onHide={idle((category) =>
                                     setHiding({ opened: true, category })
-                                }
-                                onShow={showCategory}
+                                )}
+                                onShow={idle(showCategory)}
                             />
 
                             <Box
@@ -1110,7 +1244,7 @@ function Editor({ scope }) {
                                         <Text size="sm" c="dimmed" mt="lg">
                                             {tickedRows.length > 0
                                                 ? BULK_NOTE
-                                                : "Search looks at question wording, helper text and option labels. A status filter works the same way and groups its results by category."}
+                                                : copy.searchNote}
                                         </Text>
                                     </>
                                 ) : !selected ? (
@@ -1210,14 +1344,14 @@ function Editor({ scope }) {
                                             onOpen={openQuestion(selected)}
                                             onAdd={openAdd}
                                             onRestore={restoreQuestion}
-                                            onReorder={(moved) => {
+                                            onReorder={idle((moved) => {
                                                 showNow("questions", moved);
                                                 save(() =>
                                                     reorderQuestions(
                                                         orders(moved, "question_id")
                                                     )
                                                 );
-                                            }}
+                                            })}
                                         />
                                         {master ? (
                                             <Group
@@ -1332,6 +1466,16 @@ function Editor({ scope }) {
                         Boolean(panel.category) &&
                         isList(panel.category._id)
                     }
+                    besideList={
+                        // Not for a replacement: that one takes the place of
+                        // the question it replaces, wherever that is.
+                        master &&
+                        !panel.question &&
+                        !panel.replaces &&
+                        panel.category
+                            ? onlyListOf(panel.category._id)
+                            : null
+                    }
                     {...panel}
                     opened={panel.opened && !inherits}
                     onClose={closePanel}
@@ -1391,6 +1535,7 @@ function Editor({ scope }) {
                             saveOverride({
                                 label: null,
                                 helper_text: null,
+                                required: null,
                                 options: null,
                                 addedOptions: null,
                             })
@@ -1431,6 +1576,7 @@ function Editor({ scope }) {
                 />
                 <ArchiveQuestionDialog
                     kind="category"
+                    officer={scope.audience === "officer"}
                     {...removal}
                     onClose={() => setRemoval(closed)}
                     subtitle={copy.title}
@@ -1467,7 +1613,7 @@ function Editor({ scope }) {
                     onPublish={publishRows}
                     onDiscard={(row) =>
                         save(
-                            () => discardChanges(row.items),
+                            () => discardChanges({ scope, items: row.items }),
                             () => toast.success("Change discarded")
                         )
                     }
@@ -1486,16 +1632,23 @@ function Editor({ scope }) {
 }
 
 /**
- * The page behind both addresses: the Master's, and a place's
- * (`/questionnaire/place/:placeId`).
+ * The page behind three addresses: the Master's, a place's
+ * (`/questionnaire/place/:placeId`) and, with `audience="officer"`, the
+ * officers' questionnaire (`/officer/questionnaire`).
  */
-export default function EditorPage() {
+export default function EditorPage({ audience }) {
     const { placeId } = useParams();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+    // The officers' questionnaire is one screen: its address names no place,
+    // and only a super admin is let onto it (routes.js).
+    if (audience === "officer") return <Editor scope={OFFICER} />;
     // A regional team has no Master to open: its own place's questionnaire
     // is the one it has.
     if (!placeId && user.role === "regional")
         return <Navigate to={landingFor(user)} replace={true} />;
+    // Not an id at all (a link that lost its end, or "master" typed here).
+    if (placeId && !/^[a-f0-9]{24}$/i.test(placeId))
+        return <Navigate to="/404" replace={true} />;
     return (
         // Keyed: nothing chosen in one place (ticked rows, an open panel)
         // is carried into the next.

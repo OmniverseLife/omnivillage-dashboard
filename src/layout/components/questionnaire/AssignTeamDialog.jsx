@@ -171,7 +171,8 @@ export default function AssignTeamDialog({ opened, onClose, placeId, email }) {
                                 When this person signs in, they
                             </Text>
                             <Text size="sm">
-                                see only Questionnaire and Responses, for {name}
+                                see only Questionnaire, Responses and Officer
+                                responses, for {name}
                             </Text>
                             <Text size="sm">
                                 can switch questions on or off, reword them and add

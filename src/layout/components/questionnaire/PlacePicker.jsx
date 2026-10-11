@@ -27,13 +27,20 @@ const ALL = { _id: null, name: "All places" };
  * also sent the places above its own, for their names only (`managed` is
  * false on those): they are not offered. `current` is the place on screen,
  * as `{ placeId, name }`, its name written for display; `onChoose(id)` opens
- * another.
+ * another. `above` is the name of the place it is compared with (a village's
+ * state, say), shown before it: "Place: Ladakh › Village 1" (PDF p.12).
  *
  * `allowAll` is for a screen that can also show every place at once
  * (Responses): a super admin gets an "All places" row first. It is the one
  * chosen when `current` is empty, and choosing it calls `onChoose(null)`.
  */
-export default function PlacePicker({ places, current, onChoose, allowAll }) {
+export default function PlacePicker({
+    places,
+    current,
+    above,
+    onChoose,
+    allowAll,
+}) {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const regional = user.role === "regional";
     const [opened, setOpened] = useState(false);
@@ -61,8 +68,10 @@ export default function PlacePicker({ places, current, onChoose, allowAll }) {
     // The name handed in is already written for display; the names in
     // `places` are as stored (a village's in lower case).
     const here = current ? current.name : ALL.name;
-    // A team looking at a place inside its own is shown where it stands.
+    // Where the place on screen stands: under the place it is compared
+    // with, or, for a team looking inside its own place, under that place.
     const below = regional && user.place && user.place._id !== currentId;
+    const outer = above || (below ? user.place.name : "");
 
     const listed = visiblePlaces(
         places.filter((place) => place.managed !== false),
@@ -125,11 +134,15 @@ export default function PlacePicker({ places, current, onChoose, allowAll }) {
                     bg="brand.0"
                     bd="1px solid var(--mantine-color-brand-6)"
                     rightSection={<IconChevronDown size={16} />}
-                    style={{ flexShrink: 0 }}
+                    // A long name gives way (and ends in …) before the search
+                    // box beside it is squeezed to nothing.
+                    style={{ minWidth: 0, flexShrink: 1 }}
+                    title={outer ? `${outer} › ${here}` : here}
                     onClick={() => setOpened((open) => !open)}
                 >
-                    Place:{" "}
-                    {below ? `${placeName(user.place)} › ${here}` : here}
+                    <Text span inherit truncate>
+                        Place: {outer ? `${outer} › ${here}` : here}
+                    </Text>
                 </Button>
             </Popover.Target>
             <Popover.Dropdown p="sm">
@@ -214,7 +227,7 @@ export default function PlacePicker({ places, current, onChoose, allowAll }) {
                 <Text size="xs" c="dimmed" px={12} pb={4}>
                     {regional
                         ? `You manage ${
-                              user.place ? placeName(user.place) : "your place"
+                              user.place ? user.place.name : "your place"
                           } and everything inside it. Other places and the Master are not shown.`
                         : // Responses belong to places: there is no Master
                         // to look for in that list.

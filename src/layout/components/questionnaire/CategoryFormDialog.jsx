@@ -41,6 +41,14 @@ const COPY = {
     },
 };
 
+// The officers' questionnaire keeps the Master's words, less the sentence
+// about regional teams: no place hides anything in it.
+const OFFICER_COPY = {
+    ...COPY.master,
+    title: "Add category to the officer questionnaire",
+    note: "Field officers of every village get this category.",
+};
+
 // A place's own category sits at the end and is not dragged.
 const placeCopy = (name, reach) => ({
     title: `Add category to ${name}`,
@@ -80,8 +88,13 @@ export default function CategoryFormDialog({
     const { control, handleSubmit, reset } = useForm({
         defaultValues: emptyForm,
     });
+    const master = scope.type === "master";
     const copy =
-        scope.type === "master" ? COPY.master : placeCopy(placeName, placeReach);
+        scope.audience === "officer"
+            ? OFFICER_COPY
+            : master
+            ? COPY.master
+            : placeCopy(placeName, placeReach);
     const editing = category ? language : DEFAULT_LANGUAGE;
 
     useEffect(() => {
@@ -108,7 +121,9 @@ export default function CategoryFormDialog({
             onAdd({
                 title,
                 description,
-                is_screen: form.is_screen,
+                // A place adds question pages only: nothing can be put
+                // inside a group that a place added, so it is not offered one.
+                is_screen: master ? form.is_screen : true,
                 active: form.active,
                 ...(parent && { parentId: parent._id }),
             });
@@ -179,7 +194,7 @@ export default function CategoryFormDialog({
                         )}
                     />
 
-                    {!category && (
+                    {!category && master && (
                         <>
                             <Divider />
                             <SectionHeading>What kind of category</SectionHeading>
@@ -227,7 +242,12 @@ export default function CategoryFormDialog({
                                                                     {kind.title}
                                                                 </Text>
                                                                 <Text size="sm" c="dimmed">
-                                                                    {kind.text}
+                                                                    {scope.audience === "officer"
+                                                                    ? kind.text.replace(
+                                                                          "a user fills",
+                                                                          "an officer fills"
+                                                                      )
+                                                                    : kind.text}
                                                                 </Text>
                                                             </Box>
                                                         </Group>
@@ -251,7 +271,11 @@ export default function CategoryFormDialog({
                                             )
                                         }
                                         label="Show in the app"
-                                        description="Switch off to prepare a category before field users can see it."
+                                        description={`Switch off to prepare a category before field ${
+                                            scope.audience === "officer"
+                                                ? "officers"
+                                                : "users"
+                                        } can see it.`}
                                         styles={{ label: { fontWeight: 700 } }}
                                     />
                                 )}

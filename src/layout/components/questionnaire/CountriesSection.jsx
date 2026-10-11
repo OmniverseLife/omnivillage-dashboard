@@ -47,8 +47,8 @@ const emptyForm = {
  *
  * `name` is stored lowercase because it is the join key back to the existing
  * free-text `villages.country` / `user.country` strings — that is what keeps
- * this additive. `phone_code` is what maps a villager's phone to their country
- * when the backend resolves question targeting.
+ * this additive. `phone_code` is what places a villager whose village is not
+ * found: by the country their phone number belongs to.
  */
 export default function CountriesSection() {
     const [open, setOpen] = useState(false);
@@ -142,7 +142,7 @@ export default function CountriesSection() {
                     <Text size="sm">+{row.phone_code}</Text>
                 ) : (
                     <Tooltip
-                        label="Without a phone code, targeting falls back to the user's country field"
+                        label="Without a phone code, a villager whose village is not found is placed by the country they typed"
                         withArrow
                     >
                         <Badge tt="none" color="orange" variant="light">
@@ -222,7 +222,8 @@ export default function CountriesSection() {
                             Countries
                         </Title>
                         <Text size="sm" c="dimmed">
-                            Used for questionnaire targeting and to group villages.
+                            Countries are the top level of Locations and group
+                            villages.
                         </Text>
                     </Box>
                     <Button
@@ -269,10 +270,24 @@ export default function CountriesSection() {
                             order: Number(form.order) || 0,
                         };
                         if (editItem) {
+                            // The name is the key villages, users and crops
+                            // are joined on: it is set once and not sent.
+                            const changes = { ...payload };
+                            delete changes.name;
                             editMutation.mutate({
                                 country_id: editItem._id,
-                                ...payload,
+                                ...changes,
                             });
+                        } else if (
+                            countries.some(
+                                (country) =>
+                                    country.name ===
+                                    String(form.name || "").trim().toLowerCase()
+                            )
+                        ) {
+                            toast.error(
+                                `A country called “${form.name.trim()}” already exists.`
+                            );
                         } else {
                             addMutation.mutate(payload);
                         }
@@ -282,7 +297,12 @@ export default function CountriesSection() {
                         <TextInput
                             label="Name"
                             required
-                            description="Stored lowercase — it must match how villages already spell this country"
+                            readOnly={Boolean(editItem)}
+                            description={
+                                editItem
+                                    ? "Villages are joined to the country by this name, so it cannot be changed."
+                                    : "Stored lowercase — it must match how villages already spell this country"
+                            }
                             {...register("name")}
                         />
                         <TextInput
@@ -337,7 +357,7 @@ export default function CountriesSection() {
                                         field.onChange(e.currentTarget.checked)
                                     }
                                     label="Active"
-                                    description="Inactive countries stay listed but are not offered when targeting questions."
+                                    description="An inactive country is not matched by phone code."
                                 />
                             )}
                         />
@@ -358,6 +378,8 @@ export default function CountriesSection() {
                 open={Boolean(deleteId)}
                 setOpen={() => setDeleteId(null)}
                 onAgree={() => deleteMutation.mutate(deleteId)}
+                title="Delete country"
+                text="Are you sure you want to delete this country?"
             />
         </MantineShell>
     );

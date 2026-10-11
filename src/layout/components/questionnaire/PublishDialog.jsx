@@ -23,6 +23,13 @@ const COPY = {
         heading: "Master",
         footer: "Field users get the changes the next time the app syncs.",
     },
+    // The officers' questionnaire: no place has a version of it.
+    officer: {
+        title: (changes) => `Publish ${changes} to the officer questionnaire`,
+        note: "Field officers of every village get these.",
+        heading: "Officer questionnaire",
+        footer: "Field officers get the changes the next time the app syncs.",
+    },
 };
 
 // `reach` is the place with its villages, or a village on its own.
@@ -69,7 +76,11 @@ export default function PublishDialog({
     const [off, setOff] = useState(new Set());
     const [asking, setAsking] = useState(null);
     const copy =
-        scope.type === "master" ? COPY.master : placeCopy(placeName, placeReach);
+        scope.audience === "officer"
+            ? COPY.officer
+            : scope.type === "master"
+            ? COPY.master
+            : placeCopy(placeName, placeReach);
 
     // In the order the rows arrive: the place itself, then those inside it.
     // Kept apart by their whole path; headed by its two ends ("Ladakh ›
@@ -129,7 +140,9 @@ export default function PublishDialog({
             title={
                 <Box>
                     <Text fw={700}>
-                        {copy.title(plural(pending.length, "change"))}
+                        {pending.length
+                            ? copy.title(plural(pending.length, "change"))
+                            : "Nothing to publish"}
                     </Text>
                     <Text size="xs" c="dimmed">
                         Nothing reaches the app until you publish. Untick a
@@ -254,7 +267,9 @@ export default function PublishDialog({
                             loading={busy}
                             onClick={() => onPublish(ticked)}
                         >
-                            Publish {plural(ticked.length, "change")}
+                            {ticked.length
+                                ? `Publish ${plural(ticked.length, "change")}`
+                                : "Nothing to publish"}
                         </Button>
                     </Group>
                 </Group>

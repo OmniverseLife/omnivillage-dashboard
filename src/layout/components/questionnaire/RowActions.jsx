@@ -1,5 +1,6 @@
 import { ActionIcon, Menu } from "@mantine/core";
 import { IconDots } from "@tabler/icons-react";
+import { useRef } from "react";
 
 /**
  * One overflow menu per row instead of a strip of always-visible icons.
@@ -9,20 +10,25 @@ import { IconDots } from "@tabler/icons-react";
  * `items`: [{ label, icon, onClick, color?, disabled?, divider? }]
  * `width` and `position` are for a menu whose items run long (they carry a
  * place's name, say): wider, and opening to the side that has room for it.
+ * `tabIndex` is for a list that is one tab stop (the category tree).
  */
 export default function RowActions({
     items,
     label = "Row actions",
     width = 200,
     position = "bottom-end",
+    tabIndex,
 }) {
+    const button = useRef(null);
     return (
         <Menu position={position} withinPortal shadow="md" width={width}>
             <Menu.Target>
                 <ActionIcon
+                    ref={button}
                     variant="subtle"
                     color="gray"
                     aria-label={label}
+                    tabIndex={tabIndex}
                     onClick={(event) => event.stopPropagation()}
                 >
                     <IconDots size={18} />
@@ -38,7 +44,15 @@ export default function RowActions({
                             leftSection={item.icon}
                             color={item.color}
                             disabled={item.disabled}
-                            onClick={item.onClick}
+                            // Focus goes back to this row's button first: a
+                            // dialog the item opens returns focus to where
+                            // it was, and that must not be the closed menu
+                            // (the next Tab would start at the top of the
+                            // page).
+                            onClick={() => {
+                                button.current?.focus();
+                                item.onClick();
+                            }}
                         >
                             {item.label}
                         </Menu.Item>

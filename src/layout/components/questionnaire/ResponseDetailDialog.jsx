@@ -1,10 +1,11 @@
 import { Alert, Box, Button, Divider, Group, Modal, Stack, Text } from "@mantine/core";
 import moment from "moment";
+import AnswerFiles from "./AnswerFiles";
 import { Entries } from "./GroupRowsDialog";
 import { Pill } from "./StatusPill";
 import { STICKY_FOOTER } from "./constants";
 import { csvName, downloadCsv } from "./csv";
-import { answerCell, answerText, localise } from "./localise";
+import { FILE_TYPES, answerCell, answerText, localise } from "./localise";
 import { SectionHeading } from "./shell";
 
 // "Changed in Ladakh". The list names every place its answers and columns
@@ -31,6 +32,7 @@ const notesOf = (answer, column, places) =>
 
 /** The answers of one response, and the buttons under them. */
 function Response({
+    officer,
     row,
     columns,
     places,
@@ -51,9 +53,9 @@ function Response({
     const exportResponse = () =>
         downloadCsv(
             csvName(
-                "response",
+                officer ? "officer-response" : "response",
                 heading,
-                row.userName,
+                officer ? village : row.userName,
                 moment(row.submittedAt).format("YYYY-MM-DD")
             ),
             [
@@ -73,7 +75,9 @@ function Response({
                 {row.questionnaireVersion !== null &&
                     row.questionnaireVersion !== undefined &&
                     `Answered on questionnaire version ${row.questionnaireVersion}. `}
-                Wording below is what this user saw in {village}.
+                {officer
+                    ? `Wording below is what the officer saw for ${village}.`
+                    : `Wording below is what this user saw in ${village}.`}
             </Alert>
 
             <SectionHeading>{heading}</SectionHeading>
@@ -103,6 +107,9 @@ function Response({
                             language={language}
                             size="sm"
                         />
+                    ) : FILE_TYPES.includes(answer.type) ? (
+                        // The photos and recordings themselves.
+                        <AnswerFiles answer={answer} />
                     ) : (
                         <Text
                             size="sm"
@@ -155,14 +162,19 @@ function Response({
  * and `village` are written by the page, which knows the place on screen.
  * `onPrevious` and `onNext` walk the rows of the table's page; each is
  * missing at its end of the page.
+ *
+ * With `audience="officer"` the response is a village's, saved by its field
+ * officer: it is headed by the village, not by a person.
  */
 export default function ResponseDetailDialog({
+    audience,
     opened,
     onClose,
     row,
     where,
     ...response
 }) {
+    const officer = audience === "officer";
     return (
         // On the page before any response is opened, and so without one: a
         // dialog that is first drawn already open has not seen where focus
@@ -176,10 +188,19 @@ export default function ResponseDetailDialog({
             title={
                 row && (
                     <Box>
-                        <Text fw={700}>{row.userName || "Unknown user"}</Text>
+                        <Text fw={700}>
+                            {officer
+                                ? response.village
+                                : row.userName || "Unknown user"}
+                        </Text>
                         <Text size="xs" c="dimmed">
                             {[
                                 where,
+                                // A village's response is its officers': the
+                                // one who saved last is named.
+                                officer &&
+                                    row.savedBy &&
+                                    `saved by ${row.savedBy}`,
                                 `submitted ${moment(row.submittedAt).format(
                                     "DD MMM, YYYY"
                                 )}`,
@@ -191,7 +212,7 @@ export default function ResponseDetailDialog({
                 )
             }
         >
-            {row && <Response row={row} {...response} />}
+            {row && <Response officer={officer} row={row} {...response} />}
         </Modal>
     );
 }

@@ -10,13 +10,19 @@ import {
     Stack,
 } from "@mui/material";
 
-export default function DeleteModal({ open, setOpen, onAgree }) {
+export default function DeleteModal({
+    open,
+    setOpen,
+    onAgree,
+    title = "Delete User",
+    text = "Are you sure you want to delete this user?",
+}) {
     return (
         <Dialog onClose={setOpen} open={open}>
-            <DialogTitle>Delete User</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    Are you sure you want to delete this user?
+                    {text}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>

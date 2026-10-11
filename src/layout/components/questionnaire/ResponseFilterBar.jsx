@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { IconFilterPlus, IconFilterX, IconX } from "@tabler/icons-react";
 import { useMemo, useRef } from "react";
-import { flattenFilterTargets, operatorsFor } from "./constants";
+import { FILE_TYPES, flattenFilterTargets, operatorsFor } from "./constants";
 
 // These rows sit in a popover. A list of choices that opened outside it (in
 // a portal, as it does by default) would count as a click outside, and
@@ -28,11 +28,16 @@ export default function ResponseFilterBar({ filters, onChange, columns, language
     const targets = useMemo(
         () =>
             flattenFilterTargets(columns, [], [], language).filter(
-                // ponytail: no filter on a date. The server compares a
-                // filter's value as a number or as text, and a saved date is
-                // neither, so such a row could never match. Offer it again
-                // once `f` compares dates.
-                (target) => target.type !== "date"
+                (target) =>
+                    // ponytail: no filter on a date. The server compares a
+                    // filter's value as a number or as text, and a saved
+                    // date is neither, so such a row could never match.
+                    // Offer it again once `f` compares dates.
+                    target.type !== "date" &&
+                    // None on a photo or a recording either: its value is
+                    // the ids of its files, and there is nothing in an id
+                    // to look for.
+                    !FILE_TYPES.includes(target.type)
             ),
         [columns, language]
     );

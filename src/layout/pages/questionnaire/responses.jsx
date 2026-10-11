@@ -20,7 +20,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { DataTable } from "mantine-datatable";
 import moment from "moment";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { fetchPlaces } from "../../../functions/places";
@@ -31,6 +31,7 @@ import {
     fetchResponseStats,
 } from "../../../functions/questionnaire";
 import Loading from "../../components/loading";
+import AnswerFiles from "../../components/questionnaire/AnswerFiles";
 import CategoryTree from "../../components/questionnaire/CategoryTree";
 import GroupRowsDialog from "../../components/questionnaire/GroupRowsDialog";
 import MantineShell from "../../components/questionnaire/MantineShell";
@@ -39,10 +40,19 @@ import ResponseCharts from "../../components/questionnaire/ResponseCharts";
 import ResponseDetailDialog from "../../components/questionnaire/ResponseDetailDialog";
 import ResponseFilterBar from "../../components/questionnaire/ResponseFilterBar";
 import { Pill } from "../../components/questionnaire/StatusPill";
-import { placeName, plural } from "../../components/questionnaire/constants";
+import {
+    closed,
+    isRefusal,
+    ownPlaceOf,
+    placeName,
+    plural,
+    rememberOwnPlace,
+    retry,
+} from "../../components/questionnaire/constants";
 import { csvName, downloadCsv } from "../../components/questionnaire/csv";
 import {
     DEFAULT_LANGUAGE,
+    FILE_TYPES,
     answerCell,
     answerText,
     languageName,
@@ -65,9 +75,6 @@ const RANGES = [
 
 const PAGE_SIZES = [25, 50, 100];
 
-const NOTE =
-    "One table per question page, one row per user. Click a user to see the whole response. Answers to archived questions stay visible. The export follows the place, date and category chosen here.";
-
 // A table here is as tall as its rows: its own default, the whole height of
 // what it sits in, is the height of the tree beside it; and the room the
 // shared look keeps for "no records" would stand empty under a short list.
@@ -85,15 +92,8 @@ const fitted = (records) => ({
 // These selects sit in the Filters popover: see ResponseFilterBar.
 const INSIDE = { withinPortal: false };
 
-// Closing keeps what a dialog was showing, so its contents do not change
-// under the reader while it fades out.
-const closed = (dialog) => ({ ...dialog, opened: false });
-
-// The server's "no" to a place: it is someone else's (403), or there is no
-// such place (404).
-const isRefusal = (err) => [403, 404].includes(err?.response?.status);
-// A refusal is an answer: asking again would only get it again.
-const retry = (failures, err) => !isRefusal(err) && failures < 3;
+// The "one row per entry" view asks for this many at once.
+const ENTRY_LIMIT = 200;
 
 /**
  * The flat category list as the rows of the tree: each category followed by
@@ -137,6 +137,39 @@ const villageOf = (row) =>
 const submittedOf = (row) =>
     row.submittedAt ? moment(row.submittedAt).format("DD MMM, YYYY") : "";
 
+// What differs between the two questionnaires. A villager's response is
+// that villager's. A field officer's is its village's: one per village and
+// page, whichever officer saved it last. `who` and `beside` are the two
+// columns before "Submitted": whose row it is (the name that opens it,
+// `unknown` when the server has none), then what stands beside it. The
+// tables and the export are built from the same two.
+const COPY = {
+    villager: {
+        title: "Responses",
+        search: "Search by user",
+        view: "One row per user",
+        note: "One table per question page, one row per user. Click a user to see the whole response. Answers to archived questions stay visible. The export follows the place, date and category chosen here.",
+        file: "responses",
+        who: { accessor: "userName", title: "User", text: (row) => row.userName },
+        beside: { accessor: "villageName", title: "Village", text: villageOf },
+        unknown: "Unknown user",
+    },
+    officer: {
+        title: "Officer responses",
+        search: "Search by village or officer",
+        view: "One row per village",
+        note: "One table per question page, one row per village. Click a village to see the whole response. Answers to archived questions stay visible. The export follows the place, date and category chosen here.",
+        file: "officer-responses",
+        who: { accessor: "villageName", title: "Village", text: villageOf },
+        beside: {
+            accessor: "savedBy",
+            title: "Saved by",
+            text: (row) => row.savedBy,
+        },
+        unknown: "Unknown village",
+    },
+};
+
 /**
  * "Not asked" is this screen's reading of a row: nothing was saved for the
  * question, and it was not among those on offer at that save. On offer and
@@ -155,18 +188,16 @@ const notAsked = (row, column) =>
  * filter object made from them feeds the table, the "one row per entry"
  * view, the graphs and the export, so the four cannot disagree about which
  * responses are meant.
+ *
+ * With `audience="officer"` it is the same screen over what field officers
+ * saved (`/officer/responses`): one row per village, and who saved it.
  */
-export default function Responses() {
+export default function Responses({ audience }) {
+    const copy = audience === "officer" ? COPY.officer : COPY.villager;
     const [searchParams, setSearchParams] = useSearchParams();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    const language = searchParams.get("lang") || DEFAULT_LANGUAGE;
     const urlPlace = searchParams.get("place") || "";
-    // A regional team that names no place is held to its own by the server.
-    // The request leaves it out, so the server's word stands; the picker
-    // shows it chosen.
-    const placeId =
-        urlPlace || (user.role === "regional" && user.place?._id) || "";
     const from = searchParams.get("from") || "";
     const to = searchParams.get("to") || "";
     const range =
@@ -209,13 +240,32 @@ export default function Responses() {
         queryFn: () => fetchPlaces(),
     });
     const languages = useMemo(() => languagesFor(places), [places]);
+    // Only a language that is on offer: an address can name any.
+    const language = languages.includes(searchParams.get("lang"))
+        ? searchParams.get("lang")
+        : DEFAULT_LANGUAGE;
+    // A regional account's place as the server holds it now; the copy kept
+    // from sign-in goes stale when the account is moved.
+    const ownPlace = useMemo(() => ownPlaceOf(places), [places]);
+    useEffect(() => {
+        if (ownPlace) rememberOwnPlace(ownPlace);
+    }, [ownPlace]);
+    // A regional team that names no place is held to its own by the server.
+    // The request leaves it out, so the server's word stands; the picker
+    // shows it chosen.
+    const placeId =
+        urlPlace ||
+        ownPlace?._id ||
+        (user.role === "regional" && user.place?._id) ||
+        "";
     const chosen = places.find((entry) => entry._id === placeId);
 
     // The pages of the place on screen, archived ones included: their
-    // responses must stay reachable.
+    // responses must stay reachable. Of one questionnaire: the key says
+    // which, or one tree would be drawn from what was loaded for the other.
     const categories = useQuery({
-        queryKey: ["questionnaire-categories", urlPlace],
-        queryFn: () => fetchCategories({ place: urlPlace }),
+        queryKey: ["questionnaire-categories", urlPlace, audience],
+        queryFn: () => fetchCategories({ place: urlPlace, audience }),
         retry,
         // The tree of the place being left stays while the next one loads:
         // the screen, and the picker that was just used, do not blink away.
@@ -232,11 +282,16 @@ export default function Responses() {
 
     // The request waits until the typing stops.
     const [searched] = useDebouncedValue(userSearch.trim(), 300);
-    const sent = filters.filter(
+    const typed = filters.filter(
         // A row still being filled in has no value yet.
         (entry) => entry.split(":").slice(2).join(":") !== ""
     );
+    const [settled] = useDebouncedValue(JSON.stringify(typed), 300);
+    const sent = useMemo(() => JSON.parse(settled), [settled]);
     const filterParams = {
+        // Whose responses. Here, so that every request and every cache key
+        // made from this object carries it.
+        audience,
         categoryId,
         place: urlPlace || undefined,
         // Whole days, on the viewer's own clock: from the first moment of
@@ -292,20 +347,23 @@ export default function Responses() {
     const entryRows = useQuery({
         queryKey: ["response-rows", filterParams, group?.path],
         queryFn: () =>
-            // ponytail: the first 200 entries, unpaged. Page it when a list
-            // page gathers more than that.
+            // ponytail: the first 200 entries, unpaged, and the table says
+            // so when there may be more. Page it (the endpoint takes `page`)
+            // when list pages regularly gather more than that.
             fetchResponseRows({
                 ...filterParams,
-                limit: 200,
+                limit: ENTRY_LIMIT,
                 groupPath: group.path,
             }),
         enabled: Boolean(categoryId) && !graphs && Boolean(group),
+        retry,
     });
 
     const stats = useQuery({
         queryKey: ["response-stats", filterParams],
         queryFn: () => fetchResponseStats(filterParams),
         enabled: Boolean(categoryId) && graphs,
+        retry,
     });
 
     /** Columns come from the payload, not the rows — so an unanswered or
@@ -313,8 +371,8 @@ export default function Responses() {
     const columns = useMemo(
         () => [
             {
-                accessor: "userName",
-                title: "User",
+                accessor: copy.who.accessor,
+                title: copy.who.title,
                 noWrap: true,
                 render: (row) => (
                     <Anchor
@@ -324,15 +382,15 @@ export default function Responses() {
                         fw={600}
                         onClick={() => setDetail({ opened: true, id: row._id })}
                     >
-                        {row.userName || "Unknown user"}
+                        {copy.who.text(row) || copy.unknown}
                     </Anchor>
                 ),
             },
             {
-                accessor: "villageName",
-                title: "Village",
+                accessor: copy.beside.accessor,
+                title: copy.beside.title,
                 noWrap: true,
-                render: villageOf,
+                render: copy.beside.text,
             },
             {
                 accessor: "submittedAt",
@@ -409,6 +467,10 @@ export default function Responses() {
                                     {text}
                                 </Anchor>
                             );
+                        // Photos and recordings: how many, and a link to
+                        // each. A page of this table fetches none of them.
+                        if (FILE_TYPES.includes(answer.type))
+                            return <AnswerFiles compact answer={answer} />;
 
                         // The snapshot is the point: if the wording differs
                         // from the one in force here, show what this person
@@ -444,7 +506,7 @@ export default function Responses() {
                 };
             }),
         ],
-        [table?.columns, language]
+        [table?.columns, language, copy]
     );
 
     const entryColumns = group
@@ -452,28 +514,30 @@ export default function Responses() {
               // Whose entry it is. (The entry's own id means nothing to a
               // reader; it only keys the row.)
               {
-                  accessor: "userName",
-                  title: "User",
+                  accessor: copy.who.accessor,
+                  title: copy.who.title,
                   noWrap: true,
-                  render: (row) => row.userName || "Unknown user",
+                  render: (row) => copy.who.text(row) || copy.unknown,
               },
               {
-                  accessor: "villageName",
-                  title: "Village",
+                  accessor: copy.beside.accessor,
+                  title: copy.beside.title,
                   noWrap: true,
-                  render: villageOf,
+                  render: copy.beside.text,
               },
               ...(group.column.children || [])
                   .filter((child) => child.type !== "repeatable_group")
                   .map((child) => ({
                       accessor: child.questionId,
                       title: localise(child.label, language),
-                      render: (row) =>
-                          answerText(
-                              row.answers?.[child.questionId],
-                              child,
-                              language
-                          ),
+                      render: (row) => {
+                          const answer = row.answers?.[child.questionId];
+                          return FILE_TYPES.includes(answer?.type) ? (
+                              <AnswerFiles compact answer={answer} />
+                          ) : (
+                              answerText(answer, child, language)
+                          );
+                      },
                   })),
           ]
         : [];
@@ -503,23 +567,23 @@ export default function Responses() {
 
             downloadCsv(
                 csvName(
-                    "responses",
+                    copy.file,
                     localise(selected.title),
                     chunk.place?.name || "all places",
                     moment().format("YYYY-MM-DD")
                 ),
                 [
                     [
-                        "User",
-                        "Village",
+                        copy.who.title,
+                        copy.beside.title,
                         "Submitted",
                         ...chunk.columns.map((column) =>
                             localise(column.label, language)
                         ),
                     ],
                     ...collected.map((row) => [
-                        row.userName,
-                        villageOf(row),
+                        copy.who.text(row),
+                        copy.beside.text(row),
                         submittedOf(row),
                         ...chunk.columns.map((column) => {
                             const answer = row.answers?.[column.questionId];
@@ -553,8 +617,19 @@ export default function Responses() {
         return ends.length > 1 ? `${ends[0]} › ${ends.at(-1)}` : ends[0] || "";
     };
 
-    const refusal = [categories.error, list.error].find(isRefusal)?.response
-        .data?.message;
+    const refused = [categories.error, list.error].find(isRefusal);
+    const refusal =
+        (refused &&
+            (refused.response.data?.message ||
+                "This page could not be opened.")) ||
+        // A server from before the officers' questionnaire drops the
+        // request's `audience` and lists the villagers' pages: they are not
+        // drawn under the officers' title.
+        (audience === "officer" &&
+            (categories.data || []).some(
+                (entry) => entry.audience !== "officer"
+            ) &&
+            "This server does not have the officer questionnaire yet.");
 
     // What narrows the list beyond its place, page and dates, behind one
     // button: the filters on its questions, and which of a group's entries
@@ -565,9 +640,9 @@ export default function Responses() {
                 <Button
                     variant="default"
                     rightSection={
-                        sent.length > 0 && (
+                        typed.length > 0 && (
                             <Badge size="sm" circle>
-                                {sent.length}
+                                {typed.length}
                             </Badge>
                         )
                     }
@@ -579,7 +654,14 @@ export default function Responses() {
                 <Stack gap="md">
                     <ResponseFilterBar
                         filters={filters}
-                        onChange={(next) => setParams({ f: next })}
+                        // A value being typed replaces the history entry;
+                        // a filter added or removed is a step of its own.
+                        onChange={(next) =>
+                            setParams(
+                                { f: next },
+                                next.length === filters.length
+                            )
+                        }
                         columns={table?.columns}
                         language={language}
                     />
@@ -591,7 +673,7 @@ export default function Responses() {
                             allowDeselect={false}
                             comboboxProps={INSIDE}
                             data={[
-                                { value: "", label: "One row per user" },
+                                { value: "", label: copy.view },
                                 {
                                     value: "entries",
                                     label: "One row per entry of a group",
@@ -692,15 +774,27 @@ export default function Responses() {
     ) : graphs ? (
         <ResponseCharts stats={stats.data} />
     ) : group ? (
-        <DataTable
-            {...dataTableProps}
-            {...fitted(entryRows.data?.rows)}
-            records={entryRows.data?.rows}
-            columns={entryColumns}
-            idAccessor={(row) => `${row.responseId}-${row.rowId}`}
-            fetching={entryRows.isFetching}
-            noRecordsText="No entries"
-        />
+        <>
+            <DataTable
+                {...dataTableProps}
+                {...fitted(entryRows.data?.rows)}
+                records={entryRows.data?.rows}
+                columns={entryColumns}
+                // A page has dozens of questions: whose row it is stays in
+                // sight while the answers scroll sideways.
+                pinFirstColumn
+                idAccessor={(row) => `${row.responseId}-${row.rowId}`}
+                fetching={entryRows.isFetching}
+                noRecordsText="No entries"
+            />
+            {entryRows.data?.rows.length >= ENTRY_LIMIT && (
+                <Text size="sm" c="dimmed" mt="md">
+                    The first {ENTRY_LIMIT} entries are listed, newest responses
+                    first. Narrow the place, the dates or the filters to see
+                    the rest.
+                </Text>
+            )}
+        </>
     ) : table?.total === 0 && !list.isFetching ? (
         <EmptyState
             title={narrowed ? "No responses match" : "No responses yet"}
@@ -720,6 +814,7 @@ export default function Responses() {
                 {...fitted(rows)}
                 records={rows}
                 columns={columns}
+                pinFirstColumn
                 idAccessor="_id"
                 fetching={list.isFetching}
                 // One page of them needs no pager under it.
@@ -735,13 +830,13 @@ export default function Responses() {
                 })}
             />
             <Text size="sm" c="dimmed" mt="lg">
-                {NOTE}
+                {copy.note}
             </Text>
         </>
     );
 
     return (
-        <Wrapper plain title="Responses">
+        <Wrapper plain title={copy.title}>
             <Loading
                 isLoading={categories.isLoading || (graphs && stats.isLoading)}
             />
@@ -828,8 +923,8 @@ export default function Responses() {
                                 </>
                             )}
                             <TextInput
-                                aria-label="Search by user"
-                                placeholder="Search by user"
+                                aria-label={copy.search}
+                                placeholder={copy.search}
                                 style={{ flex: 1 }}
                                 value={userSearch}
                                 onChange={(event) =>
@@ -903,6 +998,7 @@ export default function Responses() {
                     language={language}
                 />
                 <ResponseDetailDialog
+                    audience={audience}
                     opened={detail.opened && at >= 0}
                     onClose={() => setDetail(closed)}
                     row={rows[at]}

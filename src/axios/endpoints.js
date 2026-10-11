@@ -275,6 +275,10 @@ export const endpoints = {
         assign: "/admin/assign",
     },
 
+    // The villagers' questionnaire and the field officers' share every
+    // address here: a call says `audience: "officer"` for the second (see
+    // functions/questionnaire.js). The officer app's own endpoints
+    // (/officer/…) are not the dashboard's and are not listed.
     questionnaire: {
         // The editor screen: one payload for a whole questionnaire, and what
         // acts on the changes waiting in it.
@@ -309,5 +313,8 @@ export const endpoints = {
             rows: "/responses/rows",
             stats: "/responses/stats",
         },
+        // One photo or recording of an answer: its id follows. Served only
+        // to an account that may see the response holding it.
+        file: "/files/admin",
     },
 };

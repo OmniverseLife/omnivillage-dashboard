@@ -18,7 +18,7 @@ export const dataTableProps = {
         titleStyle: {
             fontSize: "var(--mantine-font-size-sm)",
             fontWeight: 600,
-            color: "var(--mantine-color-gray-6)",
+            color: "var(--mantine-color-gray-7)",
         },
     },
 };

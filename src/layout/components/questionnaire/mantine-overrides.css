@@ -60,8 +60,12 @@ a[class*="mantine-"] {
 }
 
 /* index.css kills every focus ring with `* { outline:none !important }`.
-   Put Mantine's back — losing it is an accessibility regression, not a style. */
-[class*="mantine-"]:focus-visible {
+   Put Mantine's back — losing it is an accessibility regression, not a style.
+   The second selector is for the controls that draw their ring on the element
+   AFTER a hidden input (Switch, SegmentedControl, Chip): without it the Asked
+   switch and the Table / Graphs switch showed no sign of keyboard focus. */
+[class*="mantine-"]:focus-visible,
+[class*="mantine-"]:focus-visible + [class*="mantine-"] {
     outline: revert-layer !important;
     outline-offset: revert-layer !important;
 }
@@ -83,6 +87,27 @@ a[class*="mantine-"] {
 }
 
 /*
+ * Mantine's layered build also styles `body` (font, size, line height,
+ * colour), and index.css sets none of those on `body`, so that rule applies.
+ * It reads theme variables that go when a MantineProvider unmounts, while the
+ * stylesheet stays: after any questionnaire page, the OLDER pages' sidebar
+ * and headings fell back to the system font until a full reload. `body` is
+ * handed back to what it inherits, and these screens take Mantine's font on
+ * their own containers instead.
+ */
+body {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+.questionnaire-root,
+[data-portal] {
+    font-family: var(--mantine-font-family);
+    line-height: var(--mantine-line-height);
+}
+
+/*
  * Mantine's modal/drawer surface declares `position:fixed; top:0; bottom:0`
  * but NO left/right — it relies on the static position being x=0, which holds
  * when the portal is a normal block child of <body>.
@@ -92,18 +117,9 @@ a[class*="mantine-"] {
  * child then falls back to that static position and renders entirely
  * off-screen to the right. Pinning left/right removes the dependency.
  */
-[class*="mantine-Modal-inner"],
-[class*="mantine-Drawer-inner"] {
+[class*="mantine-Modal-inner"] {
     left: 0;
     right: 0;
-}
-
-/* Same reasoning for the portal wrapper: keep it out of body's flex flow. */
-body > div:has(> [class*="mantine-Modal-root"]),
-body > div:has(> [class*="mantine-Drawer-root"]) {
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 /*

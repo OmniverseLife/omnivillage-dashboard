@@ -1,84 +1,32 @@
-import {
-    Badge,
-    Group,
-    Input,
-    SegmentedControl,
-    Stack,
-    Text,
-    Textarea,
-    TextInput,
-    Tooltip,
-} from "@mantine/core";
-import { useState } from "react";
-import { DEFAULT_LANGUAGE, languageName, missingLanguages } from "./localise";
+import { Input, Stack, Text, TextInput } from "@mantine/core";
+import { DEFAULT_LANGUAGE, languageName } from "./localise";
 
 /**
  * One field, one value per language.
  *
- * The language picker is a SegmentedControl above the input, with its own
- * label — not tabs sharing an edge with the field, which is what made the
- * previous version read as one merged control.
+ * The form it sits in owns the choice of language (one selector for every
+ * field of that form) and hands it in as `language`; this shows and edits
+ * that language's text.
  *
  * English is required because it is the stored fallback: a question with no
  * English renders blank for anyone whose language has no translation yet.
- *
- * Given `language`, the form it sits in owns the choice (one selector for
- * every field of that form) and this one shows no switcher of its own.
  */
 export default function LocalisedInput({
     label,
     value,
     onChange,
-    languages = [DEFAULT_LANGUAGE],
-    language,
+    language = DEFAULT_LANGUAGE,
     required = false,
-    multiline = false,
     placeholder,
     description,
     // Anything else goes to the input itself (`data-autofocus`, for one).
     ...input
 }) {
-    const [active, setActive] = useState(DEFAULT_LANGUAGE);
-    const current =
-        language || (languages.includes(active) ? active : DEFAULT_LANGUAGE);
-    const missing = language ? [] : missingLanguages(value, languages);
-
-    const Field = multiline ? Textarea : TextInput;
-
     return (
         <Stack gap={6}>
-            <Group justify="space-between" align="center" wrap="nowrap">
-                <Input.Label required={required} size="sm">
-                    {label}
-                </Input.Label>
-
-                <Group gap="xs" wrap="nowrap">
-                    {missing.length > 0 && (
-                        <Tooltip
-                            label={`No translation yet for ${missing
-                                .map(languageName)
-                                .join(", ")}`}
-                            withArrow
-                        >
-                            <Badge tt="none" color="orange" variant="light" size="sm">
-                                {missing.length} untranslated
-                            </Badge>
-                        </Tooltip>
-                    )}
-
-                    {!language && languages.length > 1 && (
-                        <SegmentedControl
-                            size="xs"
-                            value={current}
-                            onChange={setActive}
-                            data={languages.map((code) => ({
-                                value: code,
-                                label: languageName(code),
-                            }))}
-                        />
-                    )}
-                </Group>
-            </Group>
+            <Input.Label required={required} size="sm">
+                {label}
+            </Input.Label>
 
             {description && (
                 <Text size="xs" c="dimmed">
@@ -86,22 +34,22 @@ export default function LocalisedInput({
                 </Text>
             )}
 
-            <Field
-                autosize={multiline || undefined}
-                minRows={multiline ? 2 : undefined}
+            <TextInput
+                // The label above is not tied to the box; this names it.
+                aria-label={label}
                 // In another language the English is the hint: it is what
                 // is being translated, and what people see until it is.
                 placeholder={
-                    (current !== DEFAULT_LANGUAGE &&
+                    (language !== DEFAULT_LANGUAGE &&
                         value?.[DEFAULT_LANGUAGE]) ||
                     placeholder ||
-                    `${label} in ${languageName(current)}`
+                    `${label} in ${languageName(language)}`
                 }
-                value={(value && value[current]) || ""}
+                value={(value && value[language]) || ""}
                 onChange={(event) =>
                     onChange({
                         ...(value || {}),
-                        [current]: event.currentTarget.value,
+                        [language]: event.currentTarget.value,
                     })
                 }
                 {...input}

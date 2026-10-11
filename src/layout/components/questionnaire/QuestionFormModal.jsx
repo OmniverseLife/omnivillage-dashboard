@@ -27,6 +27,7 @@ import {
 import LocalisedInput from "./LocalisedInput";
 import OptionsList from "./OptionsList";
 import {
+    FILE_TYPES,
     PARENT_TYPES,
     QUESTION_TYPES,
     SELECT_TYPES,
@@ -34,6 +35,7 @@ import {
     nameList,
     plural,
     shortTypeLabel,
+    useUnsavedWarning,
 } from "./constants";
 import {
     DEFAULT_LANGUAGE,
@@ -56,7 +58,6 @@ const emptyForm = {
     required: false,
     min: "",
     max: "",
-    presentation: "inline",
 };
 
 /**
@@ -71,7 +72,6 @@ const toForm = (question) => ({
     helper_text: question.helper_text || {},
     min: question.min ?? "",
     max: question.max ?? "",
-    presentation: question.presentation || "inline",
     options: (question.options || []).map((option) => ({
         ...option,
         saved: true,
@@ -81,6 +81,14 @@ const toForm = (question) => ({
 
 const number = (value) =>
     value === "" || value === null || value === undefined ? null : Number(value);
+
+// The types whose `min` and `max` are a range: of the number itself, or of
+// how many rows a repeating group takes. For a photo or audio question `max`
+// alone means something: how many files one answer may hold.
+const RANGE_TYPES = ["number", "repeatable_group"];
+
+// The most files the server lets one answer hold.
+const MAX_FILES = 10;
 
 /** Form values as the API takes them. A row left wholly blank is no option. */
 const payloadOf = (form) => ({
@@ -97,9 +105,12 @@ const payloadOf = (form) => ({
               }))
         : [],
     required: form.type !== "section" && Boolean(form.required),
-    min: number(form.min),
-    max: number(form.max),
-    presentation: form.presentation || "inline",
+    // Only for a type that has them: a number left behind by another type
+    // does not ride along.
+    min: RANGE_TYPES.includes(form.type) ? number(form.min) : null,
+    max: [...RANGE_TYPES, ...FILE_TYPES].includes(form.type)
+        ? number(form.max)
+        : null,
 });
 
 /** What stops a save, in words. The server checks everything again. */
@@ -124,6 +135,13 @@ const problemWith = (form, field = false) => {
         )
             return "Two options have the same key.";
     }
+    // Left empty it is one file. The sentence is the server's own.
+    if (
+        FILE_TYPES.includes(body.type) &&
+        body.max !== null &&
+        !(Number.isInteger(body.max) && body.max >= 1 && body.max <= MAX_FILES)
+    )
+        return `A photo or audio question takes 1 to ${MAX_FILES} files.`;
     return PARENT_TYPES.includes(body.type)
         ? (form.children || [])
               .map((child) => problemWith(child, true))
@@ -205,6 +223,18 @@ const COPY = {
     },
 };
 
+// The officers' questionnaire is edited as the Master is, and keeps its
+// words. What they say a regional team can do is left out: no place changes
+// that questionnaire.
+const OFFICER_COPY = {
+    ...COPY.master,
+    addTitle: "Add question to the officer questionnaire",
+    addNote: "Field officers of every village get this question.",
+    editSubtitle: (page) => `Officer questionnaire · ${page}`,
+    editNote: () =>
+        "You are editing the officer questionnaire. Changes reach the field officers of every village.",
+};
+
 /** For a question a place added itself (PDF p.16), in that place's name. */
 const placeCopy = (name, reach) => {
     const note = `This question is asked in ${reach} only. It is not added to the Master or to any other place.`;
@@ -225,6 +255,7 @@ const whereUsed = ({
     hiddenIn = [],
     rewordedIn = [],
     optionsChangedIn = [],
+    requiredChangedIn = [],
 } = {}) =>
     [
         `Asked in every place${
@@ -233,6 +264,8 @@ const whereUsed = ({
         rewordedIn.length && `Reworded in ${nameList(rewordedIn)}.`,
         optionsChangedIn.length &&
             `Options changed in ${nameList(optionsChangedIn)}.`,
+        requiredChangedIn.length &&
+            `Required changed in ${nameList(requiredChangedIn)}.`,
     ]
         .filter(Boolean)
         .join(" ");
@@ -252,13 +285,16 @@ const whereUsed = ({
  * In a place it serves the questions that place added itself (p.16);
  * `placeName` is the place's name. Such a question is never archived or
  * replaced, and is deleted only while it has not been published. On a
- * `listPage` (one repeating list) a new question goes inside each entry.
+ * `listPage` (one repeating list) a new question goes inside each entry. In
+ * the Master it goes beside the list: `besideList` is that list, and the
+ * panel says so.
  */
 export default function QuestionFormModal({
     scope,
     placeName,
     placeReach,
     listPage,
+    besideList,
     opened,
     onClose,
     question,
@@ -292,7 +328,12 @@ export default function QuestionFormModal({
     const [replacing, setReplacing] = useState(false);
 
     const master = scope.type === "master";
-    const copy = master ? COPY.master : placeCopy(placeName, placeReach);
+    const officer = scope.audience === "officer";
+    const copy = officer
+        ? OFFICER_COPY
+        : master
+        ? COPY.master
+        : placeCopy(placeName, placeReach);
     const type = watch("type");
     const isGroup = type === "repeatable_group";
     const locked = Boolean(question?.answered);
@@ -338,6 +379,7 @@ export default function QuestionFormModal({
             return;
         onClose();
     };
+    useUnsavedWarning(opened && isDirty);
 
     const onSubmit = (form) => {
         const problem = problemWith(form);
@@ -354,9 +396,13 @@ export default function QuestionFormModal({
                 : [];
         if (!question) return onAdd(body, fields);
 
+        const keys = changedKeys(payloadOf(toForm(question)), body);
+        // A new type goes with its limits, changed or not. The server
+        // clears the limits a change of type does not name, so one left out
+        // because it happens to equal the old type's would be lost.
         const changes = pick(
             body,
-            changedKeys(payloadOf(toForm(question)), body)
+            keys.includes("type") ? [...new Set([...keys, "min", "max"])] : keys
         );
         if (!Object.keys(changes).length && !fields.some(hasWrites))
             return onClose();
@@ -420,6 +466,16 @@ export default function QuestionFormModal({
                         <Alert variant="light">
                             {question ? copy.editNote(reach) : copy.addNote}
                         </Alert>
+                        {!question && besideList && (
+                            <Alert variant="light" color="orange">
+                                This page is one list (“
+                                {localise(besideList.label, pageLanguage)}”). A
+                                question added here stands beside the list, not
+                                inside each entry. To add a field to every
+                                entry, close this panel, click the list and use
+                                Add field.
+                            </Alert>
+                        )}
                         {replaces && (
                             <Text size="sm">
                                 Replaces “{localise(replaces.label, pageLanguage)}
@@ -510,7 +566,23 @@ export default function QuestionFormModal({
                                             label: shortTypeLabel(entry.value),
                                         }))}
                                         value={field.value}
-                                        onChange={field.onChange}
+                                        onChange={(value) => {
+                                            field.onChange(value);
+                                            // A limit belongs to the type
+                                            // it was typed for: the most a
+                                            // number may be is not how many
+                                            // photos can be added. Back on
+                                            // the question's own type, its
+                                            // saved limits come back too.
+                                            const own = value === question?.type;
+                                            ["min", "max"].forEach((limit) =>
+                                                setValue(
+                                                    limit,
+                                                    own ? question[limit] ?? "" : "",
+                                                    { shouldDirty: true }
+                                                )
+                                            );
+                                        }}
                                         description="Choose carefully. The type locks once the first answer is saved."
                                         inputWrapperOrder={[
                                             "label",
@@ -523,14 +595,29 @@ export default function QuestionFormModal({
                         )}
                         {/* One replacement at a time: the server refuses a
                             second while the first waits to be published. */}
-                        {master && locked && !question.replacedByPending && (
+                        {master &&
+                            locked &&
+                            !question.replacedByPending &&
+                            !question.replacedBy && (
                             <Anchor
                                 component="button"
                                 type="button"
                                 size="sm"
                                 fw={600}
                                 style={{ alignSelf: "flex-start" }}
-                                onClick={() => setReplacing(true)}
+                                onClick={() => {
+                                    // The panel is about to hold the new
+                                    // question: what was typed about this
+                                    // one would go without a word.
+                                    if (
+                                        isDirty &&
+                                        !window.confirm(
+                                            "What you changed here has not been saved and will be lost. Create the replacement anyway?"
+                                        )
+                                    )
+                                        return;
+                                    setReplacing(true);
+                                }}
                             >
                                 Create a replacement question
                             </Anchor>
@@ -563,24 +650,22 @@ export default function QuestionFormModal({
                             </Group>
                         )}
 
-                        {isGroup && (
+                        {FILE_TYPES.includes(type) && (
                             <Controller
                                 control={control}
-                                name="presentation"
+                                name="max"
                                 render={({ field }) => (
-                                    <Select
-                                        label="How rows are entered"
-                                        allowDeselect={false}
-                                        data={[
-                                            {
-                                                value: "inline",
-                                                label: "Inline — “+ Add row” on the same screen",
-                                            },
-                                            {
-                                                value: "screen",
-                                                label: "Sub-screen — tapping a row opens its own screen",
-                                            },
-                                        ]}
+                                    <NumberInput
+                                        label={
+                                            type === "photo"
+                                                ? "How many photos can be added"
+                                                : "How many recordings can be added"
+                                        }
+                                        // Left empty, an answer is one file.
+                                        placeholder="1"
+                                        min={1}
+                                        max={MAX_FILES}
+                                        allowDecimal={false}
                                         value={field.value}
                                         onChange={field.onChange}
                                     />
@@ -650,7 +735,9 @@ export default function QuestionFormModal({
                             </>
                         )}
 
-                        {master && question && (
+                        {/* Not in the officers' questionnaire: no place
+                            changes it, so there is nothing to read here. */}
+                        {master && !officer && question && (
                             <>
                                 <Divider />
                                 <Box>
@@ -708,6 +795,7 @@ export default function QuestionFormModal({
             </Modal>
 
             <MasterImpactDialog
+                officer={scope.audience === "officer"}
                 opened={opened && impact.opened}
                 onClose={() => setImpact({ ...impact, opened: false })}
                 name={name}
@@ -721,6 +809,7 @@ export default function QuestionFormModal({
                 }}
             />
             <ArchiveQuestionDialog
+                officer={scope.audience === "officer"}
                 opened={opened && removing}
                 onClose={() => setRemoving(false)}
                 target={

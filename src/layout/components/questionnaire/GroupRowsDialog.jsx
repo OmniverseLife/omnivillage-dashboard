@@ -1,5 +1,6 @@
 import { Modal, Paper, ScrollArea, Stack, Table, Text } from "@mantine/core";
-import { answerText, localise } from "./localise";
+import AnswerFiles from "./AnswerFiles";
+import { FILE_TYPES, answerText, localise } from "./localise";
 import { dataTableProps } from "./tableStyles";
 
 // The column headings every questionnaire table has. Each stays on one
@@ -46,6 +47,8 @@ export function Entries({ column, value, language, size = "xs" }) {
                                         language={language}
                                         size={size}
                                     />
+                                ) : FILE_TYPES.includes(answer.type) ? (
+                                    <AnswerFiles answer={answer} />
                                 ) : (
                                     answerText(answer, child, language)
                                 )}
@@ -85,7 +88,15 @@ export default function GroupRowsDialog({ open, onClose, column, value, language
                 </Text>
             ) : (
                 // The bar stays in view: it is the only sign of more fields.
-                <ScrollArea type="auto" offsetScrollbars="x">
+                <ScrollArea
+                    type="auto"
+                    offsetScrollbars="x"
+                    viewportProps={{
+                        tabIndex: 0,
+                        role: "region",
+                        "aria-label": "Entries",
+                    }}
+                >
                     <Table verticalSpacing="sm" horizontalSpacing="md">
                         <Table.Thead>
                             <Table.Tr>
@@ -123,6 +134,16 @@ export default function GroupRowsDialog({ open, onClose, column, value, language
                                                             column={child}
                                                             value={answer.value}
                                                             language={language}
+                                                        />
+                                                    ) : FILE_TYPES.includes(
+                                                          answer?.type
+                                                      ) ? (
+                                                        // A link to each:
+                                                        // the table fetches
+                                                        // no file.
+                                                        <AnswerFiles
+                                                            compact
+                                                            answer={answer}
                                                         />
                                                     ) : (
                                                         answerText(

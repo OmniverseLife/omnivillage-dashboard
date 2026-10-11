@@ -44,7 +44,9 @@ function ToMaster() {
   const category = searchParams.get("categoryId");
   return (
     <Navigate
-      to={`/questionnaire/master${category ? `?category=${category}` : ""}`}
+      to={`/questionnaire/master${
+        category ? `?${new URLSearchParams({ category })}` : ""
+      }`}
       replace={true}
     />
   );
@@ -58,7 +60,7 @@ function NotFound() {
       alignItems="center"
       justifyContent="center"
       spacing={1.5}
-      sx={{ minHeight: "100vh", width: "100%", color: "#1f2933" }}
+      sx={{ minHeight: "100vh", width: "100vw", color: "#1f2933" }}
     >
       <h2 style={{ margin: 0 }}>Page not found</h2>
       <p style={{ margin: 0 }}>
@@ -84,7 +86,7 @@ function App() {
       {/* <Sidebar />
       <div className="rightSide">
         <Navbar /> */}
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<Loading isLoading />}>
         <ThemeProvider theme={THEME}>
           <Routes location={location}>
             <Route

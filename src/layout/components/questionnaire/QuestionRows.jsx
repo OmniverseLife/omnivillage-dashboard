@@ -53,6 +53,8 @@ const setBy = (row, places) => {
             `${row.asked ? "Switched back on" : "Hidden"} in ${name(from.asked)}`,
         name(from.label) && `Question reworded in ${name(from.label)}`,
         name(from.helper_text) && `Helper text set in ${name(from.helper_text)}`,
+        name(from.required) &&
+            `Made ${row.required ? "required" : "optional"} in ${name(from.required)}`,
         name(from.options) && `Options changed in ${name(from.options)}`,
     ].filter(Boolean);
     return lines.length > 0 ? lines.join("\n") : "Nothing is set for it: as in the Master.";
@@ -72,7 +74,8 @@ const sameParent = (a, b) =>
  *
  * In the Master a row is dragged among the rows that share its parent, or
  * moved with Alt+↑ / Alt+↓ on its handle. Results are in no order of their
- * own, so they have no handle.
+ * own, so they have no handle. The officers' questionnaire is listed the
+ * same way, without the column on where a question is used.
  *
  * In a place (`placeName` is its name) nothing is reordered. A row says what
  * the place did to the question and carries the switch that decides whether
@@ -96,6 +99,9 @@ export default function QuestionRows({
     onAsk,
 }) {
     const master = scope.type === "master";
+    // The Master's last column says what places did to a question. No place
+    // changes the officers' questionnaire, so there it has nothing to say.
+    const showsUse = master && scope.audience !== "officer";
     const sortable = master && !grouped;
     const [dragging, setDragging] = useState(null);
     const [over, setOver] = useState(null);
@@ -154,7 +160,8 @@ export default function QuestionRows({
 
     // A place's row starts with a tick box where the Master's has a handle,
     // and ends with two columns where the Master's has one.
-    const columns = (sortable || !master ? 1 : 0) + 2 + (master ? 1 : 2);
+    const columns =
+        (sortable || !master ? 1 : 0) + 2 + (showsUse ? 1 : master ? 0 : 2);
     const isTicked = (row) => !master && ticked.has(row._id);
     const allTicked = rows.every(isTicked);
     const anyTicked = rows.some(isTicked);
@@ -172,9 +179,9 @@ export default function QuestionRows({
                 {(sortable || !master) && <col style={{ width: 44 }} />}
                 <col />
                 <col style={{ width: 150 }} />
-                {master ? (
+                {showsUse ? (
                     <col style={{ width: 230 }} />
-                ) : (
+                ) : master ? null : (
                     <>
                         {/* Room for "Options changed in" and a name. */}
                         <col style={{ width: 240 }} />
@@ -204,9 +211,9 @@ export default function QuestionRows({
                         )}
                         <Table.Th style={heading}>Question</Table.Th>
                         <Table.Th style={heading}>Answer type</Table.Th>
-                        {master ? (
+                        {showsUse ? (
                             <Table.Th style={heading}>Where it is used</Table.Th>
-                        ) : (
+                        ) : master ? null : (
                             <>
                                 <Table.Th style={heading}>Status</Table.Th>
                                 <Table.Th
@@ -227,6 +234,7 @@ export default function QuestionRows({
                         hiddenIn = [],
                         rewordedIn = [],
                         optionsChangedIn = [],
+                        requiredChangedIn = [],
                     } = row.usage || {};
                     return (
                         <Fragment key={row._id}>
@@ -306,6 +314,10 @@ export default function QuestionRows({
                                                 event.stopPropagation()
                                             }
                                             onKeyDown={(event) => {
+                                                // A bare Space would scroll
+                                                // the page from here.
+                                                if (event.key === " ")
+                                                    event.preventDefault();
                                                 if (
                                                     !event.altKey ||
                                                     !["ArrowUp", "ArrowDown"].includes(
@@ -366,7 +378,13 @@ export default function QuestionRows({
                                                 role="button"
                                                 tabIndex={0}
                                                 onKeyDown={(event) => {
-                                                    if (event.key !== "Enter")
+                                                    // Space as well: left to
+                                                    // the browser it scrolls
+                                                    // the page.
+                                                    if (
+                                                        event.key !== "Enter" &&
+                                                        event.key !== " "
+                                                    )
                                                         return;
                                                     event.preventDefault();
                                                     open();
@@ -424,7 +442,7 @@ export default function QuestionRows({
                                         {shortTypeLabel(row.type)}
                                     </Text>
                                 </Table.Td>
-                                {master ? (
+                                {showsUse ? (
                                     <Table.Td>
                                         <Stack gap={4} align="flex-start">
                                             {/* Two places are named in the
@@ -464,9 +482,17 @@ export default function QuestionRows({
                                                     Options changed in {name}
                                                 </Pill>
                                             ))}
+                                            {requiredChangedIn.map((name) => (
+                                                <Pill
+                                                    key={`required-${name}`}
+                                                    tone="blue"
+                                                >
+                                                    Required changed in {name}
+                                                </Pill>
+                                            ))}
                                         </Stack>
                                     </Table.Td>
-                                ) : (
+                                ) : master ? null : (
                                     <>
                                         <Table.Td>
                                             <StatusPill

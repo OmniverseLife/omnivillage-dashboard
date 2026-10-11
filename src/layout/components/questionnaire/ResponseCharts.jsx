@@ -10,10 +10,26 @@ import CustomPieChart from "../customPieChart/customPieChart";
  * existing Highcharts wrappers. No new chart component and no new library —
  * the server already bucketed the numbers, so there is no histogram code here.
  */
+// Highcharts reads every string it is handed as markup: a link or a style in
+// it becomes a real link or style inside the chart. A villager's typed answer
+// and a question's wording are text, and are drawn as they were typed.
+const plain = (text) =>
+    String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;");
+
 export default function ResponseCharts({ stats }) {
     if (!stats) return null;
 
-    const { total, submissionsOverTime = [], perQuestion = [] } = stats;
+    const { total, submissionsOverTime = [] } = stats;
+    const perQuestion = (stats.perQuestion || []).map((question) => ({
+        ...question,
+        label: plain(question.label),
+        buckets: (question.buckets || []).map((bucket) => ({
+            ...bucket,
+            label: plain(bucket.label),
+        })),
+    }));
 
     if (total === 0) {
         return (
@@ -123,6 +139,27 @@ export default function ResponseCharts({ stats }) {
                         header={`${question.label} — rows per response`}
                         data={{
                             xAxis: buckets.map((b) => `${b.label} row(s)`),
+                            dataset: [
+                                {
+                                    name: "Responses",
+                                    data: buckets.map((b) => b.count),
+                                },
+                            ],
+                        }}
+                    />
+                );
+
+            // A photo or a recording cannot be charted; how many of them
+            // each response holds can, as a list's entries are.
+            case "photo":
+            case "audio":
+                return (
+                    <CustomBarChart
+                        header={`${question.label}: files per response`}
+                        data={{
+                            xAxis: buckets.map(
+                                (b) => `${b.label} ${b.label === "1" ? "file" : "files"}`
+                            ),
                             dataset: [
                                 {
                                     name: "Responses",

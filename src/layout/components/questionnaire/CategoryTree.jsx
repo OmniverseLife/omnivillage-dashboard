@@ -25,7 +25,11 @@ const MEANING = {
  * In the Master a category is dragged to a new place: dropped on the edge of
  * a row it goes beside that row (into that row's parent, which is also how
  * it leaves a group), and dropped on the middle of a group it goes inside.
- * Alt+↑ / Alt+↓ on a focused row moves it among its siblings.
+ * The keyboard does the same on a focused row: Alt+↑ / Alt+↓ among its
+ * siblings, Alt+→ into the group just above it, Alt+← out of its group.
+ *
+ * The tree is ONE tab stop: ↑ and ↓ move between its rows, Tab goes on to
+ * the row's menu and then out of the tree (36 categories were 77 stops).
  *
  * In a place (`placeName` is its name) nothing is dragged, archived or
  * deleted: a category is hidden or shown for that place, and only one the
@@ -56,6 +60,11 @@ export default function CategoryTree({
     const master = !readOnly && scope.type === "master";
     const [dragging, setDragging] = useState(null);
     const [over, setOver] = useState(null);
+    // The row Tab lands on: the one last focused, else the chosen page.
+    const [focused, setFocused] = useState(null);
+    const stop = categories.some((category) => category._id === focused)
+        ? focused
+        : selectedId || categories[0]?._id;
 
     // The tree scrolls on its own and is longer than the window (36
     // categories today), so a page opened from a link, a search result or
@@ -100,6 +109,25 @@ export default function CategoryTree({
         onReorder(reordered(siblings, category, index));
     };
 
+    // Into the group just above it, as its last category; or out of its
+    // group, to stand right after it.
+    const shift = (category, inwards) => {
+        const siblings = childrenOf(category.parentId || null);
+        const above =
+            siblings[siblings.findIndex((entry) => entry._id === category._id) - 1];
+        const group = categories.find(
+            (entry) => entry._id === category.parentId
+        );
+        if (inwards ? !above || above.is_screen : !group) return;
+        const parentId = inwards ? above._id : group.parentId || null;
+        const level = childrenOf(parentId);
+        const index = inwards
+            ? level.length
+            : level.findIndex((entry) => entry._id === group._id) + 1;
+        refocus.current = `category-${category._id}`;
+        onMove(category, parentId, reordered(level, category, index));
+    };
+
     // A category cannot go beside or inside itself or anything under it.
     const accepts = (target) =>
         dragging &&
@@ -128,25 +156,43 @@ export default function CategoryTree({
         else onMove(dragging, parentId, moved);
     };
 
-    const menu = (category) => [
-        { label: "Rename", onClick: () => onRename(category) },
-        { label: "Add sub-category", onClick: () => onAdd(category) },
-        category.active === false
-            ? { label: "Restore", onClick: () => onRestore(category) }
-            : // Nothing to keep: no questions, and no category inside it.
+    const menu = (category) => {
+        // Nothing to keep, as far as the Master can see: no questions, and
+        // no category inside it.
+        const empty =
             category.questionCount === 0 &&
-              childrenOf(category._id).length === 0
-            ? {
-                  label: "Delete",
-                  color: "red.9",
-                  onClick: () => onRemove(category, true),
-              }
-            : {
-                  label: "Archive",
-                  color: "red.9",
-                  onClick: () => onRemove(category, false),
-              },
-    ];
+            childrenOf(category._id).length === 0;
+        return [
+            { label: "Rename", onClick: () => onRename(category) },
+            { label: "Add sub-category", onClick: () => onAdd(category) },
+            ...(category.active === false
+                ? [{ label: "Restore", onClick: () => onRestore(category) }]
+                : [
+                      ...(empty
+                          ? [
+                                {
+                                    label: "Delete",
+                                    color: "red.9",
+                                    onClick: () => onRemove(category, true),
+                                },
+                            ]
+                          : []),
+                      // Also on one that looks empty, once it is published:
+                      // what places added to it is not listed in the Master,
+                      // and the server will not delete a category that holds
+                      // any of it.
+                      ...(!empty || !category.unpublished
+                          ? [
+                                {
+                                    label: "Archive",
+                                    color: "red.9",
+                                    onClick: () => onRemove(category, false),
+                                },
+                            ]
+                          : []),
+                  ]),
+        ];
+    };
 
     const placeMenu = (category) => [
         ...(category.ownerPlaceId === scope.placeId
@@ -155,7 +201,9 @@ export default function CategoryTree({
         category.status.kind === "hidden"
             ? { label: `Show in ${placeName}`, onClick: () => onShow(category) }
             : { label: `Hide in ${placeName}`, onClick: () => onHide(category) },
-        ...(category.is_screen
+        // Inside one of the Master's groups only: what a place adds sits
+        // at the top level or in such a group, never inside a place's own.
+        ...(category.is_screen || category.ownerPlaceId
             ? []
             : [
                   {
@@ -243,26 +291,50 @@ export default function CategoryTree({
                         <UnstyledButton
                             component="div"
                             role="button"
-                            tabIndex={0}
+                            tabIndex={category._id === stop ? 0 : -1}
                             id={`category-${category._id}`}
                             aria-current={selected ? "true" : undefined}
+                            aria-keyshortcuts={
+                                master
+                                    ? "Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"
+                                    : undefined
+                            }
                             px={10}
                             py={10}
                             onClick={() => onSelect(category._id)}
+                            onFocus={() => setFocused(category._id)}
                             onKeyDown={(event) => {
+                                const vertical = ["ArrowUp", "ArrowDown"].includes(
+                                    event.key
+                                );
+                                const sideways = [
+                                    "ArrowLeft",
+                                    "ArrowRight",
+                                ].includes(event.key);
                                 if (event.key === "Enter" || event.key === " ") {
                                     event.preventDefault();
                                     onSelect(category._id);
-                                } else if (
-                                    master &&
-                                    event.altKey &&
-                                    ["ArrowUp", "ArrowDown"].includes(event.key)
-                                ) {
+                                } else if (vertical && !event.altKey) {
+                                    // Between the rows of the tree.
+                                    event.preventDefault();
+                                    const all = [
+                                        ...nav.current.querySelectorAll(
+                                            '[id^="category-"]'
+                                        ),
+                                    ];
+                                    all[
+                                        all.indexOf(event.currentTarget) +
+                                            (event.key === "ArrowUp" ? -1 : 1)
+                                    ]?.focus();
+                                } else if (master && event.altKey && vertical) {
                                     event.preventDefault();
                                     nudge(
                                         category,
                                         event.key === "ArrowUp" ? -1 : 1
                                     );
+                                } else if (master && event.altKey && sideways) {
+                                    event.preventDefault();
+                                    shift(category, event.key === "ArrowRight");
                                 }
                             }}
                             style={{
@@ -331,6 +403,7 @@ export default function CategoryTree({
                             <Box className="qn-category-menu">
                                 <RowActions
                                     label={`Actions for ${title}`}
+                                    tabIndex={category._id === stop ? 0 : -1}
                                     items={
                                         master
                                             ? menu(category)

@@ -20,7 +20,7 @@ import {
 import { DataTable } from "mantine-datatable";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { deletePlace, fetchPlaces } from "../../../functions/places";
 import AssignTeamDialog from "../../components/questionnaire/AssignTeamDialog";
@@ -35,7 +35,7 @@ import {
     visiblePlaces,
 } from "../../components/questionnaire/constants";
 import { languageName } from "../../components/questionnaire/localise";
-import { PageHeader } from "../../components/questionnaire/shell";
+import { EmptyState, PageHeader } from "../../components/questionnaire/shell";
 import { dataTableProps } from "../../components/questionnaire/tableStyles";
 import Wrapper from "../../components/wrapper/wrapper";
 
@@ -76,8 +76,22 @@ const differsFrom = (diff) => {
 
 export default function Locations() {
     const navigate = useNavigate();
-    const [search, setSearch] = useState("");
-    const [level, setLevel] = useState("");
+    // The search and the level are in the URL (`q`, `level`), so Back brings
+    // a filtered list back and a view is a link. Typing replaces the history
+    // entry instead of adding one a letter.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const search = searchParams.get("q") || "";
+    const level = PLACE_LEVELS.some(
+        (entry) => entry.value === searchParams.get("level")
+    )
+        ? searchParams.get("level")
+        : "";
+    const setParam = (name, value, replace = false) => {
+        const next = new URLSearchParams(searchParams);
+        if (value) next.set(name, value);
+        else next.delete(name);
+        setSearchParams(next, { replace });
+    };
     const [form, setForm] = useState({ opened: false });
     const [assign, setAssign] = useState({ opened: false });
     const [removal, setRemoval] = useState({ opened: false });
@@ -87,6 +101,7 @@ export default function Locations() {
     const {
         data: places = [],
         isLoading,
+        isError,
         refetch,
     } = useQuery({
         // Its own entry beside the plain list: the dialogs read that one,
@@ -121,11 +136,10 @@ export default function Locations() {
                 <Text
                     size="sm"
                     fw={row.level === "country" ? 700 : undefined}
-                    tt={row.level === "village" ? "capitalize" : undefined}
                     // Flat under a level filter: the parents are not listed.
                     pl={level ? 0 : row.depth * 28}
                 >
-                    {row.name}
+                    {placeName(row)}
                 </Text>
             ),
         },
@@ -227,6 +241,7 @@ export default function Locations() {
                 <RowActions
                     // Room for "Open questionnaire" on one line.
                     width={230}
+                    label={`Actions for ${placeName(row)}`}
                     items={[
                         {
                             label: "Open questionnaire",
@@ -291,7 +306,7 @@ export default function Locations() {
                                 w={360}
                                 value={search}
                                 onChange={(event) =>
-                                    setSearch(event.currentTarget.value)
+                                    setParam("q", event.currentTarget.value, true)
                                 }
                             />
                             <Select
@@ -303,21 +318,34 @@ export default function Locations() {
                                     ...PLACE_LEVELS,
                                 ]}
                                 value={level}
-                                onChange={(value) => setLevel(value || "")}
+                                onChange={(value) => setParam("level", value)}
                             />
                         </Group>
-                        <DataTable
-                            records={rows}
-                            columns={columns}
-                            idAccessor="_id"
-                            fetching={isLoading}
-                            {...dataTableProps}
-                            noRecordsText={
-                                search || level
-                                    ? "No places match"
-                                    : "No places yet"
-                            }
-                        />
+                        {isError ? (
+                            // Not "No places yet": the list did not arrive.
+                            <EmptyState
+                                title="The places could not be loaded"
+                                description="Check the connection and try again."
+                                action={
+                                    <Button onClick={() => refetch()}>
+                                        Try again
+                                    </Button>
+                                }
+                            />
+                        ) : (
+                            <DataTable
+                                records={rows}
+                                columns={columns}
+                                idAccessor="_id"
+                                fetching={isLoading}
+                                {...dataTableProps}
+                                noRecordsText={
+                                    search || level
+                                        ? "No places match"
+                                        : "No places yet"
+                                }
+                            />
+                        )}
                     </Paper>
                 </Box>
 

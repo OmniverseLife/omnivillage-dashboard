@@ -14,10 +14,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { fetchUsage } from "../../../functions/questionnaire";
 import {
-    PARENT_TYPES,
-    QUESTION_TYPES,
+    changedIn,
     nameList,
+    PARENT_TYPES,
     plural,
+    QUESTION_TYPES,
     shortTypeLabel,
 } from "./constants";
 
@@ -56,6 +57,11 @@ function Dialog({ title, subtitle, actions, children, ...modal }) {
     );
 }
 
+// Whom a removal reaches: every place, or (the officers' questionnaire has
+// no places) every field officer.
+const EVERYWHERE = "in every place";
+const EVERY_OFFICER = "for every field officer";
+
 const ARCHIVE = {
     question: {
         lead: "This question has saved answers, so it cannot be deleted. Archiving removes it from the app in every place.",
@@ -93,6 +99,7 @@ const answersKept = (count) =>
  * sentence where the Master's does not hold: a question only one place has.
  */
 export function ArchiveQuestionDialog({
+    officer,
     opened,
     onClose,
     kind = "question",
@@ -133,7 +140,11 @@ export function ArchiveQuestionDialog({
             }
         >
             <Text size="sm">
-                {lead || (remove ? DELETE[kind] : ARCHIVE[kind].lead)}
+                {lead ||
+                    (remove ? DELETE[kind] : ARCHIVE[kind].lead).replace(
+                        EVERYWHERE,
+                        officer ? EVERY_OFFICER : EVERYWHERE
+                    )}
             </Text>
             {!remove && (
                 <Alert variant="light">
@@ -173,16 +184,15 @@ export function ReplacementDialog({ opened, onClose, question, name, onCreate })
     // page 5, which shows a question no place has touched): where it was
     // hidden the new one stays hidden; wording and options written for the
     // old question are not carried over to a question of another type.
-    const { hiddenIn = [], rewordedIn = [], optionsChangedIn = [] } =
-        question?.usage || {};
-    const reworded = [...new Set([...rewordedIn, ...optionsChangedIn])];
+    const { hiddenIn = [] } = question?.usage || {};
+    const reworded = changedIn(question?.usage);
     const forPlaces = [
         hiddenIn.length > 0 &&
             `The new question stays hidden in ${nameList(hiddenIn)}.`,
         reworded.length > 0 &&
-            `The wording and option changes of ${nameList(
+            `What ${nameList(
                 reworded
-            )} are not carried over to it.`,
+            )} changed about this question (wording, Required, options) is not carried over to it.`,
     ].filter(Boolean);
     const types = question ? replacementTypes(question) : [];
     const [type, setType] = useState("");
@@ -266,6 +276,7 @@ export function ReplacementDialog({ opened, onClose, question, name, onCreate })
  * new one reaches fewer places than `reach`, and those places are named.
  */
 export function MasterImpactDialog({
+    officer,
     opened,
     onClose,
     name,
@@ -281,7 +292,11 @@ export function MasterImpactDialog({
         <Dialog
             opened={opened}
             onClose={onClose}
-            title="This changes the Master"
+            title={
+                officer
+                    ? "This changes the officer questionnaire"
+                    : "This changes the Master"
+            }
             subtitle={`“${name}” · ${summary}`}
             actions={
                 <>
@@ -295,8 +310,13 @@ export function MasterImpactDialog({
             <Alert variant="light" color="orange">
                 {wording ? "The new wording reaches " : "The new options reach "}
                 <Text span inherit fw={700}>
-                    {plural(reached?.countries ?? 0, "country", "countries")}{" "}
-                    and {plural(reached?.villages ?? 0, "village")}
+                    {officer
+                        ? "the field officers of every village"
+                        : `${plural(
+                              reached?.countries ?? 0,
+                              "country",
+                              "countries"
+                          )} and ${plural(reached?.villages ?? 0, "village")}`}
                 </Text>
                 .
             </Alert>
@@ -369,6 +389,9 @@ export function ResetDialog({
     name,
     placeName,
     placeReach,
+    // "the Master version", or "Ladakh's version" for a place under one
+    // that changed the question: that is what it goes back to.
+    version = "the Master version",
     onConfirm,
     loading,
 }) {
@@ -376,7 +399,7 @@ export function ResetDialog({
         <Dialog
             opened={opened}
             onClose={onClose}
-            title="Reset to the Master version?"
+            title={`Reset to ${version}?`}
             subtitle={`“${name}” in ${placeName}`}
             actions={
                 <>
@@ -384,18 +407,18 @@ export function ResetDialog({
                         Cancel
                     </Button>
                     <Button loading={loading} onClick={onConfirm}>
-                        Reset to the Master version
+                        Reset to {version}
                     </Button>
                 </>
             }
         >
             <Text size="sm">
-                {placeName}&apos;s own wording and option changes for this
-                question are removed.{" "}
+                {placeName}&apos;s own wording, Required setting and option
+                changes for this question are removed.{" "}
                 {placeReach && placeReach !== placeName
                     ? `${placeReach} go`
                     : `${placeName} goes`}{" "}
-                back to the Master version.
+                back to {version}.
             </Text>
             <Text size="sm" c="dimmed">
                 Answers already collected are not changed.

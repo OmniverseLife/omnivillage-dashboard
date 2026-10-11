@@ -13,12 +13,12 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import logo from "../../../assets/logo.png";
 import * as yup from "yup";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { login } from "../../../functions/admin";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -90,6 +90,8 @@ const schema = yup.object().shape({
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  // The page a signed-out visitor was on their way to (AuthProvider).
+  const next = useSearchParams()[0].get("next") || "";
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -105,13 +107,20 @@ export default function Login() {
     resolver: yupResolver(schema),
   });
 
+  const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
+      // What the account before this one was sent stays in the query cache
+      // for minutes: none of it is this account's to be shown.
+      queryClient.clear();
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       toast.success("Logged In Successfully!");
-      navigate("/");
+      // Back to the page this sign-in interrupted, when there was one: an
+      // address of this dashboard and nothing else (a browser reads "//" and
+      // "/\\" as the start of another site).
+      navigate(/^\/(?![/\\])/.test(next) ? next : "/");
     },
     onError: (err) => {
       toast.error(Object.values(err.response.data)[0]);

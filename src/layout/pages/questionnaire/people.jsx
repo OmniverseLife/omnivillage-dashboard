@@ -19,8 +19,7 @@ import AssignTeamDialog, {
 } from "../../components/questionnaire/AssignTeamDialog";
 import MantineShell from "../../components/questionnaire/MantineShell";
 import RowActions from "../../components/questionnaire/RowActions";
-import { placeName } from "../../components/questionnaire/constants";
-import { PageHeader } from "../../components/questionnaire/shell";
+import { EmptyState, PageHeader } from "../../components/questionnaire/shell";
 import { dataTableProps } from "../../components/questionnaire/tableStyles";
 import Wrapper from "../../components/wrapper/wrapper";
 
@@ -42,6 +41,7 @@ export default function People() {
     const {
         data: team = [],
         isLoading,
+        isError,
         refetch,
     } = useQuery({
         queryKey: ["team"],
@@ -90,14 +90,8 @@ export default function People() {
         {
             accessor: "place",
             title: "Place",
-            // Only a village's own name is stored lowercase; the places
-            // above it in the breadcrumb are shown as they were typed.
-            render: ({ place }) =>
-                place?.names
-                    ?.map((name) =>
-                        name === place.name ? placeName(place) : name
-                    )
-                    .join(" › "),
+            // The server writes each name as it is read.
+            render: ({ place }) => place?.names?.join(" › "),
         },
         {
             accessor: "actions",
@@ -108,6 +102,7 @@ export default function People() {
             render: (row) =>
                 row.role === "regional" && (
                     <RowActions
+                        label={`Actions for ${row.email}`}
                         items={[
                             {
                                 label: "Change place",
@@ -158,14 +153,27 @@ export default function People() {
                     />
 
                     <Paper withBorder radius="md" style={{ overflow: "hidden" }}>
-                        <DataTable
-                            records={team}
-                            columns={columns}
-                            idAccessor="_id"
-                            fetching={isLoading}
-                            {...dataTableProps}
-                            noRecordsText="No accounts"
-                        />
+                        {isError ? (
+                            // Not "No accounts": the list did not arrive.
+                            <EmptyState
+                                title="The accounts could not be loaded"
+                                description="Check the connection and try again."
+                                action={
+                                    <Button onClick={() => refetch()}>
+                                        Try again
+                                    </Button>
+                                }
+                            />
+                        ) : (
+                            <DataTable
+                                records={team}
+                                columns={columns}
+                                idAccessor="_id"
+                                fetching={isLoading}
+                                {...dataTableProps}
+                                noRecordsText="No accounts"
+                            />
+                        )}
                     </Paper>
                 </Box>
 

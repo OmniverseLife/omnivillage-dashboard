@@ -155,6 +155,12 @@ export default function Settings() {
         reset();
         refetch();
       },
+      onError: (e) =>
+        toast.error(
+          e?.response?.data?.message ||
+            Object.values(e?.response?.data || {})[0] ||
+            "Could not add the village"
+        ),
     });
 
   const { mutate: addFeedMutate, isPending: isAddFeedPending } = useMutation({

@@ -19,12 +19,6 @@ const landConverter = (unit, value) => {
 function LandChart({ land_unit }) {
     const [searchParams] = useSearchParams();
 
-    console.log(
-        searchParams.get("village") ||
-            searchParams.get("village") !== "undefined",
-        "lala"
-    );
-
     const { data: land_allocation = {}, isLandAllocationLoading } = useQuery({
         queryKey: ["land_allocation", searchParams.getAll("village")],
         queryFn: () => getLandAllocationData(searchParams.getAll("village")),

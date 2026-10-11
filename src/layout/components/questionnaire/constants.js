@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { fetchFile } from "../../../functions/questionnaire";
 import { localise } from "./localise";
 
 export const QUESTION_TYPES = [
@@ -7,6 +10,8 @@ export const QUESTION_TYPES = [
     { value: "multi_select", label: "Multi select" },
     { value: "date", label: "Date" },
     { value: "boolean", label: "Yes / No" },
+    { value: "photo", label: "Photo" },
+    { value: "audio", label: "Audio recording", short: "Audio" },
     {
         value: "repeatable_group",
         label: "Repeatable group (+ Add row)",
@@ -19,6 +24,9 @@ export const QUESTION_TYPES = [
 export const PARENT_TYPES = ["repeatable_group", "section"];
 
 export const SELECT_TYPES = ["single_select", "multi_select"];
+
+// Types answered with files. The list is `localise.js`'s (see there why).
+export { FILE_TYPES } from "./localise";
 
 /**
  * The name the editor's list and panel use. `label` explains a type where a
@@ -88,6 +96,35 @@ export const flattenFilterTargets = (
     });
     return out;
 };
+
+/* ---------------- what the server said ---------------- */
+
+/**
+ * The server's own "no" to a request as it stands: a place that is someone
+ * else's (403), one that does not exist (404), an address it cannot read
+ * (400). Asking again gets the same answer, so it is shown and not retried.
+ * (A 401 never reaches a screen: the axios interceptor takes it.)
+ */
+export const isRefusal = (err) => {
+    const status = err?.response?.status;
+    return status >= 400 && status < 500;
+};
+export const retry = (failures, err) => !isRefusal(err) && failures < 3;
+
+/**
+ * The one 409 that is a conflict: what is on screen is no longer what is
+ * saved. Every other 409 of this backend is a rule ("Leave at least one
+ * option on…") that the person can still put right in the open form.
+ */
+export const isStale = (err) =>
+    err?.response?.status === 409 &&
+    String(err.response.data?.message || "").startsWith(
+        "This was changed by someone else"
+    );
+
+// Closing keeps what a dialog was showing, so its contents do not change
+// under the reader while it fades out.
+export const closed = (dialog) => ({ ...dialog, opened: false });
 
 /* ---------------- editor ---------------- */
 
@@ -167,6 +204,19 @@ export const nameList = (names) => NAMES.format(names);
 export const placeList = (names) =>
     names.length > 2 ? `${names.length} places` : nameList(names);
 
+/**
+ * The places that changed a Master question in any way other than hiding
+ * it: its wording, whether it is required, its options. The ONE list of what
+ * counts as a change, for the chip, the pills and the sentences.
+ */
+export const changedIn = (usage) => [
+    ...new Set([
+        ...(usage?.rewordedIn || []),
+        ...(usage?.requiredChangedIn || []),
+        ...(usage?.optionsChangedIn || []),
+    ]),
+];
+
 /** Where the Master's question is asked, from the places that hide it. */
 export const usedIn = (usage) =>
     usage?.hiddenIn?.length
@@ -194,6 +244,37 @@ export const placeName = (place) =>
         : place.name;
 
 /**
+ * A regional account's own place as the server holds it NOW: the places list
+ * marks what the account manages, and the highest of those is its own. Null
+ * for any other account (their lists carry no such mark).
+ */
+export const ownPlaceOf = (places) =>
+    places
+        .filter((place) => place.managed === true)
+        .reduce((top, place) => (!top || place.depth < top.depth ? place : top), null);
+
+/**
+ * The copy of that place kept from sign-in goes stale when a super admin
+ * moves the account ("Change place"): the menu link and the start page are
+ * built from it. It is rewritten from the list whenever a screen reads one.
+ */
+export const rememberOwnPlace = (own) => {
+    try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        if (user.role !== "regional" || user.place?._id === own._id) return;
+        localStorage.setItem(
+            "user",
+            JSON.stringify({
+                ...user,
+                place: { _id: own._id, name: placeName(own), level: own.level },
+            })
+        );
+    } catch (unreadable) {
+        // Nothing stored that can be read: the next sign-in writes it.
+    }
+};
+
+/**
  * "India › Ladakh › Leh". A place's `path` already lists its ancestors root
  * first, so nothing walks parent links; `byId` is a Map of every place.
  */
@@ -219,4 +300,57 @@ export const visiblePlaces = (places, search, level, test) => {
     if (level || (!query && !test)) return matches;
     const keep = new Set(matches.flatMap((place) => [...place.path, place._id]));
     return places.filter((place) => keep.has(place._id));
+};
+
+/**
+ * While `unsaved`, the browser asks before a reload or a closed tab throws
+ * away what was typed in an open panel (its own Cancel, X and Esc already
+ * ask).
+ */
+export const useUnsavedWarning = (unsaved) => {
+    useEffect(() => {
+        if (!unsaved) return undefined;
+        const warn = (event) => {
+            event.preventDefault();
+            event.returnValue = "";
+        };
+        window.addEventListener("beforeunload", warn);
+        return () => window.removeEventListener("beforeunload", warn);
+    }, [unsaved]);
+};
+
+/* ---------------- files ---------------- */
+
+/**
+ * One photo or recording of an answer, as an address an image or a player
+ * can be given. The file is behind the sign-in, and an address straight to
+ * the API would carry no token: it is fetched like any other request and
+ * handed to the browser from memory. `thumb` asks for a photo's small copy;
+ * `enabled` holds the request back (until the file is scrolled to, say).
+ * `type` is what the server found the file to be ("image/jpeg", "audio/mp4").
+ */
+export const useFile = (id, { thumb = false, enabled = true } = {}) => {
+    const { data: blob, isError } = useQuery({
+        queryKey: ["file", id, thumb],
+        queryFn: () => fetchFile(id, { thumb }),
+        enabled,
+        // A file never changes under its id.
+        staleTime: Infinity,
+        retry,
+    });
+    // The cache holds the file; its address is made and given back here. One
+    // made with the request and given back on leaving would be dead the
+    // second time this runs (in development every effect runs twice), and
+    // one never given back keeps the file in memory as long as the tab lives.
+    const [url, setUrl] = useState("");
+    useEffect(() => {
+        if (!blob) return undefined;
+        const made = URL.createObjectURL(blob);
+        setUrl(made);
+        return () => {
+            URL.revokeObjectURL(made);
+            setUrl("");
+        };
+    }, [blob]);
+    return { url, type: blob?.type || "", failed: isError };
 };

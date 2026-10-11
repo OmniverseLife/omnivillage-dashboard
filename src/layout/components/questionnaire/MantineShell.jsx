@@ -85,10 +85,22 @@ const theme = createTheme({
         // The design draws every field label bold, in the panels and in the
         // small dialogs alike.
         InputWrapper: { styles: { label: { fontWeight: 700 } } },
+        // Every dialog's X has a name for whoever cannot see it.
+        Modal: {
+            defaultProps: { closeButtonProps: { "aria-label": "Close" } },
+        },
         TextInput: { defaultProps: { size: "sm" } },
         Select: { defaultProps: { size: "sm", checkIconPosition: "right" } },
-        Textarea: { defaultProps: { size: "sm" } },
     },
+});
+
+// Muted text (c="dimmed": the type column, notes, "Not asked") is gray.6 in
+// Mantine, 3.3:1 on white: below what small text needs, and lighter than the
+// design draws it. gray.7 is 8.2:1.
+const dimmedText = () => ({
+    variables: {},
+    light: { "--mantine-color-dimmed": "var(--mantine-color-gray-7)" },
+    dark: {},
 });
 
 /**
@@ -102,7 +114,11 @@ const theme = createTheme({
  */
 export default function MantineShell({ children }) {
     return (
-        <MantineProvider theme={theme} defaultColorScheme="light">
+        <MantineProvider
+            theme={theme}
+            defaultColorScheme="light"
+            cssVariablesResolver={dimmedText}
+        >
             <div className="questionnaire-root">{children}</div>
         </MantineProvider>
     );
