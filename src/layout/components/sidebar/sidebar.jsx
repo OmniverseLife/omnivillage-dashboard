@@ -38,7 +38,7 @@ export default function Sidebar({ role }) {
             <div className="sidebar">
                 <div className="logo">
                     <img src={logo} alt="" />
-                    <h1>OMNI VILLAGE</h1>
+                    {/* <h1>OMNI VILLAGE</h1> */}
                 </div>
                 <Link
                     // Its own place's questionnaire: where it also lands.
@@ -102,8 +102,15 @@ export default function Sidebar({ role }) {
         <div className="sidebar">
             <div className="logo">
                 <img src={logo} alt="" />
-                <h1>OMNI VILLAGE</h1>
+                {/* <h1>OMNI VILLAGE</h1> */}
             </div>
+            <Link
+                to="/chat"
+                className={paths.includes("chat") ? "link active" : "link"}
+            >
+                <i className="fa-solid fa-robot"></i>
+                <p>Ask Me</p>
+            </Link>
             <Link
                 // to="/dashboard"
                 onClick={(event) => {
@@ -125,6 +132,14 @@ export default function Sidebar({ role }) {
             {dashboardMenu && (
                 <div className="menu">
                     <Link
+                        to="/dashboard/overview"
+                        className={
+                            paths.includes("overview") ? "link active" : "link"
+                        }
+                    >
+                        <p>Overview</p>
+                    </Link>
+                    <Link
                         to={`/dashboard/production`}
                         className={
                             paths.includes("production")
@@ -132,7 +147,7 @@ export default function Sidebar({ role }) {
                                 : "link"
                         }
                     >
-                        Production
+                        Food (Production)
                     </Link>
                     <Link
                         to={`/dashboard/consumption`}
@@ -142,9 +157,9 @@ export default function Sidebar({ role }) {
                                 : "link"
                         }
                     >
-                        Consumption
+                        Food (Consumption)
                     </Link>
-                    <Link
+                    {/* <Link
                         to={`/dashboard/food-balance`}
                         className={
                             paths.includes("food-balance")
@@ -153,6 +168,78 @@ export default function Sidebar({ role }) {
                         }
                     >
                         Food Balance
+                    </Link> */}
+                    <Link
+                        to={`/dashboard/demographics`}
+                        className={
+                            paths.includes("demographics") ? "link active" : "link"
+                        }
+                    >
+                        Demographics
+                    </Link>
+                    <Link
+                        to={`/dashboard/landholdings`}
+                        className={
+                            paths.includes("landholdings") ? "link active" : "link"
+                        }
+                    >
+                        Landholdings
+                    </Link>
+                    <Link
+                        to={`/dashboard/water`}
+                        className={
+                            paths.includes("water") ? "link active" : "link"
+                        }
+                    >
+                        Water
+                    </Link>
+                    <Link
+                        to={`/dashboard/housing`}
+                        className={
+                            paths.includes("housing") ? "link active" : "link"
+                        }
+                    >
+                        Housing
+                    </Link>
+                    <Link
+                        to={`/dashboard/energy`}
+                        className={
+                            paths.includes("energy") ? "link active" : "link"
+                        }
+                    >
+                        Energy & Fuel
+                    </Link>
+                    <Link
+                        to={`/dashboard/forestry`}
+                        className={
+                            paths.includes("forestry") ? "link active" : "link"
+                        }
+                    >
+                        Forestry and Timber
+                    </Link>
+                    <Link
+                        to={`/dashboard/mobility`}
+                        className={
+                            paths.includes("mobility") ? "link active" : "link"
+                        }
+                    >
+                        Mobility
+                    </Link>
+                    <Link
+                        to={`/dashboard/personal`}
+                        className={
+                            paths.includes("personal") ? "link active" : "link"
+                        }
+                    >
+                        Other Personal & Household items
+                    </Link>
+                    <Link
+                        to={`/dashboard/business`}
+                        className={
+                            paths.includes("business") ? "link active" : "link"
+                        }
+                    >
+                        Business & Commercial Establishments/ Organizations
                     </Link>
                 </div>
             )}

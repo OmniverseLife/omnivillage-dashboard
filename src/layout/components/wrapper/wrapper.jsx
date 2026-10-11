@@ -40,7 +40,7 @@ export default function Wrapper({ children, title, plain }) {
     useEffect(() => {
         if (!isLoading) {
             const _villages = {};
-            data.forEach((_data) => {
+            data?.forEach((_data) => {
                 _villages[_data.country] = [
                     ...(_villages[_data.country] || []),
                     _data,
@@ -53,8 +53,16 @@ export default function Wrapper({ children, title, plain }) {
     useEffect(() => {
         if (plain) return;
         if (searchParams.getAll("village").length === 0 && !isLoading) {
-            searchParams.set("country", data[0]?.country);
-            searchParams.set("village", data[0]?.name);
+            // The dashboards open on Rukha (Bhutan), where the survey data
+            // is. Where that village is not in the list (another database,
+            // or it was renamed in Locations), on the first village.
+            const start =
+                data?.find(
+                    (_data) =>
+                        _data.country === "bhutan" && _data.name === "rukha"
+                ) || data?.[0];
+            searchParams.set("country", start?.country);
+            searchParams.set("village", start?.name);
             setSearchParams(searchParams);
         }
     }, [data, isLoading, plain, searchParams, setSearchParams]);
@@ -72,7 +80,8 @@ export default function Wrapper({ children, title, plain }) {
             <Sidebar role={role} />
             <div className="rightSide">
                 <Navbar title={title} />
-                {location.pathname.includes("dashboard") && (
+                {location.pathname.includes("dashboard") &&
+                    !location.pathname.includes("overview") && (
                     <Stack
                         direction="row"
                         alignItems="center"

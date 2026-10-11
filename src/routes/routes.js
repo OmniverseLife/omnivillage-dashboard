@@ -198,6 +198,79 @@ export const routes = [
         role: "viewer,admin",
     },
     {
+        path: "/dashboard/demographics",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Demographics/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/landholdings",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Landholdings/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/housing",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Housing/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/water",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Water/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/energy",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Energy/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/forestry",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Forestry/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/chat",
+        Component: lazy(() => import("../layout/pages/chat/Chat")),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/overview",
+        Component: lazy(() => import("../layout/pages/OverviewPage")),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/mobility",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Mobility/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/personal",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Personal/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/business",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Business/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
         path: "/login",
         Component: lazy(() => import("../layout/pages/login/login")),
         role: "public",

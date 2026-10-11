@@ -6,7 +6,7 @@ import { Navigate, useLocation } from "react-router-dom";
 // eslint-disable-next-line react-refresh/only-export-components
 export const landingFor = (user) =>
   user?.role !== "regional"
-    ? "/dashboard/production"
+    ? "/dashboard/overview"
     : user.place?._id
     ? `/questionnaire/place/${user.place._id}`
     : "/questionnaire/responses";
