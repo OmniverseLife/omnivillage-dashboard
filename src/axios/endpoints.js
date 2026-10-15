@@ -400,6 +400,7 @@ export const endpoints = {
             toggle: "/questions/toggle-active",
             reorder: "/questions/reorder",
             move: "/questions/move",
+            arrange: "/questions/arrange",
             delete: "/questions/delete-question",
         },
         responses: {

@@ -183,6 +183,16 @@ export const moveQuestion = async (body) => {
     return res.data;
 };
 
+/**
+ * The Master's questions, one or several, to a new place: `{ items: [{
+ * question_id, rev }], categoryId, parentQuestionId, before }` (null parent:
+ * the top of the page; null before: at the end). As a draft.
+ */
+export const arrangeQuestions = async (body) => {
+    const res = await axiosInstance.put(questions.arrange, body);
+    return res.data;
+};
+
 export const deleteQuestion = async ({ id, rev }) => {
     const res = await axiosInstance.delete(questions.delete, { params: { id, rev } });
     return res.data;

@@ -1,9 +1,16 @@
-import { Box, Group, Text, UnstyledButton } from "@mantine/core";
+import { Box, Checkbox, Group, Text, UnstyledButton } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
+import BulkBar from "./BulkBar";
 import "./CategoryTree.css";
 import RowActions from "./RowActions";
 import StatusPill from "./StatusPill";
-import { DROP_MARK, reordered } from "./constants";
+import {
+    DROP_MARK,
+    QUESTION_DRAG,
+    dragBadge,
+    plural,
+    reordered,
+} from "./constants";
 import { localise } from "./localise";
 
 // What each tag of a place's tree means (PDF p.18), for whoever holds the
@@ -27,6 +34,11 @@ const MEANING = {
  * it leaves a group), and dropped on the middle of a group it goes inside.
  * The keyboard does the same on a focused row: Alt+↑ / Alt+↓ among its
  * siblings, Alt+→ into the group just above it, Alt+← out of its group.
+ * Several are moved at once by ticking them: a ticked row drags every ticked
+ * one along, and the bar the ticks bring up moves them to the end of a group
+ * (the route without a mouse). What is inside a moved group goes with it.
+ * Questions dragged from the right pane can be dropped on a question page:
+ * they go to the end of it (`onDropQuestions(page, ids)`).
  *
  * The tree is ONE tab stop: ↑ and ↓ move between its rows, Tab goes on to
  * the row's menu and then out of the tree (36 categories were 77 stops).
@@ -54,11 +66,24 @@ export default function CategoryTree({
     onRestore,
     onReorder,
     onMove,
+    onDropQuestions,
     onHide,
     onShow,
 }) {
     const master = !readOnly && scope.type === "master";
+    // The categories on the move, outermost only: what is inside one of
+    // them goes along with it.
     const [dragging, setDragging] = useState(null);
+    const [ticked, setTicked] = useState(() => new Set());
+    const tickedRows = categories.filter((category) =>
+        ticked.has(category._id)
+    );
+    const toggle = (id) =>
+        setTicked((old) => {
+            const next = new Set(old);
+            if (!next.delete(id)) next.add(id);
+            return next;
+        });
     const [over, setOver] = useState(null);
     // The row Tab lands on: the one last focused, else the chosen page.
     const [focused, setFocused] = useState(null);
@@ -119,19 +144,47 @@ export default function CategoryTree({
             (entry) => entry._id === category.parentId
         );
         if (inwards ? !above || above.is_screen : !group) return;
-        const parentId = inwards ? above._id : group.parentId || null;
-        const level = childrenOf(parentId);
-        const index = inwards
-            ? level.length
-            : level.findIndex((entry) => entry._id === group._id) + 1;
         refocus.current = `category-${category._id}`;
-        onMove(category, parentId, reordered(level, category, index));
+        if (inwards) put([category], above._id);
+        else put([category], group.parentId || null, group, true);
     };
 
+    // Puts `moving` in the group `parentId` (null: the top level), beside
+    // `target` there, before it or `after` it, or at the end without one.
+    const put = (moving, parentId, target, after) => {
+        const siblings = childrenOf(parentId);
+        const others = siblings.filter(
+            (entry) => !moving.some((one) => one._id === entry._id)
+        );
+        const index = target
+            ? others.findIndex((entry) => entry._id === target._id) +
+              (after ? 1 : 0)
+            : others.length;
+        const moved = reordered(siblings, moving, index);
+        if (!moved.length) return;
+        if (moving.every((entry) => (entry.parentId || null) === parentId))
+            onReorder(moved);
+        else onMove(moving, parentId, moved);
+    };
+
+    // A ticked category inside another ticked one goes along with it.
+    const outermost = (picked) =>
+        picked.filter(
+            (entry) =>
+                !entry.trail.some(
+                    (above) =>
+                        above._id !== entry._id &&
+                        picked.some((one) => one._id === above._id)
+                )
+        );
+    const onTheMove = (target) =>
+        Boolean(dragging) &&
+        target.trail.some((entry) =>
+            dragging.some((one) => one._id === entry._id)
+        );
+
     // A category cannot go beside or inside itself or anything under it.
-    const accepts = (target) =>
-        dragging &&
-        !target.trail.some((entry) => entry._id === dragging._id);
+    const accepts = (target) => Boolean(dragging) && !onTheMove(target);
 
     const zoneOf = (event, target) => {
         const box = event.currentTarget.getBoundingClientRect();
@@ -141,19 +194,34 @@ export default function CategoryTree({
     };
 
     const drop = (target, zone) => {
-        const parentId =
-            zone === "inside" ? target._id : target.parentId || null;
-        const siblings = childrenOf(parentId);
-        const others = siblings.filter((entry) => entry._id !== dragging._id);
-        const index =
-            zone === "inside"
-                ? others.length
-                : others.findIndex((entry) => entry._id === target._id) +
-                  (zone === "after" ? 1 : 0);
-        const moved = reordered(siblings, dragging, index);
-        if (!moved.length) return;
-        if ((dragging.parentId || null) === parentId) onReorder(moved);
-        else onMove(dragging, parentId, moved);
+        if (zone === "inside") put(dragging, target._id);
+        else put(dragging, target.parentId || null, target, zone === "after");
+        // The ticks were for this move.
+        if (dragging.some((entry) => ticked.has(entry._id)))
+            setTicked(new Set());
+    };
+
+    // The bar's way: to the end of a group, or of the top level. Not into
+    // one of the ticked categories, nor anything inside them.
+    const ticks = outermost(tickedRows);
+    const into = (target) =>
+        !target.trail.some((entry) =>
+            ticks.some((one) => one._id === entry._id)
+        );
+    const destinations = [
+        { value: "", label: "The top level" },
+        ...categories
+            .filter((category) => !category.is_screen && into(category))
+            .map((category) => ({
+                value: category._id,
+                label: category.trail
+                    .map((entry) => localise(entry.title, language))
+                    .join(" › "),
+            })),
+    ];
+    const moveTicked = (parentId) => {
+        put(ticks, parentId || null);
+        setTicked(new Set());
     };
 
     const menu = (category) => {
@@ -218,11 +286,13 @@ export default function CategoryTree({
             component="nav"
             ref={nav}
             aria-label="Categories"
+            data-ticking={ticks.length > 0 || undefined}
             // Tight, so that a title the length of "Demographic Information"
             // still fits on one line beside its menu button.
             p={8}
             style={{
-                width: 260,
+                // The Master's rows also hold a tick box.
+                width: master ? 284 : 260,
                 flexShrink: 0,
                 // Stays in view beside a long page of questions, and scrolls
                 // on its own when it is itself taller than the window.
@@ -233,6 +303,25 @@ export default function CategoryTree({
                 overflowY: "auto",
             }}
         >
+            {master && ticks.length > 0 && (
+                <Box
+                    pb={4}
+                    style={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 1,
+                        background: "var(--mantine-color-body)",
+                    }}
+                >
+                    <BulkBar
+                        compact
+                        count={ticks.length}
+                        pages={destinations}
+                        onMove={moveTicked}
+                        onClear={() => setTicked(new Set())}
+                    />
+                </Box>
+            )}
             {categories.map((category) => {
                 const title = localise(category.title, language);
                 const selected = category._id === selectedId;
@@ -254,23 +343,69 @@ export default function CategoryTree({
                         ml={category.depth * 20}
                         draggable={master}
                         onDragStart={(event) => {
+                            // A ticked row takes every ticked one along.
+                            const moving = ticked.has(category._id)
+                                ? outermost(tickedRows)
+                                : [category];
                             // Firefox starts a drag only once it carries data.
-                            event.dataTransfer.setData("text/plain", title);
+                            event.dataTransfer.setData(
+                                "text/plain",
+                                moving
+                                    .map((entry) =>
+                                        localise(entry.title, language)
+                                    )
+                                    .join("\n")
+                            );
                             event.dataTransfer.effectAllowed = "move";
-                            setDragging(category);
+                            if (moving.length > 1)
+                                dragBadge(
+                                    event,
+                                    plural(
+                                        moving.length,
+                                        "category",
+                                        "categories"
+                                    )
+                                );
+                            setDragging(moving);
                         }}
                         onDragEnd={() => {
                             setDragging(null);
                             setOver(null);
                         }}
                         onDragOver={(event) => {
+                            // Questions from the right pane: a page takes
+                            // them, whole.
+                            if (
+                                master &&
+                                category.is_screen &&
+                                !archived &&
+                                event.dataTransfer.types.includes(QUESTION_DRAG)
+                            ) {
+                                event.preventDefault();
+                                if (over?.id !== category._id)
+                                    setOver({ id: category._id, zone: "inside" });
+                                return;
+                            }
                             if (!accepts(category)) return;
                             event.preventDefault();
                             const zone = zoneOf(event, category);
                             if (over?.id !== category._id || over.zone !== zone)
                                 setOver({ id: category._id, zone });
                         }}
+                        onDragLeave={() => {
+                            if (!dragging && over?.id === category._id)
+                                setOver(null);
+                        }}
                         onDrop={(event) => {
+                            const questions =
+                                event.dataTransfer.getData(QUESTION_DRAG);
+                            if (questions) {
+                                event.preventDefault();
+                                setOver(null);
+                                if (master && category.is_screen && !archived)
+                                    onDropQuestions(category, JSON.parse(questions));
+                                return;
+                            }
                             if (!accepts(category)) return;
                             event.preventDefault();
                             drop(category, zoneOf(event, category));
@@ -279,13 +414,24 @@ export default function CategoryTree({
                         }}
                         style={{
                             borderRadius: "var(--mantine-radius-md)",
-                            opacity: dragging?._id === category._id ? 0.4 : 1,
+                            opacity: onTheMove(category) ? 0.4 : 1,
                             boxShadow:
                                 over?.id === category._id
                                     ? DROP_MARK[over.zone]
                                     : undefined,
                         }}
                     >
+                        {master && (
+                            <Checkbox
+                                className="qn-category-tick"
+                                size="xs"
+                                ml={6}
+                                aria-label={`Select “${title}”`}
+                                tabIndex={category._id === stop ? 0 : -1}
+                                checked={ticked.has(category._id)}
+                                onChange={() => toggle(category._id)}
+                            />
+                        )}
                         {/* Not a <button>: Firefox will not start a drag
                             from one. */}
                         <UnstyledButton

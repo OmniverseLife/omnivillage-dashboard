@@ -34,6 +34,7 @@ import {
     editQuestion,
     fetchEditor,
     moveQuestion,
+    arrangeQuestions,
     publishChanges,
     reorderCategories,
     reorderQuestions,
@@ -60,6 +61,7 @@ import QuestionFormModal from "../../components/questionnaire/QuestionFormModal"
 import QuestionRows from "../../components/questionnaire/QuestionRows";
 import StatusPill, { Pill } from "../../components/questionnaire/StatusPill";
 import {
+    PARENT_TYPES,
     SELECT_TYPES,
     changedIn,
     closed,
@@ -96,7 +98,7 @@ const COPY = {
         tag: "Master",
         note: "Every place starts with this questionnaire. Regional teams then switch questions off, reword them or add their own, for their own place only.",
         footnote:
-            "Click a question to edit or archive it. Places are not chosen here: each regional team switches questions on or off for itself. Questions a team added for its own place are listed in that place. From the keyboard, Alt and the arrow keys move a focused category: up and down among its neighbours, right into the group above it, left out of its group.",
+            "Click a question to edit or archive it. Drag a question by its handle to move it: between two questions, onto a group or section to put it inside, or onto a page on the left. Categories on the left are dragged the same way: beside another, or onto a group to go inside it. Tick several questions, or several categories, to move them together. Places are not chosen here: each regional team switches questions on or off for itself. Questions a team added for its own place are listed in that place. From the keyboard, Alt and the arrow keys move a focused question or category: up and down among its neighbours, right into the group above it, left out of its group.",
         searchNote:
             "Search looks at question wording, helper text and option labels. A status filter works the same way and groups its results by category.",
         chips: [
@@ -121,7 +123,7 @@ const COPY = {
         tag: "Officer",
         note: "Field officers answer these pages for each village assigned to them. Places do not change them.",
         footnote:
-            "Click a question to edit or archive it. From the keyboard, Alt and the arrow keys move a focused category: up and down among its neighbours, right into the group above it, left out of its group.",
+            "Click a question to edit or archive it. Drag a question by its handle to move it: between two questions, onto a group or section to put it inside, or onto a page on the left. Categories on the left are dragged the same way: beside another, or onto a group to go inside it. Tick several questions, or several categories, to move them together. From the keyboard, Alt and the arrow keys move a focused question or category: up and down among its neighbours, right into the group above it, left out of its group.",
         searchNote:
             "Search looks at question wording, helper text and option labels.",
         chips: [{ value: "", label: "All" }],
@@ -609,22 +611,39 @@ function Editor({ scope }) {
     const orders = (moved, idField) =>
         moved.map(({ _id, order }) => ({ [idField]: _id, order }));
 
-    const moveCategory = (category, parentId, moved) => {
-        const mine = moved.find((entry) => entry._id === category._id);
-        const others = moved.filter((entry) => entry !== mine);
-        showNow("categories", [{ ...mine, parentId }, ...others]);
-        save(async () => {
-            await reparentCategory({
-                category_id: category._id,
-                rev: category.rev,
-                parentId,
-                order: mine.order,
-            });
-            // Its new neighbours shared one order and were renumbered to
-            // make a place for it.
-            if (others.length)
-                await reorderCategories(orders(others, "category_id"));
-        });
+    // Into another group (null: the top level). `moving` are the categories
+    // themselves, what they hold goes along; `moved` is the new order of
+    // their new level, theirs and their neighbours' (shared orders are
+    // renumbered to make a place for them).
+    const moveCategories = (moving, parentId, moved) => {
+        const going = moving.filter(
+            (category) => (category.parentId || null) !== parentId
+        );
+        const ids = new Set(going.map((category) => category._id));
+        const orderOf = (id) => moved.find((entry) => entry._id === id)?.order;
+        showNow(
+            "categories",
+            moved.map((entry) =>
+                ids.has(entry._id) ? { ...entry, parentId } : entry
+            )
+        );
+        const others = moved.filter((entry) => !ids.has(entry._id));
+        save(() =>
+            inSequence(async (send) => {
+                for (const category of going)
+                    await send(reparentCategory, {
+                        category_id: category._id,
+                        rev: category.rev,
+                        parentId,
+                        order: orderOf(category._id),
+                    });
+                if (others.length)
+                    await send(
+                        reorderCategories,
+                        orders(others, "category_id")
+                    );
+            })
+        );
     };
 
     const removeCategory = () => {
@@ -702,6 +721,57 @@ function Editor({ scope }) {
                 }),
             clearTicks
         );
+
+    /*
+     * Where the Master's questions go: a drag, a keyboard move, or the bar of
+     * ticked ones. They are drawn there at once, numbered as the server will
+     * number them; a refusal reloads them where they were, in its words.
+     * `moving` are the questions themselves (what is inside them follows);
+     * `parentQuestionId` null is the top of the page, `before` null the end.
+     */
+    const arrange = (moving, { categoryId, parentQuestionId = null, before = null }) => {
+        if (!moving.length || !data) return;
+        const ids = new Set(moving.map((question) => question._id));
+        const beside = data.questions
+            .filter(
+                (question) =>
+                    !question.ownerPlaceId &&
+                    !ids.has(question._id) &&
+                    (parentQuestionId
+                        ? question.parentQuestionId === parentQuestionId
+                        : !question.parentQuestionId &&
+                          question.categoryId === categoryId)
+            )
+            .sort((a, b) => a.order - b.order);
+        const at = before
+            ? beside.findIndex((question) => question._id === before)
+            : -1;
+        const sequence =
+            at < 0
+                ? [...beside, ...moving]
+                : [...beside.slice(0, at), ...moving, ...beside.slice(at)];
+        showNow(
+            "questions",
+            sequence.map((question, index) =>
+                ids.has(question._id)
+                    ? { _id: question._id, parentQuestionId, categoryId, order: index + 1 }
+                    : { _id: question._id, order: index + 1 }
+            )
+        );
+        saveDraft(
+            () =>
+                arrangeQuestions({
+                    items: moving.map((question) => ({
+                        question_id: question._id,
+                        rev: question.rev ?? 0,
+                    })),
+                    categoryId,
+                    parentQuestionId,
+                    before,
+                }),
+            clearTicks
+        );
+    };
 
     // Hiding a category asks first (it takes its questions with it);
     // showing it again does not.
@@ -886,7 +956,67 @@ function Editor({ scope }) {
     const categoryChanges = categoriesOf(compare?.own);
     const categoriesAbove = categoriesOf(compare?.inherited);
 
-    const bulkBar = (
+    // In the Master the bar moves what is ticked: into a group or section of
+    // this page (at its end), or to the end of another page. A ticked
+    // question inside a ticked group goes along with the group.
+    const questionById = new Map(
+        (data?.questions || []).map((question) => [question._id, question])
+    );
+    const tickedAbove = (question) => {
+        for (let at = question; at; at = questionById.get(at.parentQuestionId))
+            if (ticked.has(at._id)) return true;
+        return false;
+    };
+    const tickedRoots = tickedRows.filter(
+        (row) => !tickedAbove(questionById.get(row.parentQuestionId))
+    );
+    const masterMoves = master
+        ? [
+              ...rows
+                  .filter(
+                      (row) =>
+                          PARENT_TYPES.includes(row.type) &&
+                          !row.archived &&
+                          !tickedAbove(row)
+                  )
+                  .map((row) => ({
+                      value: `into:${row._id}`,
+                      label: `Into “${localise(row.label, language)}”`,
+                      group: "On this page",
+                  })),
+              ...tree
+                  .filter(
+                      (category) =>
+                          category.is_screen &&
+                          category.active !== false &&
+                          category._id !== selected?._id
+                  )
+                  .map((category) => ({
+                      value: `page:${category._id}`,
+                      label: pathOf(category),
+                      group: "To the end of another page",
+                  })),
+          ]
+        : [];
+    const moveTickedTo = (value) => {
+        const [kind, id] = value.split(":");
+        arrange(
+            tickedRoots,
+            kind === "into"
+                ? { categoryId: selected._id, parentQuestionId: id }
+                : { categoryId: id }
+        );
+    };
+
+    const bulkBar = master ? (
+        <BulkBar
+            count={tickedRows.length}
+            pages={masterMoves}
+            busy={busy}
+            onMove={moveTickedTo}
+            onClear={clearTicks}
+        />
+    ) : (
         <BulkBar
             count={tickedRows.length}
             placeName={here}
@@ -1158,7 +1288,15 @@ function Editor({ scope }) {
                                         )
                                     );
                                 })}
-                                onMove={idle(moveCategory)}
+                                onMove={idle(moveCategories)}
+                                onDropQuestions={idle((page, ids) =>
+                                    arrange(
+                                        ids
+                                            .map((id) => questionById.get(id))
+                                            .filter(Boolean),
+                                        { categoryId: page._id }
+                                    )
+                                )}
                                 onHide={idle((category) =>
                                     setHiding({ opened: true, category })
                                 )}
@@ -1352,6 +1490,12 @@ function Editor({ scope }) {
                                                     )
                                                 );
                                             })}
+                                            onArrange={idle((moving, place) =>
+                                                arrange(moving, {
+                                                    categoryId: selected._id,
+                                                    ...place,
+                                                })
+                                            )}
                                         />
                                         {master ? (
                                             <Group

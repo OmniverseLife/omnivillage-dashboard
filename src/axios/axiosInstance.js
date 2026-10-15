@@ -1,10 +1,10 @@
 import axios from "axios";
 import { endpoints } from "./endpoints";
 
-// export const baseURL = `${process.env.REACT_APP_BASE_URL}/api`;
-// export const mediaURL = `${process.env.REACT_APP_BASE_URL}/`;
-export const baseURL = `${process.env.REACT_APP_TEST_URL}/api`;
-export const mediaURL = `${process.env.REACT_APP_TEST_URL}/`;
+export const baseURL = `${process.env.REACT_APP_BASE_URL}/api`;
+export const mediaURL = `${process.env.REACT_APP_BASE_URL}/`;
+// export const baseURL = `${process.env.REACT_APP_TEST_URL}/api`;
+// export const mediaURL = `${process.env.REACT_APP_TEST_URL}/`;
 // The server the demographic-dashboard branch was built against. Not what
 // the instance below talks to: that branch`s API is in this backend now, and
 // login, the questionnaire, places and files were never on that server.

@@ -19,7 +19,10 @@ import StatusPill, { Pill } from "./StatusPill";
 import {
     DROP_MARK,
     PARENT_TYPES,
+    QUESTION_DRAG,
+    dragBadge,
     nameList,
+    plural,
     reordered,
     shortTypeLabel,
     usedIn,
@@ -72,10 +75,16 @@ const sameParent = (a, b) =>
  * field of a group or section is a row of its own with a `depth`; a result
  * carries the `group` heading it belongs under. Nothing is saved here.
  *
- * In the Master a row is dragged among the rows that share its parent, or
- * moved with Alt+↑ / Alt+↓ on its handle. Results are in no order of their
- * own, so they have no handle. The officers' questionnaire is listed the
- * same way, without the column on where a question is used.
+ * In the Master a row is dragged by its handle: in front of or after
+ * another row, beside it; onto a group or a section, inside it; or onto a
+ * page of the category tree (which reads QUESTION_DRAG). A ticked row takes
+ * every ticked one along, and a group what is in it. From the keyboard,
+ * Alt+↑ / Alt+↓ move it among its neighbours, Alt+→ / Alt+← into the group
+ * above it and out of its own. `onArrange(rows, { parentQuestionId, before
+ * })` is told where they go; `onReorder` only of a new order. Results are in
+ * no order of their own, so they have no handle. The officers'
+ * questionnaire is listed the same way, without the column on where a
+ * question is used.
  *
  * In a place (`placeName` is its name) nothing is reordered. A row says what
  * the place did to the question and carries the switch that decides whether
@@ -95,6 +104,7 @@ export default function QuestionRows({
     onAdd,
     onRestore,
     onReorder,
+    onArrange,
     onTick,
     onAsk,
 }) {
@@ -103,6 +113,10 @@ export default function QuestionRows({
     // changes the officers' questionnaire, so there it has nothing to say.
     const showsUse = master && scope.audience !== "officer";
     const sortable = master && !grouped;
+    // A place ticks questions for its bar; the Master ticks them to move
+    // several at once.
+    const tickable = !master || sortable;
+    // What is being dragged: one row, or every ticked one.
     const [dragging, setDragging] = useState(null);
     const [over, setOver] = useState(null);
 
@@ -130,6 +144,42 @@ export default function QuestionRows({
         );
 
     const siblingsOf = (row) => rows.filter((other) => sameParent(other, row));
+    const byId = new Map(rows.map((row) => [row._id, row]));
+    const ancestorsOf = (row) => {
+        const found = [];
+        let current = byId.get(row.parentQuestionId);
+        while (current && !found.includes(current)) {
+            found.push(current);
+            current = byId.get(current.parentQuestionId);
+        }
+        return found;
+    };
+    // The repeating groups a question holds along its deepest branch, itself
+    // included, and those around a parent, itself included: two deep at
+    // most, as the server holds them.
+    const groupsIn = (row) =>
+        (row.type === "repeatable_group" ? 1 : 0) +
+        Math.max(0, ...(row.children || []).map(groupsIn));
+    const groupsAround = (parent) =>
+        [parent, ...ancestorsOf(parent)].filter(
+            (row) => row.type === "repeatable_group"
+        ).length;
+    /** Whether `moving` may go inside `parent` (null: the top of the page). */
+    const canGoInto = (moving, parent) => {
+        if (!parent) return true;
+        if (!PARENT_TYPES.includes(parent.type)) return false;
+        const ids = new Set(moving.map((row) => row._id));
+        if ([parent, ...ancestorsOf(parent)].some((row) => ids.has(row._id)))
+            return false;
+        if (
+            parent.type === "section" &&
+            moving.some((row) => row.type === "section")
+        )
+            return false;
+        return moving.every(
+            (row) => groupsAround(parent) + groupsIn(row) <= 2
+        );
+    };
 
     const nudge = (row, by) => {
         const siblings = siblingsOf(row);
@@ -139,30 +189,90 @@ export default function QuestionRows({
         onReorder(reordered(siblings, row, index));
     };
 
-    const accepts = (target) =>
-        dragging && dragging._id !== target._id && sameParent(dragging, target);
+    // Alt+→ puts a question inside the group or section just above it, at
+    // its end; Alt+← takes it out, to just after the one it was in.
+    const shift = (row, inward) => {
+        if (inward) {
+            const siblings = siblingsOf(row);
+            const above =
+                siblings[siblings.findIndex((entry) => entry._id === row._id) - 1];
+            if (!above || !canGoInto([row], above)) return;
+            refocus.current = `handle-${row._id}`;
+            onArrange([row], { parentQuestionId: above._id, before: null });
+            return;
+        }
+        const parent = byId.get(row.parentQuestionId);
+        if (!parent) return;
+        const outside = byId.get(parent.parentQuestionId) || null;
+        if (!canGoInto([row], outside)) return;
+        const around = siblingsOf(parent);
+        const next = around[around.findIndex((entry) => entry._id === parent._id) + 1];
+        refocus.current = `handle-${row._id}`;
+        onArrange([row], {
+            parentQuestionId: outside?._id || null,
+            before: next?._id || null,
+        });
+    };
 
-    const zoneOf = (event) => {
+    // Where a drop lands. On a group or a section, all but its top edge
+    // puts the questions inside it, at the top; on any other row they go in
+    // front of it or after it, beside it.
+    const zoneOf = (event, row) => {
         const box = event.currentTarget.getBoundingClientRect();
-        return event.clientY - box.top < box.height / 2 ? "before" : "after";
+        const share = (event.clientY - box.top) / box.height;
+        if (PARENT_TYPES.includes(row.type))
+            return share < 0.35 ? "before" : "inside";
+        return share < 0.5 ? "before" : "after";
     };
-
-    const drop = (target, zone) => {
-        const siblings = siblingsOf(target);
-        const index =
-            siblings
-                .filter((entry) => entry._id !== dragging._id)
-                .findIndex((entry) => entry._id === target._id) +
-            (zone === "after" ? 1 : 0);
-        const moved = reordered(siblings, dragging, index);
-        if (moved.length) onReorder(moved);
+    const placeFor = (target, zone) => {
+        const moving = new Set(dragging.map((row) => row._id));
+        if (zone === "inside")
+            return {
+                parent: target,
+                before:
+                    rows.find(
+                        (row) =>
+                            row.parentQuestionId === target._id &&
+                            !moving.has(row._id)
+                    )?._id || null,
+            };
+        const parent = byId.get(target.parentQuestionId) || null;
+        if (zone === "before") return { parent, before: target._id };
+        const siblings = siblingsOf(target).filter((row) => !moving.has(row._id));
+        const index = siblings.findIndex((row) => row._id === target._id);
+        return { parent, before: siblings[index + 1]?._id || null };
     };
+    const accepts = (target, zone) => {
+        if (!dragging) return false;
+        const moving = new Set(dragging.map((row) => row._id));
+        // Not onto itself, nor anywhere inside what is moving.
+        if ([target, ...ancestorsOf(target)].some((row) => moving.has(row._id)))
+            return false;
+        return canGoInto(dragging, placeFor(target, zone).parent);
+    };
+    const arrangeTo = (place) => {
+        onArrange(dragging, {
+            parentQuestionId: place.parent?._id || null,
+            before: place.before,
+        });
+        setDragging(null);
+        setOver(null);
+    };
+    // A drag of several shows how many, not the one row it began on.
+    const isMoving = (row) =>
+        Boolean(dragging) &&
+        [row, ...ancestorsOf(row)].some((entry) =>
+            dragging.some((moving) => moving._id === entry._id)
+        );
 
     // A place's row starts with a tick box where the Master's has a handle,
     // and ends with two columns where the Master's has one.
     const columns =
-        (sortable || !master ? 1 : 0) + 2 + (showsUse ? 1 : master ? 0 : 2);
-    const isTicked = (row) => !master && ticked.has(row._id);
+        (sortable ? 1 : 0) +
+        (tickable ? 1 : 0) +
+        2 +
+        (showsUse ? 1 : master ? 0 : 2);
+    const isTicked = (row) => tickable && ticked.has(row._id);
     const allTicked = rows.every(isTicked);
     const anyTicked = rows.some(isTicked);
 
@@ -176,7 +286,8 @@ export default function QuestionRows({
             data-ticking={anyTicked || undefined}
         >
             <colgroup>
-                {(sortable || !master) && <col style={{ width: 44 }} />}
+                {sortable && <col style={{ width: 44 }} />}
+                {tickable && <col style={{ width: sortable ? 36 : 44 }} />}
                 <col />
                 <col style={{ width: 150 }} />
                 {showsUse ? (
@@ -193,7 +304,7 @@ export default function QuestionRows({
                 <Table.Thead>
                     <Table.Tr>
                         {sortable && <Table.Th />}
-                        {!master && (
+                        {tickable && (
                             <Table.Th>
                                 <Checkbox
                                     className="qn-tick"
@@ -256,43 +367,76 @@ export default function QuestionRows({
                                 onClick={open}
                                 draggable={sortable}
                                 onDragStart={(event) => {
+                                    // A ticked row takes every ticked one
+                                    // along; a group takes what is in it.
+                                    const picked = isTicked(row)
+                                        ? rows.filter(isTicked)
+                                        : [row];
+                                    const moving = picked.filter(
+                                        (entry) =>
+                                            !ancestorsOf(entry).some((above) =>
+                                                picked.includes(above)
+                                            )
+                                    );
                                     // Firefox starts a drag only once it
                                     // carries data.
                                     event.dataTransfer.setData(
                                         "text/plain",
-                                        label
+                                        moving
+                                            .map((entry) =>
+                                                localise(entry.label, language)
+                                            )
+                                            .join("\n")
+                                    );
+                                    event.dataTransfer.setData(
+                                        QUESTION_DRAG,
+                                        JSON.stringify(
+                                            moving.map((entry) => entry._id)
+                                        )
                                     );
                                     event.dataTransfer.effectAllowed = "move";
-                                    setDragging(row);
+                                    if (moving.length > 1)
+                                        dragBadge(event, plural(moving.length, "question"));
+                                    setDragging(moving);
                                 }}
                                 onDragEnd={() => {
                                     setDragging(null);
                                     setOver(null);
                                 }}
                                 onDragOver={(event) => {
-                                    if (!accepts(row)) return;
+                                    if (!dragging) return;
+                                    const zone = zoneOf(event, row);
+                                    if (!accepts(row, zone)) {
+                                        if (over?.id === row._id) setOver(null);
+                                        return;
+                                    }
                                     event.preventDefault();
-                                    const zone = zoneOf(event);
                                     if (over?.id !== row._id || over.zone !== zone)
                                         setOver({ id: row._id, zone });
                                 }}
                                 onDrop={(event) => {
-                                    if (!accepts(row)) return;
+                                    if (!dragging) return;
+                                    const zone = zoneOf(event, row);
+                                    if (!accepts(row, zone)) return;
                                     event.preventDefault();
-                                    drop(row, zoneOf(event));
-                                    setDragging(null);
-                                    setOver(null);
+                                    arrangeTo(placeFor(row, zone));
                                 }}
+                                data-drop={
+                                    over?.id === row._id ? over.zone : undefined
+                                }
                                 style={{
                                     cursor: "pointer",
-                                    opacity: dragging?._id === row._id ? 0.4 : 1,
+                                    opacity: isMoving(row) ? 0.4 : 1,
                                     boxShadow:
                                         over?.id === row._id
                                             ? DROP_MARK[over.zone]
                                             : undefined,
-                                    backgroundColor: isTicked(row)
-                                        ? "var(--mantine-color-brand-0)"
-                                        : undefined,
+                                    backgroundColor:
+                                        isTicked(row) ||
+                                        (over?.id === row._id &&
+                                            over.zone === "inside")
+                                            ? "var(--mantine-color-brand-0)"
+                                            : undefined,
                                 }}
                             >
                                 {sortable && (
@@ -307,8 +451,8 @@ export default function QuestionRows({
                                             id={`handle-${row._id}`}
                                             variant="subtle"
                                             color="gray"
-                                            aria-label={`Move “${label}”. Alt and the up or down arrow change its place.`}
-                                            title="Drag to reorder, or press Alt+↑ / Alt+↓"
+                                            aria-label={`Move “${label}”. Alt and the up or down arrow change its place; Alt and the right arrow put it in the group above it, Alt and the left arrow take it out of its group.`}
+                                            title="Drag to move it: onto a group or section to put it inside, onto a page on the left to move it there. Alt+↑ / Alt+↓ move it, Alt+→ / Alt+← in and out of a group."
                                             style={{ cursor: "grab" }}
                                             onClick={(event) =>
                                                 event.stopPropagation()
@@ -320,23 +464,37 @@ export default function QuestionRows({
                                                     event.preventDefault();
                                                 if (
                                                     !event.altKey ||
-                                                    !["ArrowUp", "ArrowDown"].includes(
-                                                        event.key
-                                                    )
+                                                    ![
+                                                        "ArrowUp",
+                                                        "ArrowDown",
+                                                        "ArrowLeft",
+                                                        "ArrowRight",
+                                                    ].includes(event.key)
                                                 )
                                                     return;
                                                 event.preventDefault();
-                                                nudge(
-                                                    row,
-                                                    event.key === "ArrowUp" ? -1 : 1
-                                                );
+                                                if (
+                                                    event.key === "ArrowUp" ||
+                                                    event.key === "ArrowDown"
+                                                )
+                                                    nudge(
+                                                        row,
+                                                        event.key === "ArrowUp"
+                                                            ? -1
+                                                            : 1
+                                                    );
+                                                else
+                                                    shift(
+                                                        row,
+                                                        event.key === "ArrowRight"
+                                                    );
                                             }}
                                         >
                                             <IconEqual size={18} />
                                         </ActionIcon>
                                     </Table.Td>
                                 )}
-                                {!master && (
+                                {tickable && (
                                     // A click beside the box must not open
                                     // the question it was aimed away from.
                                     <Table.Td
@@ -543,6 +701,42 @@ export default function QuestionRows({
                         </Fragment>
                     );
                 })}
+                {sortable && dragging && (
+                    <Table.Tr
+                        onDragOver={(event) => {
+                            event.preventDefault();
+                            if (over?.id !== "end")
+                                setOver({ id: "end", zone: "inside" });
+                        }}
+                        onDragLeave={() => {
+                            if (over?.id === "end") setOver(null);
+                        }}
+                        onDrop={(event) => {
+                            event.preventDefault();
+                            arrangeTo({ parent: null, before: null });
+                        }}
+                    >
+                        <Table.Td colSpan={columns}>
+                            <Text
+                                size="sm"
+                                c="dimmed"
+                                ta="center"
+                                py={6}
+                                data-drop={over?.id === "end" ? "end" : undefined}
+                                style={{
+                                    border: "1px dashed var(--mantine-color-gray-4)",
+                                    borderRadius: "var(--mantine-radius-md)",
+                                    backgroundColor:
+                                        over?.id === "end"
+                                            ? "var(--mantine-color-brand-0)"
+                                            : undefined,
+                                }}
+                            >
+                                Drop here to move to the end of this page
+                            </Text>
+                        </Table.Td>
+                    </Table.Tr>
+                )}
             </Table.Tbody>
         </Table>
     );

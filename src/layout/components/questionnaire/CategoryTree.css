@@ -14,3 +14,15 @@
 .qn-category-menu:has([aria-expanded="true"]) {
     opacity: 1;
 }
+
+/* The Master's tick boxes, the same way: on the row under the pointer or
+   holding focus, and on every row once anything is ticked. */
+.qn-category-tick {
+    opacity: 0;
+}
+
+.qn-category:hover .qn-category-tick,
+.qn-category-tick:focus-within,
+nav[data-ticking] .qn-category-tick {
+    opacity: 1;
+}

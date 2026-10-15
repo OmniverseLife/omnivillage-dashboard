@@ -133,39 +133,74 @@ export const plural = (count, one, many = `${one}s`) =>
     `${count} ${count === 1 ? one : many}`;
 
 /**
- * Where a moved row lands among `siblings` (in their current order), as the
- * `[{ _id, order }]` to save. `index` counts the places between the OTHER
+ * Where moved rows land among `siblings` (in their current order), as the
+ * `[{ _id, order }]` to save. `moved` is one row, or several that land
+ * together in the order given. `index` counts the places between the OTHER
  * rows: 0 is before the first of them.
  *
- * One new `order` is enough when it fits between the two rows it lands
- * between (their midpoint). Rows saved before ordering existed share a value,
- * and nothing fits between two equal numbers, so the list is renumbered then.
+ * New `order`s are enough when they fit between the two rows they land
+ * between (spread evenly over the gap). Rows saved before ordering existed
+ * share a value, and nothing fits between two equal numbers, so the list is
+ * renumbered then.
  */
 export const reordered = (siblings, moved, index) => {
-    const rest = siblings.filter((entry) => entry._id !== moved._id);
-    // Dropped back where it was: nothing to save.
-    if (rest.length < siblings.length && siblings[index]?._id === moved._id)
+    const moving = [].concat(moved);
+    const ids = new Set(moving.map((entry) => entry._id));
+    const rest = siblings.filter((entry) => !ids.has(entry._id));
+    // Dropped back where they were: nothing to save.
+    if (
+        rest.length === siblings.length - moving.length &&
+        moving.every((entry, at) => siblings[index + at]?._id === entry._id)
+    )
         return [];
     const before = rest[index - 1];
     const after = rest[index];
     if (before && after && before.order >= after.order)
-        return [...rest.slice(0, index), moved, ...rest.slice(index)].map(
+        return [...rest.slice(0, index), ...moving, ...rest.slice(index)].map(
             (entry, position) => ({ _id: entry._id, order: position })
         );
-    const order =
+    const count = moving.length;
+    const orderOf = (at) =>
         before && after
-            ? (before.order + after.order) / 2
+            ? before.order +
+              ((after.order - before.order) * (at + 1)) / (count + 1)
             : before
-            ? before.order + 1
+            ? before.order + 1 + at
             : after
-            ? after.order - 1
-            : 0;
-    return [{ _id: moved._id, order }];
+            ? after.order - count + at
+            : at;
+    return moving.map((entry, at) => ({ _id: entry._id, order: orderOf(at) }));
+};
+
+/**
+ * A drag of several rows shows how many go, in place of the one row the
+ * pointer picked up.
+ */
+export const dragBadge = (event, words) => {
+    const badge = document.createElement("div");
+    badge.textContent = words;
+    Object.assign(badge.style, {
+        position: "absolute",
+        top: "-1000px",
+        padding: "6px 12px",
+        borderRadius: "999px",
+        background: "var(--mantine-color-brand-6)",
+        color: "#fff",
+        font: "600 13px Montserrat, sans-serif",
+    });
+    document.body.appendChild(badge);
+    event.dataTransfer.setDragImage(badge, 12, 12);
+    setTimeout(() => badge.remove());
 };
 
 // Where a dragged row will land, drawn on the row it is held over: a line
 // on the edge it goes beside, or a frame around the group it goes into.
 const ACCENT = "var(--mantine-primary-color-filled)";
+// What a dragged question carries, besides its words: its ids, so the
+// category tree can take it onto another page. A category's drag does not
+// carry it, which is how the tree tells the two apart.
+export const QUESTION_DRAG = "application/x-omni-questions";
+
 export const DROP_MARK = {
     before: `inset 0 2px 0 ${ACCENT}`,
     after: `inset 0 -2px 0 ${ACCENT}`,
