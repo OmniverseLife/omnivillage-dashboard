@@ -29,9 +29,7 @@ function SelfGrown({ type_id, weight_unit, setSummary }) {
   });
 
   const selfGrownData = {
-    xAxis: self_grown
-      .map((_item) => _item.name)
-      .sort((a, b) => a.localeCompare(b)),
+    xAxis: self_grown.map((_item) => _item.name),
     dataset: [
       {
         name: "Self Grown",
@@ -48,9 +46,7 @@ function SelfGrown({ type_id, weight_unit, setSummary }) {
   );
 
   const selfConsumedData = {
-    xAxis: self_consumed
-      .map((_item) => _item.name)
-      .sort((a, b) => a.localeCompare(b)),
+    xAxis: self_consumed.map((_item) => _item.name),
     dataset: [
       {
         name: "Self Consumed",
