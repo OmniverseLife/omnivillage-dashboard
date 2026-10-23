@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "new-omni-dashboard",
     "source": ".",
     "ignore": [
       "firebase.json",
