@@ -17,7 +17,10 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchVillages } from "../../../functions/others";
 import Loading from "../../components/loading/index";
 
-export default function Wrapper({ children }) {
+// `plain` is for pages that keep their own filters in the URL (the
+// questionnaire ones): nothing here waits on the villages list for them, and
+// the legacy `country`/`village` params are not written.
+export default function Wrapper({ children, title, plain }) {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const [villages, setVillages] = useState([]);
@@ -37,7 +40,7 @@ export default function Wrapper({ children }) {
     useEffect(() => {
         if (!isLoading) {
             const _villages = {};
-            data.forEach((_data) => {
+            data?.forEach((_data) => {
                 _villages[_data.country] = [
                     ...(_villages[_data.country] || []),
                     _data,
@@ -48,12 +51,21 @@ export default function Wrapper({ children }) {
     }, [data, isLoading]);
 
     useEffect(() => {
+        if (plain) return;
         if (searchParams.getAll("village").length === 0 && !isLoading) {
-            searchParams.set("country", data[0]?.country);
-            searchParams.set("village", data[0]?.name);
+            // The dashboards open on Rukha (Bhutan), where the survey data
+            // is. Where that village is not in the list (another database,
+            // or it was renamed in Locations), on the first village.
+            const start =
+                data?.find(
+                    (_data) =>
+                        _data.country === "bhutan" && _data.name === "rukha"
+                ) || data?.[0];
+            searchParams.set("country", start?.country);
+            searchParams.set("village", start?.name);
             setSearchParams(searchParams);
         }
-    }, [data, isLoading, searchParams, setSearchParams]);
+    }, [data, isLoading, plain, searchParams, setSearchParams]);
 
     return (
         <Box
@@ -64,11 +76,12 @@ export default function Wrapper({ children }) {
                 width: "100vw",
             }}
         >
-            <Loading isLoading={isLoading} />
+            <Loading isLoading={isLoading && !plain} />
             <Sidebar role={role} />
             <div className="rightSide">
-                <Navbar />
-                {location.pathname.includes("dashboard") && (
+                <Navbar title={title} />
+                {location.pathname.includes("dashboard") &&
+                    !location.pathname.includes("overview") && (
                     <Stack
                         direction="row"
                         alignItems="center"
@@ -172,7 +185,7 @@ export default function Wrapper({ children }) {
                         </FormControl>
                     </Stack>
                 )}
-                {!isLoading ? children : null}
+                {plain || !isLoading ? children : null}
             </div>
         </Box>
     );

@@ -35,9 +35,20 @@ const schema = yup.object().shape({
         .oneOf([yup.ref("password"), null], "Confirm Password doesn't match"),
 });
 
-export default function Navbar() {
+export default function Navbar({ title }) {
     const location = useLocation();
     const paths = location.pathname.split("/");
+
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    // The place is not on the stored user yet, so a regional account has no
+    // name to show for now.
+    const signedInAs = {
+        admin: "super admin",
+        viewer: "viewer",
+        regional: user.place?.name
+            ? `the ${user.place.name} team`
+            : "regional team",
+    }[user.role];
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [modal, setModal] = useState(false);
@@ -73,8 +84,20 @@ export default function Navbar() {
     return (
         <div className="navbar">
             <div className="navbar-items">
-                <h3 style={{ textTransform: "capitalize" }}>{heading}</h3>
+                <h3 style={{ textTransform: title ? "none" : "capitalize" }}>
+                    {title || heading}
+                </h3>
                 <div className="profile">
+                    {signedInAs && (
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            noWrap
+                            sx={{ marginRight: "13px" }}
+                        >
+                            Signed in as {signedInAs}
+                        </Typography>
+                    )}
                     <span onClick={(e) => setAnchorEl(e.currentTarget)}>
                         <img src={profile} alt="" />
                     </span>

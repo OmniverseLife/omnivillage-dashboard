@@ -4,6 +4,100 @@ export const endpoints = {
         forgot_password: "/admin/forgot-password",
         change_password: "/admin/change-password",
     },
+    demographic: {
+        maritalStatus: "/demographic-dashboard/marital-status",
+        dietPattern: "/demographic-dashboard/diet-pattern",
+        bmiDistribution: "/demographic-dashboard/bmi-distribution",
+        chronicDiseasePrevalence:
+            "/demographic-dashboard/chronic-disease-prevalence",
+        incomeRange: "/demographic-dashboard/income-range",
+        motorDisability: "/demographic-dashboard/motor-disability",
+        populationSnapshot: "/demographic-dashboard/population-snapshot",
+        languageHeatmap: "/demographic-dashboard/language-heatmap",
+        occupationTreeMap: "/demographic-dashboard/occupation-tree",
+        savingsAndInvestments: "/demographic-dashboard/savings-investments",
+        habitData: "/demographic-dashboard/habits-data",
+        educationAspirations: "/demographic-dashboard/education-aspirations",
+    },
+    landholding: {
+        parcelData: "/landholding-dashboard/parcel-data",
+        parcelSize: "/landholding-dashboard/parcel-size",
+        locationSplit: "/landholding-dashboard/location-split",
+        utilisationSplit: "/landholding-dashboard/utilisation-split",
+        usagePurpose: "/landholding-dashboard/usage-purpose",
+        landIdleSankey: "/landholding-dashboard/land-idle-sankey",
+        purchaseTimeline: "/landholding-dashboard/purchase-timeline",
+        declarationVsUse:
+            "/landholding-dashboard/landholding-declaration-vs-use",
+    },
+    housing: {
+        renovationUrgency: "/housing-dashboard/renovation-urgency",
+        housingType: "/housing-dashboard/housing-type",
+        unitFloorData: "/housing-dashboard/unit-floor-data",
+        builtRenovated: "/housing-dashboard/built-renovated",
+        amenities: "/housing-dashboard/amenities",
+        amenitiesHeatmap: "/housing-dashboard/amenities-heatmap",
+        equipmentData: "/housing-dashboard/equipment-data",
+        expansionDemand: "/housing-dashboard/expansion-demand",
+        renovationDemand: "/housing-dashboard/renovation-demand",
+    },
+    water: {
+        waterConsumption: "/water-dashboard/water-consumption",
+        waterSources: "/water-dashboard/water-sources",
+        sourceQuality: "/water-dashboard/source-quality",
+        sourceExpense: "/water-dashboard/source-expense",
+        harvestingCapacity: "/water-dashboard/harvesting-capacity",
+        wasteDisposal: "/water-dashboard/waste-disposal",
+        wasteRecycle: "/water-dashboard/waste-recycle",
+        wasteScarcity: "/water-dashboard/waste-scarcity",
+        wasteMeter: "/water-dashboard/waste-meter",
+    },
+    energy: {
+        gridAccess: "/energy-dashboard/grid-access",
+        kwhConsumption: "/energy-dashboard/kwh-consumption",
+        spendVsConsumption: "/energy-dashboard/spend-consumption",
+        fuelType: "/energy-dashboard/fuel-type",
+        otherFuels: "/energy-dashboard/other-fuels",
+        microGridUsage: "/energy-dashboard/micro-grid-usage",
+        renewableShare: "/energy-dashboard/renewable-share",
+        energyPerCapita: "/energy-dashboard/energy-per-capita",
+    },
+    mobility: {
+        vehicleTypeDistribution:
+            "/mobility-dashboard/vehicle-type-distribution",
+        travelDistanceSplit: "/mobility-dashboard/travel-distance-split",
+        usagePurpose: "/mobility-dashboard/usage-purpose",
+        usageFrequency: "/mobility-dashboard/usage-frequency",
+        vehicleRequirement: "/mobility-dashboard/vehicle-requirement",
+        vehicleUrgency: "/mobility-dashboard/vehicle-urgency",
+        vehiclePerHousehold: "/mobility-dashboard/vehicle-per-hh",
+        mobilityGap: "/mobility-dashboard/mobility-gap",
+    },
+    forestry: {
+        forestAreaByVillage: "/forestry-dashboard/forest-area-by-village",
+        timberSplit: "/forestry-dashboard/timber-split",
+        otherProduce: "/forestry-dashboard/other-produce",
+        timberRequirement: "/forestry-dashboard/timber-requirement",
+        purposeCloud: "/forestry-dashboard/purpose-cloud",
+        timberNeedHarvested: "/forestry-dashboard/timber-need-harvested",
+    },
+    personal: {
+        personalExpense: "/personal-dashboard/personal-expense",
+        localStacked: "/personal-dashboard/local-stacked",
+        localMarket: "/personal-dashboard/local-market",
+        localProduceShare: "/personal-dashboard/local-produce-share",
+    },
+    commercial: {
+        businessTypeDistribution:
+            "/commercial-dashboard/business-type-distribution",
+        businessStarted: "/commercial-dashboard/business-started",
+        legalStructure: "/commercial-dashboard/legal-structure",
+        investmentIncome: "/commercial-dashboard/investment-income",
+        manpowerSource: "/commercial-dashboard/manpower-source",
+        resourceConsumption: "/commercial-dashboard/resource-consumption",
+        supportNeed: "/commercial-dashboard/support-need",
+        businessDetails: "/commercial-dashboard/business-details",
+    },
     user: {
         list_all: "/user/list-all",
         download: "/user/download-pdf",
@@ -257,5 +351,65 @@ export const endpoints = {
         landholding: "/landholding-officer-dropdown",
         mobility: "/mobility-officer-dropdown",
         water: "/water-officer-dropdown",
+    },
+
+    countries: {
+        get: "/countries",
+        add: "/countries/add-country",
+        edit: "/countries/edit-country",
+        delete: "/countries/delete-country",
+    },
+
+    places: {
+        list: "/places",
+    },
+
+    team: {
+        list: "/admin/team",
+        assign: "/admin/assign",
+    },
+
+    // The villagers' questionnaire and the field officers' share every
+    // address here: a call says `audience: "officer"` for the second (see
+    // functions/questionnaire.js). The officer app's own endpoints
+    // (/officer/…) are not the dashboard's and are not listed.
+    questionnaire: {
+        // The editor screen: one payload for a whole questionnaire, and what
+        // acts on the changes waiting in it.
+        editor: "/questionnaire/editor",
+        // What one place changes about a question or category: whether it
+        // is asked there, its wording, its options.
+        overrides: "/questionnaire/overrides",
+        usage: "/questionnaire/usage",
+        publish: "/questionnaire/publish",
+        discard: "/questionnaire/discard",
+        history: "/questionnaire/history",
+        // Takes back the latest published change, and only that one.
+        undo: "/questionnaire/undo",
+        categories: {
+            get: "/categories",
+            add: "/categories/add-category",
+            edit: "/categories/edit-category",
+            reparent: "/categories/reparent",
+            reorder: "/categories/reorder",
+            delete: "/categories/delete-category",
+        },
+        questions: {
+            add: "/questions/add-question",
+            edit: "/questions/edit-question",
+            toggle: "/questions/toggle-active",
+            reorder: "/questions/reorder",
+            move: "/questions/move",
+            arrange: "/questions/arrange",
+            delete: "/questions/delete-question",
+        },
+        responses: {
+            list: "/responses",
+            rows: "/responses/rows",
+            stats: "/responses/stats",
+        },
+        // One photo or recording of an answer: its id follows. Served only
+        // to an account that may see the response holding it.
+        file: "/files/admin",
     },
 };

@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import "./sidebar.css";
-import {
-    Link,
-    useLocation,
-    useNavigate,
-    useSearchParams,
-} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../../assets/logo.png";
+import { landingFor } from "../AuthProvider/AuthProvider";
 
 export default function Sidebar({ role }) {
     const location = useLocation();
-    const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const paths = location.pathname.split("/");
-    const [searchParams] = useSearchParams();
+    // The questionnaire links are told by where an address starts, not by a
+    // word found anywhere in it: /officer/responses is not
+    // /questionnaire/responses. A page under a link's own (one file of a
+    // response) still lights it.
+    const at = (address) =>
+        location.pathname === address ||
+        location.pathname.startsWith(`${address}/`);
 
     const [productionMenu, setproductionMenu] = useState(
         paths.includes("production") && !paths.includes("dashboard") && true
@@ -20,20 +23,100 @@ export default function Sidebar({ role }) {
     const [consumtionMenu, setconsumtionMenu] = useState(
         paths.includes("consumption") && !paths.includes("dashboard") && true
     );
-    const [cropsMenu, setcropsMenu] = useState(paths.includes("crops") && true);
     const [dashboardMenu, setdashboardMenu] = useState(
         paths.includes("dashboard") && true
     );
+    const [questionnaireMenu, setquestionnaireMenu] = useState(
+        at("/questionnaire")
+    );
+    const [officerMenu, setofficerMenu] = useState(at("/officer"));
+
+    // A regional team gets its own short menu; the full one below is left as
+    // it was for admin and viewer.
+    if (role === "regional") {
+        return (
+            <div className="sidebar">
+                <div className="logo">
+                    <img src={logo} alt="" />
+                    {/* <h1>OMNI VILLAGE</h1> */}
+                </div>
+                <Link
+                    // Its own place's questionnaire: where it also lands.
+                    to={landingFor(
+                        JSON.parse(localStorage.getItem("user") || "{}")
+                    )}
+                    className={
+                        at("/questionnaire/place") ? "link active" : "link"
+                    }
+                >
+                    <i className="fa-solid fa-clipboard-question"></i>
+                    <p>Questionnaire</p>
+                </Link>
+                <Link
+                    to="/questionnaire/responses"
+                    className={
+                        at("/questionnaire/responses") ? "link active" : "link"
+                    }
+                >
+                    <i className="fa-solid fa-table-list"></i>
+                    <p>Responses</p>
+                </Link>
+                <Link
+                    // What the field officers of its villages saved. Their
+                    // questions are the super admin's to write.
+                    to="/officer/responses"
+                    className={
+                        at("/officer/responses") ? "link active" : "link"
+                    }
+                >
+                    <i className="fa-solid fa-clipboard-list"></i>
+                    <p>Officer responses</p>
+                </Link>
+                <Link
+                    to="/login"
+                    onClick={() => {
+                        localStorage.clear();
+                        // The next account in this tab starts with nothing cached.
+                        queryClient.clear();
+                    }}
+                    className="link"
+                >
+                    <i className="fa-solid fa-power-off"></i>
+                    <p>Logout</p>
+                </Link>
+                <p
+                    style={{
+                        padding: "14px 10px",
+                        fontSize: "12px",
+                        lineHeight: 1.5,
+                        color: "#666",
+                    }}
+                >
+                    A regional team sees only these pages, and only for its own place.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="sidebar">
             <div className="logo">
                 <img src={logo} alt="" />
-                <h1>OMNI VILLAGE</h1>
+                {/* <h1>OMNI VILLAGE</h1> */}
             </div>
             <Link
+                to="/chat"
+                className={paths.includes("chat") ? "link active" : "link"}
+            >
+                <i className="fa-solid fa-robot"></i>
+                <p>Ask Me</p>
+            </Link>
+            <Link
                 // to="/dashboard"
-                onClick={() => setdashboardMenu(!dashboardMenu)}
+                onClick={(event) => {
+                    event.preventDefault();
+                    setdashboardMenu(!dashboardMenu);
+                }}
                 className={paths.includes("dashboard") ? "link active" : "link"}
             >
                 <i className="fa-solid fa-chart-line"></i>
@@ -49,6 +132,14 @@ export default function Sidebar({ role }) {
             {dashboardMenu && (
                 <div className="menu">
                     <Link
+                        to="/dashboard/overview"
+                        className={
+                            paths.includes("overview") ? "link active" : "link"
+                        }
+                    >
+                        <p>Overview</p>
+                    </Link>
+                    <Link
                         to={`/dashboard/production`}
                         className={
                             paths.includes("production")
@@ -56,7 +147,7 @@ export default function Sidebar({ role }) {
                                 : "link"
                         }
                     >
-                        Production
+                        Food (Production)
                     </Link>
                     <Link
                         to={`/dashboard/consumption`}
@@ -66,9 +157,9 @@ export default function Sidebar({ role }) {
                                 : "link"
                         }
                     >
-                        Consumption
+                        Food (Consumption)
                     </Link>
-                    <Link
+                    {/* <Link
                         to={`/dashboard/food-balance`}
                         className={
                             paths.includes("food-balance")
@@ -77,6 +168,78 @@ export default function Sidebar({ role }) {
                         }
                     >
                         Food Balance
+                    </Link> */}
+                    <Link
+                        to={`/dashboard/demographics`}
+                        className={
+                            paths.includes("demographics") ? "link active" : "link"
+                        }
+                    >
+                        Demographics
+                    </Link>
+                    <Link
+                        to={`/dashboard/landholdings`}
+                        className={
+                            paths.includes("landholdings") ? "link active" : "link"
+                        }
+                    >
+                        Landholdings
+                    </Link>
+                    <Link
+                        to={`/dashboard/water`}
+                        className={
+                            paths.includes("water") ? "link active" : "link"
+                        }
+                    >
+                        Water
+                    </Link>
+                    <Link
+                        to={`/dashboard/housing`}
+                        className={
+                            paths.includes("housing") ? "link active" : "link"
+                        }
+                    >
+                        Housing
+                    </Link>
+                    <Link
+                        to={`/dashboard/energy`}
+                        className={
+                            paths.includes("energy") ? "link active" : "link"
+                        }
+                    >
+                        Energy & Fuel
+                    </Link>
+                    <Link
+                        to={`/dashboard/forestry`}
+                        className={
+                            paths.includes("forestry") ? "link active" : "link"
+                        }
+                    >
+                        Forestry and Timber
+                    </Link>
+                    <Link
+                        to={`/dashboard/mobility`}
+                        className={
+                            paths.includes("mobility") ? "link active" : "link"
+                        }
+                    >
+                        Mobility
+                    </Link>
+                    <Link
+                        to={`/dashboard/personal`}
+                        className={
+                            paths.includes("personal") ? "link active" : "link"
+                        }
+                    >
+                        Other Personal & Household items
+                    </Link>
+                    <Link
+                        to={`/dashboard/business`}
+                        className={
+                            paths.includes("business") ? "link active" : "link"
+                        }
+                    >
+                        Business & Commercial Establishments/ Organizations
                     </Link>
                 </div>
             )}
@@ -89,7 +252,10 @@ export default function Sidebar({ role }) {
                                 ? "link active"
                                 : "link"
                         }
-                        onClick={() => setproductionMenu(!productionMenu)}
+                        onClick={(event) => {
+                    event.preventDefault();
+                    setproductionMenu(!productionMenu);
+                }}
                         // to="/production"
                     >
                         <i className="fa-solid fa-seedling"></i>
@@ -171,7 +337,10 @@ export default function Sidebar({ role }) {
                         </div>
                     )}
                     <Link
-                        onClick={() => setconsumtionMenu(!consumtionMenu)}
+                        onClick={(event) => {
+                    event.preventDefault();
+                    setconsumtionMenu(!consumtionMenu);
+                }}
                         className={
                             paths.includes("consumption") &&
                             !paths.includes("dashboard")
@@ -300,6 +469,121 @@ export default function Sidebar({ role }) {
                         </div>
                     )}
                     <Link
+                        onClick={(event) => {
+                    event.preventDefault();
+                    setquestionnaireMenu(!questionnaireMenu);
+                }}
+                        className={
+                            at("/questionnaire") ? "link active" : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-clipboard-question"></i>
+                        <p>Questionnaire</p>
+                        <span>
+                            {questionnaireMenu ? (
+                                <i className="fa-solid fa-minus"></i>
+                            ) : (
+                                <i className="fa-solid fa-plus"></i>
+                            )}
+                        </span>
+                    </Link>
+                    {questionnaireMenu && (
+                        <div className="menu">
+                            <Link
+                                to="/questionnaire/master"
+                                className={
+                                    at("/questionnaire/master")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Master questionnaire
+                            </Link>
+                            <Link
+                                to="/questionnaire/regional"
+                                className={
+                                    at("/questionnaire/regional")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Regional questionnaires
+                            </Link>
+                            <Link
+                                to="/questionnaire/responses"
+                                className={
+                                    at("/questionnaire/responses")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Responses
+                            </Link>
+                        </div>
+                    )}
+                    <Link
+                        onClick={(event) => {
+                            event.preventDefault();
+                            setofficerMenu(!officerMenu);
+                        }}
+                        className={at("/officer") ? "link active" : "link"}
+                    >
+                        <i className="fa-solid fa-clipboard-list"></i>
+                        {/* The longest name in the menu: should it break
+                            beside the icon and the +, its two lines stay
+                            inside the row. */}
+                        <p style={{ lineHeight: 1.2 }}>Officer questionnaire</p>
+                        <span>
+                            {officerMenu ? (
+                                <i className="fa-solid fa-minus"></i>
+                            ) : (
+                                <i className="fa-solid fa-plus"></i>
+                            )}
+                        </span>
+                    </Link>
+                    {officerMenu && (
+                        <div className="menu">
+                            <Link
+                                to="/officer/questionnaire"
+                                className={
+                                    at("/officer/questionnaire")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Questions
+                            </Link>
+                            <Link
+                                to="/officer/responses"
+                                className={
+                                    at("/officer/responses")
+                                        ? "link active"
+                                        : "link"
+                                }
+                            >
+                                Responses
+                            </Link>
+                        </div>
+                    )}
+                    <Link
+                        to="/locations"
+                        className={
+                            paths.includes("locations") ? "link active" : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-location-dot"></i>
+                        <p>Locations</p>
+                    </Link>
+                    <Link
+                        to="/people"
+                        className={
+                            paths.includes("people") ? "link active" : "link"
+                        }
+                    >
+                        <i className="fa-solid fa-user-shield"></i>
+                        <p>People</p>
+                    </Link>
+                    <Link
                         to="/users"
                         className={
                             paths.includes("users") ? "link active" : "link"
@@ -363,6 +647,8 @@ export default function Sidebar({ role }) {
                 to="/login"
                 onClick={() => {
                     localStorage.clear();
+                        // The next account in this tab starts with nothing cached.
+                        queryClient.clear();
                 }}
                 style={{ marginTop: "auto" }}
                 className="link"

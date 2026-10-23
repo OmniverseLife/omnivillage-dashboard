@@ -80,3 +80,29 @@ export const getAllCrops = async (country) => {
   });
   return res.data;
 };
+
+/* ---------------- countries (questionnaire targeting + village linkage) ---------------- */
+
+export const fetchCountries = async (activeOnly = false) => {
+  const res = await axiosInstance.get(endpoints.countries.get, {
+    params: { active: activeOnly ? "true" : undefined },
+  });
+  return res.data;
+};
+
+export const addCountry = async (body) => {
+  const res = await axiosInstance.post(endpoints.countries.add, body);
+  return res.data;
+};
+
+export const editCountry = async (body) => {
+  const res = await axiosInstance.put(endpoints.countries.edit, body);
+  return res.data;
+};
+
+export const deleteCountry = async (id) => {
+  const res = await axiosInstance.delete(endpoints.countries.delete, {
+    params: { id },
+  });
+  return res.data;
+};

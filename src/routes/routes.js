@@ -2,6 +2,64 @@ import { lazy } from "react";
 
 export const routes = [
     {
+        // A regional team that comes here is sent on to its own place.
+        path: "/questionnaire/master",
+        Component: lazy(() => import("../layout/pages/questionnaire/editor")),
+        role: "admin,regional",
+    },
+    {
+        path: "/questionnaire/place/:placeId",
+        Component: lazy(() => import("../layout/pages/questionnaire/editor")),
+        role: "admin,regional",
+    },
+    {
+        // Every place beside the Master: a super admin's overview.
+        path: "/questionnaire/regional",
+        Component: lazy(() => import("../layout/pages/questionnaire/regional")),
+        role: "admin",
+    },
+    {
+        path: "/questionnaire/responses",
+        Component: lazy(() => import("../layout/pages/questionnaire/responses")),
+        role: "admin,regional",
+    },
+    {
+        // One photo or recording of an answer: where a link in Responses,
+        // or in a file exported from it, leads.
+        path: "/questionnaire/responses/file/:fileId",
+        Component: lazy(() => import("../layout/pages/questionnaire/file")),
+        role: "admin,regional",
+    },
+    {
+        // The questionnaire field officers answer about their villages: the
+        // same editor on a tree of its own. No place changes it, so it has
+        // the Master's screen and no other. Not under /questionnaire: the
+        // menu tells its links apart by where an address starts.
+        path: "/officer/questionnaire",
+        Component: lazy(() =>
+            import("../layout/pages/questionnaire/officerEditor")
+        ),
+        role: "admin",
+    },
+    {
+        // What the officers saved, by place: a regional team for its own.
+        path: "/officer/responses",
+        Component: lazy(() =>
+            import("../layout/pages/questionnaire/officerResponses")
+        ),
+        role: "admin,regional",
+    },
+    {
+        path: "/locations",
+        Component: lazy(() => import("../layout/pages/questionnaire/locations")),
+        role: "admin",
+    },
+    {
+        path: "/people",
+        Component: lazy(() => import("../layout/pages/questionnaire/people")),
+        role: "admin",
+    },
+    {
         path: "/users",
         Component: lazy(() => import("../layout/pages/users/users")),
         role: "admin",
@@ -137,6 +195,79 @@ export const routes = [
     {
         path: "/dashboard/food-balance",
         Component: lazy(() => import("../layout/pages/dashboard/foodBalance")),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/demographics",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Demographics/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/landholdings",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Landholdings/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/housing",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Housing/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/water",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Water/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/energy",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Energy/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/forestry",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Forestry/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/chat",
+        Component: lazy(() => import("../layout/pages/chat/Chat")),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/overview",
+        Component: lazy(() => import("../layout/pages/OverviewPage")),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/mobility",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Mobility/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/personal",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Personal/Dashboard")
+        ),
+        role: "viewer,admin",
+    },
+    {
+        path: "/dashboard/business",
+        Component: lazy(() =>
+            import("../layout/pages/dashboard/Business/Dashboard")
+        ),
         role: "viewer,admin",
     },
     {

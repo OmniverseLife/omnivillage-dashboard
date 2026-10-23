@@ -1,0 +1,126 @@
+[
+  {
+    "category": "General Village Overview",
+    "question": "What is the **grid access percentage** in Rukha village?"
+  },
+  {
+    "category": "Energy Overview",
+    "question": "Provide an overview of the **main energy sources** used in Rukha village and their percentages."
+  },
+  {
+    "category": "Energy Overview",
+    "question": "What is the **total energy consumption** in Rukha village, and is any of it **renewable**?"
+  },
+  {
+    "category": "Energy Specifics",
+    "question": "Which energy source has the **highest count of users** in Rukha village?"
+  },
+  {
+    "category": "Transportation Overview",
+    "question": "Summarize the **types and counts of vehicles** currently present in Rukha village."
+  },
+  {
+    "category": "Transportation Overview",
+    "question": "What are the **total distances travelled** by vehicles both within and outside Rukha village?"
+  },
+  {
+    "category": "Transportation Specifics",
+    "question": "What are the **main purposes for travel** by residents in Rukha village, and their associated distances?"
+  },
+  {
+    "category": "Transportation Specifics",
+    "question": "List the **vehicle requirements** identified for Rukha village by type and count."
+  },
+  {
+    "category": "Demographics: Marital Status",
+    "question": "Provide a summary of the **marital status counts** in Rukha village."
+  },
+  {
+    "category": "Demographics: Marital Status",
+    "question": "How many individuals in Rukha village are **married** versus **single**?"
+  },
+  {
+    "category": "Health: Diet",
+    "question": "Describe the **dietary habits** of females in Rukha village by type and share."
+  },
+  {
+    "category": "Health: Diet",
+    "question": "Describe the **dietary habits** of males in Rukha village by type and share."
+  },
+  {
+    "category": "Health: Chronic Disease",
+    "question": "What are the **most prevalent chronic diseases** in Rukha village, and their prevalence percentages?"
+  },
+  {
+    "category": "Health: Chronic Disease",
+    "question": "How many members in Rukha village report **no chronic disease**?"
+  },
+  {
+    "category": "Socio-Economics: Income",
+    "question": "Summarize the **income ranges for females** in Rukha village, including counts for each range."
+  },
+  {
+    "category": "Socio-Economics: Income",
+    "question": "Summarize the **income ranges for males** in Rukha village, including counts for each range."
+  },
+  {
+    "category": "Socio-Economics: Income",
+    "question": "How many males in Rukha village report an **income above Nu. 20,00,000**?"
+  },
+  {
+    "category": "Health: Motor Disability",
+    "question": "Provide an overview of **motor disability prevalence among females** in Rukha village."
+  },
+  {
+    "category": "Health: Motor Disability",
+    "question": "Provide an overview of **motor disability prevalence among males** in Rukha village."
+  },
+  {
+    "category": "Occupation",
+    "question": "What are the **primary occupations** of residents in Rukha village and their counts?"
+  },
+  {
+    "category": "Financial Status",
+    "question": "Summarize the **financial indicators** for Rukha village, including bank account percentage, savings percentage, and average savings amount."
+  },
+  {
+    "category": "Financial Status",
+    "question": "What percentage of households in Rukha village have a **bank account** versus **savings**?"
+  },
+  {
+    "category": "Land Utilization Overview",
+    "question": "Provide an overview of **land utilization statistics** in Rukha village, including utilized and unutilized areas."
+  },
+  {
+    "category": "Land Utilization Overview",
+    "question": "Describe the **main types of land use** in Rukha village and their associated areas."
+  },
+  {
+    "category": "Land Utilization Specifics",
+    "question": "What is the **total area used for farming** (subsistence, organic, horticulture) in Rukha village?"
+  },
+  {
+    "category": "Housing Overview",
+    "question": "Summarize the **types of housing** present in Rukha village and their counts."
+  },
+  {
+    "category": "Housing Overview",
+    "question": "Provide an overview of the **most common amenities** in households in Rukha village."
+  },
+  {
+    "category": "Housing Specifics",
+    "question": "How many households in Rukha village have **refrigerators** and **gas stoves/induction cooktops**?"
+  },
+  {
+    "category": "Water Sources Overview",
+    "question": "List the **main water sources** in Rukha village and their counts."
+  },
+  {
+    "category": "Water Sources Overview",
+    "question": "Provide a summary of the **water quality** for the primary water sources in Rukha village."
+  },
+  {
+    "category": "Water Sources Specifics",
+    "question": "How many **springs** in Rukha village are categorized as **potable (safe)**?"
+  }
+]

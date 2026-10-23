@@ -114,7 +114,12 @@ function Production() {
 
     useEffect(() => {
         if (searchParams.get("option") === "harvested-products") {
+            // A product is chosen once its crop is known: tested the other
+            // way round, the first crop was never selected and the page
+            // opened empty with product=undefined in the address.
             if (
+                searchParams.get("crop") &&
+                searchParams.get("crop") !== "undefined" &&
                 (!searchParams.get("product") ||
                     searchParams.get("product") === "undefined") &&
                 !isNamesLoading

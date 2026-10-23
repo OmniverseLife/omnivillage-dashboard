@@ -103,6 +103,12 @@ export default function Login() {
     onSuccess: () => {
       toast.success("Reset email sent successfully!"), navigate("/login");
     },
+    onError: (err) =>
+      toast.error(
+        err?.response?.data?.message ||
+          Object.values(err?.response?.data || {})[0] ||
+          "Could not send the reset email"
+      ),
   });
 
   return (
