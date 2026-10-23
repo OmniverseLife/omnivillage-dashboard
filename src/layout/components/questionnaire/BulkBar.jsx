@@ -15,8 +15,8 @@ import { IconChevronDown } from "@tabler/icons-react";
  * moves what is ticked, to the places in `pages`, each with the `group` it
  * is listed under.
  *
- * `compact` is the bar over the category tree, under 300 pixels wide,
- * which moves ticked categories the same way.
+ * `compact` is the bar over the category tree, a narrow pane, which moves
+ * ticked categories the same way.
  */
 export default function BulkBar({
     count,

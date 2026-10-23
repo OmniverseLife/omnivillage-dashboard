@@ -291,8 +291,10 @@ export default function CategoryTree({
             // still fits on one line beside its menu button.
             p={8}
             style={{
-                // The Master's rows also hold a tick box.
-                width: master ? 284 : 260,
+                // Wider in the Master, whose rows also hold a tick box: with
+                // the window, so a long title stays on one line on a wide
+                // screen and the questions keep their room on a small one.
+                width: master ? "clamp(300px, 25vw, 380px)" : 260,
                 flexShrink: 0,
                 // Stays in view beside a long page of questions, and scrolls
                 // on its own when it is itself taller than the window.
